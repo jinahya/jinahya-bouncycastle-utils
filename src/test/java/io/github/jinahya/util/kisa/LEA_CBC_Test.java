@@ -1,8 +1,8 @@
 package io.github.jinahya.util.kisa;
 
-import io.github.jinahya.util._TestUtils;
 import io.github.jinahya.util.bouncycastle.crypto.JinahyaCipherParametersUtils;
 import io.github.jinahya.util.bouncycastle.crypto._BufferedBlockCipherTestUtils;
+import io.github.jinahya.util.bouncycastle.crypto._CipherParametersTestUtils;
 import io.github.jinahya.util.bouncycastle.crypto.padding._BlockCipherPaddingTestUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -33,8 +33,8 @@ class LEA_CBC_Test
                 final var cipher = new PaddedBufferedBlockCipher(CBCBlockCipher.newInstance(engine), p);
                 final var params = JinahyaCipherParametersUtils.newRandomParametersWithIV(null, ks, cipher);
                 return Arguments.of(
-                        Named.of(_TestUtils.cipherName(cipher, p), cipher),
-                        Named.of(_TestUtils.paramsName(params), params)
+                        Named.of(_BufferedBlockCipherTestUtils.cipherName(cipher, p), cipher),
+                        Named.of(_CipherParametersTestUtils.paramsName(params), params)
                 );
             });
         });
