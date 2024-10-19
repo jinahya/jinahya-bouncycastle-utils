@@ -11,11 +11,24 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public final class _StreamCipherTestUtils {
 
+    public static String cipherName(final StreamCipher cipher) {
+        return Objects.requireNonNull(cipher, "cipher is null").getAlgorithmName();
+    }
+
+//    public static String cipherName(final StreamCipher cipher, final BlockCipherPadding padding) {
+//        return _BlockCipherTestUtils.cipherName(
+//                Objects.requireNonNull(cipher, "cipher is null").getUnderlyingCipher(),
+//                padding
+//        );
+//    }
+
+    // -----------------------------------------------------------------------------------------------------------------
     private static void __(final StreamCipher cipher, final CipherParameters params, final byte[] plain) {
         // ----------------------------------------------------------------------------------------------------- encrypt
         cipher.init(true, params);
