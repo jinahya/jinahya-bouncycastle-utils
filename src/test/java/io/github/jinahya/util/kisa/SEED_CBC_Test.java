@@ -1,9 +1,9 @@
-package io.github.jinahya.bouncycastle.util.kisa;
+package io.github.jinahya.util.kisa;
 
-import io.github.jinahya.bouncycastle.util._BouncyCastleTestUtils;
-import io.github.jinahya.bouncycastle.util._BufferedBlockCipherTestUtils;
-import io.github.jinahya.bouncycastle.util._TestUtils;
+import io.github.jinahya.util._TestUtils;
 import io.github.jinahya.util.bouncycastle.crypto.JinahyaCipherParametersUtils;
+import io.github.jinahya.util.bouncycastle.crypto._BufferedBlockCipherTestUtils;
+import io.github.jinahya.util.bouncycastle.crypto.padding._BlockCipherPaddingTestUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.engines.SEEDEngine;
@@ -25,13 +25,13 @@ class SEED_CBC_Test
 
     private static Stream<Arguments> getargumentsstream() {
         return getKeySizeStream().mapToObj(ks -> {
-            return _BouncyCastleTestUtils.getBlockCipherPaddingStream().map(p -> {
+            return _BlockCipherPaddingTestUtils.getBlockCipherPaddingStream().map(p -> {
                 final var engine = new SEEDEngine();
                 final var cipher = new PaddedBufferedBlockCipher(CBCBlockCipher.newInstance(engine), p);
                 final var params = JinahyaCipherParametersUtils.newRandomParametersWithIV(null, ks, cipher);
                 return Arguments.of(
                         Named.of(_TestUtils.cipherName(cipher, p), cipher),
-                        Named.of(_TestUtils.keyName(params), params)
+                        Named.of(_TestUtils.paramsName(params), params)
                 );
             });
         }).flatMap(Function.identity());

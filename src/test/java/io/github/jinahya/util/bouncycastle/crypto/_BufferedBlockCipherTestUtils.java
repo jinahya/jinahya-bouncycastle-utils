@@ -1,56 +1,37 @@
-package io.github.jinahya.bouncycastle.util.kisa;
+package io.github.jinahya.util.bouncycastle.crypto;
 
-import io.github.jinahya.bouncycastle.util._LogUtils;
-import io.github.jinahya.bouncycastle.util._RandomTestUtils;
-import io.github.jinahya.bouncycastle.util._TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto.JinahyaBufferedBlockCipherUtils;
-import io.github.jinahya.util.bouncycastle.crypto.JinahyaCipherParametersUtils;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import io.github.jinahya.util._LogUtils;
+import io.github.jinahya.util._RandomTestUtils;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
-import org.bouncycastle.crypto.engines.LEAEngine;
-import org.bouncycastle.crypto.modes.CTSBlockCipher;
-import org.junit.jupiter.api.Named;
-import org.junit.jupiter.api.io.TempDir;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.bouncycastle.crypto.paddings.BlockCipherPadding;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.security.MessageDigest;
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@NoArgsConstructor(access = AccessLevel.PACKAGE)
-@Slf4j
-class LEA_CTS_Test
-        extends LEA__Test {
+public final class _BufferedBlockCipherTestUtils {
 
-    private static Stream<Arguments> getArgumentsStream() {
-        return getKeySizeStream().mapToObj(ks -> {
-            final var engine = new LEAEngine();
-            final var cipher = new CTSBlockCipher(engine);
-            final var params = JinahyaCipherParametersUtils.newRandomKeyParameter(null, ks);
-            return Arguments.of(
-                    Named.of(_TestUtils.cipherName(cipher), cipher),
-                    Named.of(_TestUtils.keyName(params), params)
-            );
-        });
+    public static String cipherName(final BufferedBlockCipher cipher) {
+        return _BlockCipherTestUtils.cipherName(Objects.requireNonNull(cipher, "cipher is null").getUnderlyingCipher());
     }
 
-    @MethodSource({"getArgumentsStream"})
-    @ParameterizedTest
-    void __(final BufferedBlockCipher cipher, final CipherParameters params) throws Exception {
-        // ------------------------------------------------------------------------------------------------------- plain
-        final var plain = new byte[ThreadLocalRandom.current().nextInt(16) + cipher.getBlockSize()];
-        ThreadLocalRandom.current().nextBytes(plain);
+    public static String cipherName(final BufferedBlockCipher cipher, final BlockCipherPadding padding) {
+        return _BlockCipherTestUtils.cipherName(
+                Objects.requireNonNull(cipher, "cipher is null").getUnderlyingCipher(),
+                padding
+        );
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    public static void __(final BufferedBlockCipher cipher, final CipherParameters params, final byte[] plain)
+            throws Exception {
         // ----------------------------------------------------------------------------------------------------- encrypt
         cipher.init(true, params);
         final var encrypted = JinahyaBufferedBlockCipherUtils.processBytesAndDoFinal(cipher, plain);
@@ -62,13 +43,16 @@ class LEA_CTS_Test
         assertThat(decrypted).isEqualTo(plain);
     }
 
-    @MethodSource({"getArgumentsStream"})
-    @ParameterizedTest
-    void __(final BufferedBlockCipher cipher, final CipherParameters params, @TempDir final File dir)
+    public static void __(final BufferedBlockCipher cipher, final CipherParameters params) throws Exception {
+        __(cipher, params, new byte[0]); // empty
+        __(cipher, params, new byte[1]); // zero
+        __(cipher, params, _RandomTestUtils.newRandomBytes(1));
+        __(cipher, params, _RandomTestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(16)));
+    }
+
+    public static void __(final BufferedBlockCipher cipher, final CipherParameters params, final File dir,
+                          final File plain)
             throws Exception {
-        // -------------------------------------------------------------------------------------------------------- plain
-        final var plain = File.createTempFile("tmp", null, dir);
-        _RandomTestUtils.writeRandomBytesWhile(plain, f -> f.length() < cipher.getBlockSize());
         // ----------------------------------------------------------------------------------------------------- encrypt
         cipher.init(true, params);
         final var encrypted = File.createTempFile("tmp", null, dir);
@@ -92,5 +76,16 @@ class LEA_CTS_Test
             final var digest = MessageDigest.getInstance(algorithm);
             assertThat(decrypted).hasDigest(digest, DigestUtils.digest(digest, plain));
         }
+    }
+
+    public static void __(final BufferedBlockCipher cipher, final CipherParameters params, final File dir)
+            throws Exception {
+        __(cipher, params, dir, File.createTempFile("tmp", null, dir));
+        __(cipher, params, dir, _RandomTestUtils.writeRandomBytes(File.createTempFile("tmp", null, dir)));
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    private _BufferedBlockCipherTestUtils() {
+        throw new AssertionError("instantiation is not allowed");
     }
 }

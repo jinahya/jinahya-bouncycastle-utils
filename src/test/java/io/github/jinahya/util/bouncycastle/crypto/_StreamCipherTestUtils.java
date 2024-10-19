@@ -1,41 +1,41 @@
-package io.github.jinahya.bouncycastle.util;
+package io.github.jinahya.util.bouncycastle.crypto;
 
-import io.github.jinahya.util.bouncycastle.crypto.JinahyaBufferedBlockCipherUtils;
+import io.github.jinahya.util._LogUtils;
+import io.github.jinahya.util._RandomTestUtils;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
+import org.bouncycastle.crypto.StreamCipher;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.security.MessageDigest;
-import java.util.concurrent.ThreadLocalRandom;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public final class _BufferedBlockCipherTestUtils {
+public final class _StreamCipherTestUtils {
 
-    private static void __(final BufferedBlockCipher cipher, final CipherParameters params, final byte[] plain)
-            throws Exception {
+    private static void __(final StreamCipher cipher, final CipherParameters params, final byte[] plain) {
         // ----------------------------------------------------------------------------------------------------- encrypt
         cipher.init(true, params);
-        final var encrypted = JinahyaBufferedBlockCipherUtils.processBytesAndDoFinal(cipher, plain);
+        final var encrypted = JinahyaStreamCipherUtils.processBytes(cipher, plain);
         // ----------------------------------------------------------------------------------------------------- decrypt
         cipher.init(false, params);
-        final var decrypted = JinahyaBufferedBlockCipherUtils.processBytesAndDoFinal(cipher, encrypted);
+        final var decrypted = JinahyaStreamCipherUtils.processBytes(cipher, encrypted);
         // -------------------------------------------------------------------------------------------------------- then
         _LogUtils.log(plain, encrypted, decrypted);
         assertThat(decrypted).isEqualTo(plain);
     }
 
-    public static void __(final BufferedBlockCipher cipher, final CipherParameters params) throws Exception {
-        __(cipher, params, new byte[0]); // empty
-        __(cipher, params, new byte[1]); // zero
-        __(cipher, params, _RandomTestUtils.newRandomBytes(1));
-        __(cipher, params, _RandomTestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(16)));
+    public static void __(final StreamCipher cipher, final CipherParameters params) throws Exception {
+        _RandomTestUtils.getRandomBytesStream().forEach(b -> {
+            __(cipher, params, b);
+        });
     }
 
-    private static void __(final BufferedBlockCipher cipher, final CipherParameters params, final File dir,
+    // -----------------------------------------------------------------------------------------------------------------
+    private static void __(final StreamCipher cipher, final CipherParameters params, final File dir,
                            final File plain)
             throws Exception {
         // ----------------------------------------------------------------------------------------------------- encrypt
@@ -43,7 +43,7 @@ public final class _BufferedBlockCipherTestUtils {
         final var encrypted = File.createTempFile("tmp", null, dir);
         try (var source = new FileInputStream(plain);
              var target = new FileOutputStream(encrypted)) {
-            JinahyaBufferedBlockCipherUtils.processAllBytesAndDoFinal(cipher, source, target, 1);
+            JinahyaStreamCipherUtils.processAllBytes(cipher, source, target, 1);
             target.flush();
         }
         // ----------------------------------------------------------------------------------------------------- decrypt
@@ -51,7 +51,7 @@ public final class _BufferedBlockCipherTestUtils {
         final var decrypted = File.createTempFile("tmp", null, dir);
         try (var source = new FileInputStream(encrypted);
              var target = new FileOutputStream(decrypted)) {
-            JinahyaBufferedBlockCipherUtils.processAllBytesAndDoFinal(cipher, source, target, 1);
+            JinahyaStreamCipherUtils.processAllBytes(cipher, source, target, 1);
             target.flush();
         }
         // -------------------------------------------------------------------------------------------------------- then
@@ -63,13 +63,18 @@ public final class _BufferedBlockCipherTestUtils {
         }
     }
 
-    public static void __(final BufferedBlockCipher cipher, final CipherParameters params, final File dir)
-            throws Exception {
-        __(cipher, params, dir, File.createTempFile("tmp", null, dir));
-        __(cipher, params, dir, _RandomTestUtils.writeRandomBytes(File.createTempFile("tmp", null, dir)));
+    public static void __(final StreamCipher cipher, final CipherParameters params, final File dir) throws IOException {
+        _RandomTestUtils.getRandomFileStream(dir).forEach(f -> {
+            try {
+                __(cipher, params, dir, f);
+            } catch (final Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
-    private _BufferedBlockCipherTestUtils() {
+    // -----------------------------------------------------------------------------------------------------------------
+    private _StreamCipherTestUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

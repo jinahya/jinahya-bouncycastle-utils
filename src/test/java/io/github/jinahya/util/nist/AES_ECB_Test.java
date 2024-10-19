@@ -1,6 +1,9 @@
-package io.github.jinahya.bouncycastle.util;
+package io.github.jinahya.util.nist;
 
+import io.github.jinahya.util._TestUtils;
 import io.github.jinahya.util.bouncycastle.crypto.JinahyaCipherParametersUtils;
+import io.github.jinahya.util.bouncycastle.crypto._BufferedBlockCipherTestUtils;
+import io.github.jinahya.util.bouncycastle.crypto.padding._BlockCipherPaddingTestUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
@@ -20,14 +23,14 @@ class AES_ECB_Test
         extends AES__Test {
 
     private static Stream<Arguments> getArgumentsStream() {
-        return _BouncyCastleTestUtils.getBlockCipherPaddingStream().flatMap(p -> {
+        return _BlockCipherPaddingTestUtils.getBlockCipherPaddingStream().flatMap(p -> {
             return getKeySizeStream().mapToObj(ks -> {
                 final var engine = AESEngine.newInstance();
                 final var cipher = new PaddedBufferedBlockCipher(engine, p);
                 final var params = JinahyaCipherParametersUtils.newRandomKeyParameter(null, ks);
                 return Arguments.of(
                         Named.of(_TestUtils.cipherName(cipher, p), cipher),
-                        Named.of(_TestUtils.keyName(params), params)
+                        Named.of(_TestUtils.paramsName(params), params)
                 );
             });
         });

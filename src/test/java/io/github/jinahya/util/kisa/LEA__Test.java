@@ -1,4 +1,4 @@
-package io.github.jinahya.bouncycastle.util;
+package io.github.jinahya.util.kisa;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -8,7 +8,7 @@ import java.util.stream.IntStream;
 
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 @Slf4j
-abstract class AES__Test {
+abstract class LEA__Test {
 
     static IntStream getKeySizeStream() {
         return IntStream.of(

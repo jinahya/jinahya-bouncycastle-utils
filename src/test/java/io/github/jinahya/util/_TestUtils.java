@@ -1,4 +1,4 @@
-package io.github.jinahya.bouncycastle.util;
+package io.github.jinahya.util;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -25,7 +25,7 @@ public final class _TestUtils {
         return String.format("%1$s/%2$d", cipher.getAlgorithmName(), keysize);
     }
 
-    static String cipherName(final BlockCipher cipher) {
+    public static String cipherName(final BlockCipher cipher) {
         return cipherName(cipher, cipher.getBlockSize());
     }
 
@@ -37,7 +37,7 @@ public final class _TestUtils {
         return cipherName(Objects.requireNonNull(cipher, "cipher is null").getUnderlyingCipher());
     }
 
-    static String cipherName(final BlockCipher cipher, final BlockCipherPadding padding) {
+    public static String cipherName(final BlockCipher cipher, final BlockCipherPadding padding) {
         return String.format("%1$s/%2$s", cipher.getAlgorithmName(), padding.getPaddingName());
     }
 
@@ -52,13 +52,13 @@ public final class _TestUtils {
         return String.format("%1$d 0x%2$02X", key.length << 3, key[0]);
     }
 
-    public static String keyName(final CipherParameters parameters) {
+    public static String paramsName(final CipherParameters parameters) {
         Objects.requireNonNull(parameters, "parameters is null");
         if (parameters instanceof KeyParameter p) {
             return keyName(p.getKey());
         }
         if (parameters instanceof ParametersWithIV p) {
-            return keyName(p.getParameters());
+            return paramsName(p.getParameters());
         }
         throw new RuntimeException("failed to get key from " + parameters);
     }

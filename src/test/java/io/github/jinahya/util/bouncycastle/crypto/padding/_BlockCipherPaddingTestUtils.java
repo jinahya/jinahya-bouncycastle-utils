@@ -1,4 +1,4 @@
-package io.github.jinahya.bouncycastle.util;
+package io.github.jinahya.util.bouncycastle.crypto.padding;
 
 import org.bouncycastle.crypto.paddings.BlockCipherPadding;
 import org.bouncycastle.crypto.paddings.ISO10126d2Padding;
@@ -9,7 +9,7 @@ import org.bouncycastle.crypto.paddings.X923Padding;
 
 import java.util.stream.Stream;
 
-public final class _BouncyCastleTestUtils {
+public final class _BlockCipherPaddingTestUtils {
 
     /**
      * .
@@ -30,7 +30,7 @@ public final class _BouncyCastleTestUtils {
         );
     }
 
-    private _BouncyCastleTestUtils() {
+    private _BlockCipherPaddingTestUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

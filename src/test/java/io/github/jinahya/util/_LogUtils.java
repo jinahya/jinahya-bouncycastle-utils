@@ -1,4 +1,4 @@
-package io.github.jinahya.bouncycastle.util;
+package io.github.jinahya.util;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;

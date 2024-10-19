@@ -1,13 +1,17 @@
-package io.github.jinahya.bouncycastle.util.kisa;
+package io.github.jinahya.util.kisa;
 
-import io.github.jinahya.bouncycastle.util._BouncyCastleTestUtils;
-import io.github.jinahya.bouncycastle.util._BufferedBlockCipherTestUtils;
-import io.github.jinahya.bouncycastle.util._TestUtils;
+import io.github.jinahya.util._TestUtils;
 import io.github.jinahya.util.bouncycastle.crypto.JinahyaCipherParametersUtils;
+import io.github.jinahya.util.bouncycastle.crypto._BufferedBlockCipherTestUtils;
+import io.github.jinahya.util.bouncycastle.crypto._CipherParametersTestUtils;
+import io.github.jinahya.util.bouncycastle.crypto.padding._BlockCipherPaddingTestUtils;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
-import org.bouncycastle.crypto.engines.SEEDEngine;
+import org.bouncycastle.crypto.engines.ARIAEngine;
+import org.bouncycastle.crypto.modes.CBCBlockCipher;
 import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
 import org.junit.jupiter.api.Named;
 import org.junit.jupiter.api.io.TempDir;
@@ -16,25 +20,25 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.File;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
+@NoArgsConstructor(access = AccessLevel.PACKAGE)
 @Slf4j
-class SEED_ECB_Test
-        extends SEED__Test {
+class ARIA_CBC_Test
+        extends ARIA__Test {
 
     private static Stream<Arguments> getArgumentsStream() {
-        return getKeySizeStream().mapToObj(ks -> {
-            return _BouncyCastleTestUtils.getBlockCipherPaddingStream().map(p -> {
-                final var engine = new SEEDEngine();
-                final var cipher = new PaddedBufferedBlockCipher(engine, p);
-                final var params = JinahyaCipherParametersUtils.newRandomKeyParameter(null, ks);
+        return _BlockCipherPaddingTestUtils.getBlockCipherPaddingStream().flatMap(p -> {
+            return getKeySizeStream().mapToObj(ks -> {
+                final var engine = new ARIAEngine();
+                final var cipher = new PaddedBufferedBlockCipher(CBCBlockCipher.newInstance(engine), p);
+                final var params = JinahyaCipherParametersUtils.newRandomParametersWithIV(null, ks, cipher);
                 return Arguments.of(
                         Named.of(_TestUtils.cipherName(cipher, p), cipher),
-                        Named.of(_TestUtils.keyName(params), params)
+                        Named.of(_CipherParametersTestUtils.paramsName(params), params)
                 );
             });
-        }).flatMap(Function.identity());
+        });
     }
 
     // -----------------------------------------------------------------------------------------------------------------
