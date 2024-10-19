@@ -2,15 +2,14 @@ package io.github.jinahya.util.bouncycastle.crypto;
 
 import io.github.jinahya.util._LogUtils;
 import io.github.jinahya.util._RandomTestUtils;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.paddings.BlockCipherPadding;
 
+import _javax.security._MessageDigestTestUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.security.MessageDigest;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -72,10 +71,7 @@ public final class _BufferedBlockCipherTestUtils {
         // -------------------------------------------------------------------------------------------------------- then
         _LogUtils.log(plain, encrypted, decrypted);
         assertThat(decrypted).hasSize(plain.length());
-        for (var algorithm : new String[]{"SHA-1", "SHA-256"}) {
-            final var digest = MessageDigest.getInstance(algorithm);
-            assertThat(decrypted).hasDigest(digest, DigestUtils.digest(digest, plain));
-        }
+        _MessageDigestTestUtils.__(plain, decrypted);
     }
 
     public static void __(final BufferedBlockCipher cipher, final CipherParameters params, final File dir)
