@@ -33,7 +33,7 @@ public final class _RandomTestUtils {
         Objects.requireNonNull(tester, "tester is null");
         do {
             try (var stream = new FileOutputStream(file, true)) {
-                stream.write(newRandomBytes(ThreadLocalRandom.current().nextInt(1024)));
+                stream.write(newRandomBytes(ThreadLocalRandom.current().nextInt(8192)));
                 stream.flush();
             }
         } while (tester.test(file));

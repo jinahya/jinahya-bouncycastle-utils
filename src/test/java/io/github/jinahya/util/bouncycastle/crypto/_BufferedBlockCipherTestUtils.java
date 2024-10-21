@@ -46,7 +46,7 @@ public final class _BufferedBlockCipherTestUtils {
         __(cipher, params, new byte[0]); // empty
         __(cipher, params, new byte[1]); // single-zero
         __(cipher, params, _RandomTestUtils.newRandomBytes(1)); // single-random
-        __(cipher, params, _RandomTestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(16)));
+        __(cipher, params, _RandomTestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(1024)));
     }
 
     public static void __(final BufferedBlockCipher cipher, final CipherParameters params, final File dir,

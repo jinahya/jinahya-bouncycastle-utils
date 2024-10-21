@@ -39,18 +39,13 @@ public final class JinahyaBufferedBlockCipherUtils {
     private static byte[] processAllBytes(final BufferedBlockCipher cipher, final InputStream source,
                                           final OutputStream target, final byte[] in, byte[] out)
             throws IOException {
-        Objects.requireNonNull(cipher, "cipher is null");
-        Objects.requireNonNull(source, "source is null");
-        Objects.requireNonNull(target, "target is null");
-        if (Objects.requireNonNull(in, "in is null").length == 0) {
-            throw new IllegalArgumentException("in.length is zero");
-        }
-        if (Objects.requireNonNull(out, "out is null").length == 0) {
-            throw new IllegalArgumentException("out.length is zero");
-        }
-        int outputSize;
+        assert cipher != null : "cipher shouldn't be null";
+        assert source != null : "source shouldn't be null";
+        assert target != null : "target shouldn't be null";
+        assert out != null : "out shouldn't be null";
+        assert out.length > 0 : "out.length shouldn't be zero";
         for (int r; (r = source.read(in)) != -1; ) {
-            outputSize = cipher.getOutputSize(r);
+            final var outputSize = cipher.getOutputSize(r);
             if (out.length < outputSize) {
                 out = new byte[outputSize];
             }
@@ -78,7 +73,15 @@ public final class JinahyaBufferedBlockCipherUtils {
     private static byte[] processAllBytes(final BufferedBlockCipher cipher, final InputStream source,
                                           final OutputStream target, final byte[] in)
             throws IOException {
-        return processAllBytes(cipher, source, target, in, new byte[cipher.getOutputSize(in.length)]);
+        assert in != null;
+        assert in.length > 0 : "out.length shouldn't be zero";
+        return processAllBytes(
+                cipher,
+                source,
+                target,
+                in,
+                new byte[cipher.getOutputSize(in.length)]
+        );
     }
 
     /**
@@ -88,6 +91,7 @@ public final class JinahyaBufferedBlockCipherUtils {
      * @param cipher the cipher.
      * @param source the input stream from which bytes to process are read.
      * @param target the output stream to which processed bytes are written.
+     * @param <T>    cipher type parameter
      * @throws IOException if an I/O error occurs.
      * @see #processAllBytes(BufferedBlockCipher, InputStream, OutputStream, byte[])
      * @see BufferedBlockCipher#doFinal(byte[], int)
@@ -95,17 +99,22 @@ public final class JinahyaBufferedBlockCipherUtils {
      * href="https://downloads.bouncycastle.org/java/docs/bcprov-jdk18on-javadoc/org/bouncycastle/crypto/BufferedBlockCipher.html">org.bouncycastle.crypto.BufferedBlockCipher</a>
      * (bcprov-jdk18on-javadoc)
      */
-    public static void processAllBytesAndDoFinal(final BufferedBlockCipher cipher, final InputStream source,
-                                                 final OutputStream target)
+    public static <T extends BufferedBlockCipher> T processAllBytesAndDoFinal(final T cipher, final InputStream source,
+                                                                              final OutputStream target)
             throws IOException, InvalidCipherTextException {
+        Objects.requireNonNull(cipher, "cipher is null");
+        Objects.requireNonNull(source, "source is null");
+        Objects.requireNonNull(target, "target is null");
         for (var out = processAllBytes(cipher, source, target, new byte[cipher.getBlockSize()]); ; ) {
             try {
                 target.write(out, 0, cipher.doFinal(out, 0));
                 break;
             } catch (final DataLengthException dle) {
+                System.err.println("doubling up out.length from " + out.length);
                 out = new byte[out.length << 1];
             }
         }
+        return cipher;
     }
 
     // -----------------------------------------------------------------------------------------------------------------

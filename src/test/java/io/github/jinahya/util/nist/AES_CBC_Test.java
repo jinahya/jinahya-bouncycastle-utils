@@ -1,9 +1,7 @@
 package io.github.jinahya.util.nist;
 
 import io.github.jinahya.util._TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto.JinahyaCipherParametersUtils;
 import io.github.jinahya.util.bouncycastle.crypto._BufferedBlockCipherTestUtils;
-import io.github.jinahya.util.bouncycastle.crypto.padding._BlockCipherPaddingTestUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
@@ -19,24 +17,26 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.io.File;
 import java.util.stream.Stream;
 
+import static io.github.jinahya.util.bouncycastle.crypto.padding._BlockCipherPaddingTestUtils.getBlockCipherPaddingStream;
+import static io.github.jinahya.util.bouncycastle.crypto.params._ParametersWithIVTestUtils.newRandomInstanceOfParametersWithIV;
+
 @Slf4j
 class AES_CBC_Test
         extends AES__Test {
 
     private static Stream<Arguments> getArgumentsStream() {
-        return _BlockCipherPaddingTestUtils.getBlockCipherPaddingStream().flatMap(p -> {
-            return getKeySizeStream().mapToObj(ks -> {
-                final var engine = AESEngine.newInstance();
-                final var cipher = new PaddedBufferedBlockCipher(CBCBlockCipher.newInstance(engine), p);
-                final var params = JinahyaCipherParametersUtils.newRandomParametersWithIV(null, ks, cipher);
-                return Arguments.of(
-                        Named.of(_TestUtils.cipherName(cipher, p), cipher),
-                        Named.of(_TestUtils.paramsName(params), params)
-                );
-            });
-        });
+        return getBlockCipherPaddingStream().flatMap(p -> getKeySizeStream().mapToObj(ks -> {
+            final var engine = AESEngine.newInstance();
+            final var cipher = new PaddedBufferedBlockCipher(CBCBlockCipher.newInstance(engine), p);
+            final var params = newRandomInstanceOfParametersWithIV(null, ks, cipher);
+            return Arguments.of(
+                    Named.of(_TestUtils.cipherName(cipher, p), cipher),
+                    Named.of(_TestUtils.paramsName(params), params)
+            );
+        }));
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
     @MethodSource({"getArgumentsStream"})
     @ParameterizedTest
     void __(final BufferedBlockCipher cipher, final CipherParameters params) throws Exception {
@@ -45,8 +45,7 @@ class AES_CBC_Test
 
     @MethodSource({"getArgumentsStream"})
     @ParameterizedTest
-    void __(final BufferedBlockCipher cipher, final CipherParameters params, @TempDir final File dir)
-            throws Exception {
+    void __(final BufferedBlockCipher cipher, final CipherParameters params, @TempDir final File dir) throws Exception {
         _BufferedBlockCipherTestUtils.__(cipher, params, dir);
     }
 }

@@ -1,13 +1,12 @@
 package io.github.jinahya.util.kisa;
 
 import io.github.jinahya.util._TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto.JinahyaCipherParametersUtils;
 import io.github.jinahya.util.bouncycastle.crypto._StreamCipherTestUtils;
+import io.github.jinahya.util.bouncycastle.crypto.params._ParametersWithIVTestUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.CipherParameters;
-import org.bouncycastle.crypto.StreamBlockCipher;
 import org.bouncycastle.crypto.StreamCipher;
 import org.bouncycastle.crypto.engines.ARIAEngine;
 import org.bouncycastle.crypto.modes.OFBBlockCipher;
@@ -28,7 +27,7 @@ import java.util.stream.Stream;
 class ARIA_OFB_Test
         extends ARIA__Test {
 
-    private static IntStream getBlockSizeStream() {
+    private static IntStream getOFBBlockSizeStream() {
         return IntStream.of(
                 1,
                 8,
@@ -38,16 +37,16 @@ class ARIA_OFB_Test
     }
 
     private static Stream<Arguments> getArgumentsStream() {
-        return getKeySizeStream().mapToObj(ks -> getBlockSizeStream().mapToObj(bs -> {
+        return getKeySizeStream().mapToObj(ks -> getOFBBlockSizeStream().mapToObj(ofbbs -> {
             final var engine = new ARIAEngine();
             final OFBBlockCipher cipher;
             try {
-                cipher = new OFBBlockCipher(engine, bs);
+                cipher = new OFBBlockCipher(engine, ofbbs);
             } catch (final Exception e) {
-                log.error("failed to create with blockSize of {}", bs, e);
+                log.error("failed to create with OFBB-blockSize of {}", ofbbs, e);
                 return null;
             }
-            final var params = JinahyaCipherParametersUtils.newRandomParametersWithIV(null, ks, cipher);
+            final var params = _ParametersWithIVTestUtils.newRandomInstanceOfParametersWithIV(null, ks, cipher);
             return Arguments.of(
                     Named.of(_TestUtils.cipherName(cipher), cipher),
                     Named.of(_TestUtils.paramsName(params), params)
@@ -64,8 +63,7 @@ class ARIA_OFB_Test
 
     @MethodSource({"getArgumentsStream"})
     @ParameterizedTest
-    void __(final StreamBlockCipher cipher, final CipherParameters params, @TempDir final File dir)
-            throws Exception {
+    void __(final StreamCipher cipher, final CipherParameters params, @TempDir final File dir) throws Exception {
         _StreamCipherTestUtils.__(cipher, params, dir);
     }
 }

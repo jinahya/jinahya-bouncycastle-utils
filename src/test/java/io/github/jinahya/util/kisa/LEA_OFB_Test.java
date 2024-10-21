@@ -1,8 +1,8 @@
 package io.github.jinahya.util.kisa;
 
 import io.github.jinahya.util._TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto.JinahyaCipherParametersUtils;
 import io.github.jinahya.util.bouncycastle.crypto._StreamCipherTestUtils;
+import io.github.jinahya.util.bouncycastle.crypto.params._ParametersWithIVTestUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +47,7 @@ class LEA_OFB_Test
                 log.error("failed to create with blockSize of {}", bs, e);
                 return null;
             }
-            final var params = JinahyaCipherParametersUtils.newRandomParametersWithIV(null, ks, cipher);
+            final var params = _ParametersWithIVTestUtils.newRandomInstanceOfParametersWithIV(null, ks, cipher);
             return Arguments.of(
                     Named.of(_TestUtils.cipherName(cipher), cipher),
                     Named.of(_TestUtils.paramsName(params), params)

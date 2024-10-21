@@ -1,9 +1,9 @@
 package io.github.jinahya.util.kisa;
 
-import io.github.jinahya.util.bouncycastle.crypto.JinahyaCipherParametersUtils;
 import io.github.jinahya.util.bouncycastle.crypto._BufferedBlockCipherTestUtils;
 import io.github.jinahya.util.bouncycastle.crypto._CipherParametersTestUtils;
 import io.github.jinahya.util.bouncycastle.crypto.padding._BlockCipherPaddingTestUtils;
+import io.github.jinahya.util.bouncycastle.crypto.params._ParametersWithIVTestUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +31,7 @@ class LEA_CBC_Test
             return getKeySizeStream().mapToObj(ks -> {
                 final var engine = new LEAEngine();
                 final var cipher = new PaddedBufferedBlockCipher(CBCBlockCipher.newInstance(engine), p);
-                final var params = JinahyaCipherParametersUtils.newRandomParametersWithIV(null, ks, cipher);
+                final var params = _ParametersWithIVTestUtils.newRandomInstanceOfParametersWithIV(null, ks, cipher.getUnderlyingCipher());
                 return Arguments.of(
                         Named.of(_BufferedBlockCipherTestUtils.cipherName(cipher, p), cipher),
                         Named.of(_CipherParametersTestUtils.paramsName(params), params)
@@ -40,6 +40,7 @@ class LEA_CBC_Test
         });
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
     @MethodSource({"getArgumentsStream"})
     @ParameterizedTest
     void __(final BufferedBlockCipher cipher, final CipherParameters params) throws Exception {

@@ -1,9 +1,9 @@
 package io.github.jinahya.util.kisa;
 
 import io.github.jinahya.util._RandomTestUtils;
-import io.github.jinahya.util.bouncycastle.crypto.JinahyaCipherParametersUtils;
 import io.github.jinahya.util.bouncycastle.crypto._BufferedBlockCipherTestUtils;
 import io.github.jinahya.util.bouncycastle.crypto._CipherParametersTestUtils;
+import io.github.jinahya.util.bouncycastle.crypto.params._KeyParametersTestUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +30,7 @@ class ARIA_CTS_Test
         return getKeySizeStream().mapToObj(ks -> {
             final var engine = new ARIAEngine();
             final var cipher = new CTSBlockCipher(engine);
-            final var params = JinahyaCipherParametersUtils.newRandomKeyParameter(null, ks);
+            final var params = _KeyParametersTestUtils.newRandomInstanceOfKeyParameter(null, ks);
             return Arguments.of(
                     Named.of(_BufferedBlockCipherTestUtils.cipherName(cipher), cipher),
                     Named.of(_CipherParametersTestUtils.paramsName(params), params)

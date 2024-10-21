@@ -1,13 +1,12 @@
 package io.github.jinahya.util.kisa;
 
 import io.github.jinahya.util._TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto.JinahyaCipherParametersUtils;
 import io.github.jinahya.util.bouncycastle.crypto._StreamCipherTestUtils;
+import io.github.jinahya.util.bouncycastle.crypto.params._ParametersWithIVTestUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.CipherParameters;
-import org.bouncycastle.crypto.StreamBlockCipher;
 import org.bouncycastle.crypto.StreamCipher;
 import org.bouncycastle.crypto.engines.LEAEngine;
 import org.bouncycastle.crypto.modes.CFBBlockCipher;
@@ -47,7 +46,7 @@ class LEA_CFB_Test
                 log.error("failed to create with blockSize of {}", bs, e);
                 return null;
             }
-            final var params = JinahyaCipherParametersUtils.newRandomParametersWithIV(null, ks, ks);
+            final var params = _ParametersWithIVTestUtils.newRandomInstanceOfParametersWithIV(null, ks, ks);
             return Arguments.of(
                     Named.of(_TestUtils.cipherName(cipher), cipher),
                     Named.of(_TestUtils.paramsName(params), params)
@@ -64,8 +63,7 @@ class LEA_CFB_Test
 
     @MethodSource({"getArgumentsStream"})
     @ParameterizedTest
-    void __(final StreamBlockCipher cipher, final CipherParameters params, @TempDir final File dir)
-            throws Exception {
+    void __(final StreamCipher cipher, final CipherParameters params, @TempDir final File dir) throws Exception {
         _StreamCipherTestUtils.__(cipher, params, dir);
     }
 }

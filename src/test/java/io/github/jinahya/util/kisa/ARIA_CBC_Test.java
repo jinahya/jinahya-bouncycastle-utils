@@ -1,18 +1,13 @@
 package io.github.jinahya.util.kisa;
 
-import io.github.jinahya.util.bouncycastle.crypto.JinahyaCipherParametersUtils;
+import io.github.jinahya.util._CBC_TestUtils;
 import io.github.jinahya.util.bouncycastle.crypto._BufferedBlockCipherTestUtils;
-import io.github.jinahya.util.bouncycastle.crypto._CipherParametersTestUtils;
-import io.github.jinahya.util.bouncycastle.crypto.padding._BlockCipherPaddingTestUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.engines.ARIAEngine;
-import org.bouncycastle.crypto.modes.CBCBlockCipher;
-import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
-import org.junit.jupiter.api.Named;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -27,17 +22,10 @@ class ARIA_CBC_Test
         extends ARIA__Test {
 
     private static Stream<Arguments> getArgumentsStream() {
-        return _BlockCipherPaddingTestUtils.getBlockCipherPaddingStream().flatMap(p -> {
-            return getKeySizeStream().mapToObj(ks -> {
-                final var engine = new ARIAEngine();
-                final var cipher = new PaddedBufferedBlockCipher(CBCBlockCipher.newInstance(engine), p);
-                final var params = JinahyaCipherParametersUtils.newRandomParametersWithIV(null, ks, cipher);
-                return Arguments.of(
-                        Named.of(_BufferedBlockCipherTestUtils.cipherName(cipher, p), cipher),
-                        Named.of(_CipherParametersTestUtils.paramsName(params), params)
-                );
-            });
-        });
+        return _CBC_TestUtils.getArgumentsStream(
+                ARIA__Test::getKeySizeStream,
+                ARIAEngine::new
+        );
     }
 
     // -----------------------------------------------------------------------------------------------------------------

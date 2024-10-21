@@ -1,6 +1,7 @@
-package io.github.jinahya.util;
+package _org.junit.jupiter.api;
 
 import io.github.jinahya.util.bouncycastle.crypto.JinahyaCipherParametersUtils;
+import io.github.jinahya.util.bouncycastle.crypto._CipherParametersTestUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.BlockCipher;
 import org.bouncycastle.crypto.BufferedBlockCipher;
@@ -10,11 +11,12 @@ import org.bouncycastle.crypto.StreamCipher;
 import org.bouncycastle.crypto.paddings.BlockCipherPadding;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
+import org.junit.jupiter.api.Named;
 
 import java.util.Objects;
 
 @Slf4j
-public final class _TestUtils {
+public final class _Named_TestUtils {
 
     // -----------------------------------------------------------------------------------------------------------------
     static String cipherName(final StreamCipher cipher, final int keySize) {
@@ -30,6 +32,7 @@ public final class _TestUtils {
         return cipherName(cipher, cipher.getBlockSize());
     }
 
+    @Deprecated
     public static String cipherName(final BufferedBlockCipher cipher) {
         return cipherName(Objects.requireNonNull(cipher, "cipher is null").getUnderlyingCipher());
     }
@@ -78,7 +81,16 @@ public final class _TestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private _TestUtils() {
+    public static <T extends BlockCipher> Named<T> namedOf(final T cipher) {
+        return Named.of(cipherName(cipher), cipher);
+    }
+
+    public static <T extends CipherParameters> Named<T> namedOf(final T params) {
+        return Named.of(_CipherParametersTestUtils.paramsName(params), params);
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    private _Named_TestUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

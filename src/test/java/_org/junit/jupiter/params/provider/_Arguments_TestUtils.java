@@ -1,7 +1,7 @@
-package io.github.jinahya.util;
+package _org.junit.jupiter.params.provider;
 
+import _org.junit.jupiter.api._Named_TestUtils;
 import io.github.jinahya.util.bouncycastle.crypto.JinahyaCipherParametersUtils;
-import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.BlockCipher;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
@@ -10,11 +10,11 @@ import org.bouncycastle.crypto.StreamCipher;
 import org.bouncycastle.crypto.paddings.BlockCipherPadding;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
+import org.junit.jupiter.params.provider.Arguments;
 
 import java.util.Objects;
 
-@Slf4j
-public final class _TestUtils {
+public class _Arguments_TestUtils {
 
     // -----------------------------------------------------------------------------------------------------------------
     static String cipherName(final StreamCipher cipher, final int keySize) {
@@ -77,8 +77,15 @@ public final class _TestUtils {
         throw new RuntimeException("failed to get key from " + params);
     }
 
+    public static Arguments argumentsOf(final BlockCipher cipher, final CipherParameters params) {
+        return Arguments.of(
+                _Named_TestUtils.namedOf(cipher),
+                _Named_TestUtils.namedOf(params)
+        );
+    }
+
     // -----------------------------------------------------------------------------------------------------------------
-    private _TestUtils() {
+    private _Arguments_TestUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

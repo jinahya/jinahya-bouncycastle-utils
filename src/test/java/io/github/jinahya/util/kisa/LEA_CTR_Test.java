@@ -1,8 +1,8 @@
 package io.github.jinahya.util.kisa;
 
-import io.github.jinahya.util.bouncycastle.crypto.JinahyaCipherParametersUtils;
 import io.github.jinahya.util.bouncycastle.crypto._CipherParametersTestUtils;
 import io.github.jinahya.util.bouncycastle.crypto._StreamCipherTestUtils;
+import io.github.jinahya.util.bouncycastle.crypto.params._ParametersWithIVTestUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +28,7 @@ class LEA_CTR_Test
         return getKeySizeStream().mapToObj(ks -> {
             final var engine = new LEAEngine();
             final var cipher = SICBlockCipher.newInstance(engine);
-            final var params = JinahyaCipherParametersUtils.newRandomParametersWithIV(null, ks, cipher);
+            final var params = _ParametersWithIVTestUtils.newRandomInstanceOfParametersWithIV(null, ks, cipher);
             return Arguments.of(
                     Named.of(_StreamCipherTestUtils.cipherName(cipher), cipher),
                     Named.of(_CipherParametersTestUtils.paramsName(params), params)

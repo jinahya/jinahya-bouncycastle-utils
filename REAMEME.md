@@ -20,6 +20,9 @@ Examples with [Bouncy Castle for Java](https://www.bouncycastle.org/documentatio
   * [NIST SP 800-38G Recommendation for Block Cipher Modes of Operation: Methods for Format-Preserving Encryption](chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-38G.pdf)
 * [KISA 암호이용활성화](https://seed.kisa.or.kr)
   * [LEA](https://seed.kisa.or.kr/kisa/algorithm/EgovLeaInfo.do)
+* GitHub
+  * [The Bouncy Castle Crypto Package For Java](https://github.com/bcgit/bc-java)
+    * [[QUESTION] ZeroBytePadding with Zero-Ending Input? #1871](https://github.com/bcgit/bc-java/issues/1871)
 * https://data-make.tistory.com/
   * [[JAVA] KISA SEED CBC 암/복호화](https://data-make.tistory.com/759)
 * [RetroTV's Dev Blog](https://blog.retrotv.dev/)

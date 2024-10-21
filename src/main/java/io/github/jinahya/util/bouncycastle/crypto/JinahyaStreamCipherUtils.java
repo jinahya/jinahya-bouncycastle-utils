@@ -10,7 +10,7 @@ import java.io.OutputStream;
 import java.util.Objects;
 
 /**
- * A utility class for {@link org.bouncycastle.crypto.StreamCipher}.
+ * A utility class for {@link StreamCipher}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @see <a
@@ -25,6 +25,7 @@ public final class JinahyaStreamCipherUtils {
             try {
                 return Arrays.copyOf(out, cipher.processBytes(in, 0, in.length, out, 0));
             } catch (final DataLengthException dle) {
+                System.err.println("doubling up out.length from " + out.length);
                 out = new byte[out.length << 1];
             }
         }
@@ -35,8 +36,8 @@ public final class JinahyaStreamCipherUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    static byte[] processAllBytes(final StreamCipher cipher, final InputStream source, final OutputStream target,
-                                  final byte[] in, byte[] out)
+    static <T extends StreamCipher> T processAllBytes(final T cipher, final InputStream source,
+                                                      final OutputStream target, final byte[] in, byte[] out)
             throws IOException {
         Objects.requireNonNull(cipher, "cipher is null");
         Objects.requireNonNull(source, "source is null");
@@ -53,11 +54,12 @@ public final class JinahyaStreamCipherUtils {
                     target.write(out, 0, cipher.processBytes(in, 0, r, out, 0));
                     break;
                 } catch (final DataLengthException dle) {
+                    System.err.println("doubling up out.length from " + out.length);
                     out = new byte[out.length << 1];
                 }
             }
         }
-        return out;
+        return cipher;
     }
 
     /**
@@ -79,8 +81,7 @@ public final class JinahyaStreamCipherUtils {
     public static <T extends StreamCipher> T processAllBytes(final T cipher, final InputStream source,
                                                              final OutputStream target, final byte[] in)
             throws IOException {
-        processAllBytes(cipher, source, target, in, new byte[in.length]);
-        return cipher;
+        return processAllBytes(cipher, source, target, in, new byte[in.length]);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
