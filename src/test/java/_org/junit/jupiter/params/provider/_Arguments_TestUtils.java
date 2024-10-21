@@ -84,6 +84,20 @@ public class _Arguments_TestUtils {
         );
     }
 
+    public static Arguments argumentsOf(final BufferedBlockCipher cipher, final CipherParameters params) {
+        return argumentsOf(
+                Objects.requireNonNull(cipher, "cipher is null").getUnderlyingCipher(),
+                params
+        );
+    }
+
+//    public static Arguments argumentsOf(final StreamBlockCipher cipher, final CipherParameters params) {
+//        return argumentsOf(
+//                Objects.requireNonNull(cipher, "cipher is null").getUnderlyingCipher(),
+//                params
+//        );
+//    }
+
     // -----------------------------------------------------------------------------------------------------------------
     private _Arguments_TestUtils() {
         throw new AssertionError("instantiation is not allowed");
