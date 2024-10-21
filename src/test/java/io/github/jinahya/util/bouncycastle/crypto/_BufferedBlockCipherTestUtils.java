@@ -1,12 +1,12 @@
 package io.github.jinahya.util.bouncycastle.crypto;
 
+import _javax.security._MessageDigestTestUtils;
 import io.github.jinahya.util._LogUtils;
 import io.github.jinahya.util._RandomTestUtils;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.paddings.BlockCipherPadding;
 
-import _javax.security._MessageDigestTestUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -38,14 +38,14 @@ public final class _BufferedBlockCipherTestUtils {
         cipher.init(false, params);
         final var decrypted = JinahyaBufferedBlockCipherUtils.processBytesAndDoFinal(cipher, encrypted);
         // -------------------------------------------------------------------------------------------------------- then
-        _LogUtils.log(plain, encrypted, decrypted);
+//        _LogUtils.log(plain, encrypted, decrypted);
         assertThat(decrypted).isEqualTo(plain);
     }
 
     public static void __(final BufferedBlockCipher cipher, final CipherParameters params) throws Exception {
         __(cipher, params, new byte[0]); // empty
-        __(cipher, params, new byte[1]); // zero
-        __(cipher, params, _RandomTestUtils.newRandomBytes(1));
+        __(cipher, params, new byte[1]); // single-zero
+        __(cipher, params, _RandomTestUtils.newRandomBytes(1)); // single-random
         __(cipher, params, _RandomTestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(16)));
     }
 
@@ -57,7 +57,7 @@ public final class _BufferedBlockCipherTestUtils {
         final var encrypted = File.createTempFile("tmp", null, dir);
         try (var source = new FileInputStream(plain);
              var target = new FileOutputStream(encrypted)) {
-            JinahyaBufferedBlockCipherUtils.processAllBytesAndDoFinal(cipher, source, target, 1);
+            JinahyaBufferedBlockCipherUtils.processAllBytesAndDoFinal(cipher, source, target);
             target.flush();
         }
         // ----------------------------------------------------------------------------------------------------- decrypt
@@ -65,11 +65,11 @@ public final class _BufferedBlockCipherTestUtils {
         final var decrypted = File.createTempFile("tmp", null, dir);
         try (var source = new FileInputStream(encrypted);
              var target = new FileOutputStream(decrypted)) {
-            JinahyaBufferedBlockCipherUtils.processAllBytesAndDoFinal(cipher, source, target, 1);
+            JinahyaBufferedBlockCipherUtils.processAllBytesAndDoFinal(cipher, source, target);
             target.flush();
         }
         // -------------------------------------------------------------------------------------------------------- then
-        _LogUtils.log(plain, encrypted, decrypted);
+//        _LogUtils.log(plain, encrypted, decrypted);
         assertThat(decrypted).hasSize(plain.length());
         _MessageDigestTestUtils.__(plain, decrypted);
     }

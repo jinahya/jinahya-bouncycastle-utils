@@ -18,16 +18,46 @@ import java.util.Objects;
  */
 public final class JinahyaStreamCipherUtils {
 
-    public static byte[] processBytes(final StreamCipher cipher, final byte[] in) {
+    static byte[] processBytes(final StreamCipher cipher, final byte[] in, byte[] out) {
         Objects.requireNonNull(cipher, "cipher is null");
         Objects.requireNonNull(in, "in is null");
-        for (var out = new byte[in.length]; ; ) {
+        while (true) {
             try {
                 return Arrays.copyOf(out, cipher.processBytes(in, 0, in.length, out, 0));
             } catch (final DataLengthException dle) {
                 out = new byte[out.length << 1];
             }
         }
+    }
+
+    public static byte[] processBytes(final StreamCipher cipher, final byte[] in) {
+        return processBytes(cipher, in, new byte[in.length]);
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    static byte[] processAllBytes(final StreamCipher cipher, final InputStream source, final OutputStream target,
+                                  final byte[] in, byte[] out)
+            throws IOException {
+        Objects.requireNonNull(cipher, "cipher is null");
+        Objects.requireNonNull(source, "source is null");
+        Objects.requireNonNull(target, "target is null");
+        if (Objects.requireNonNull(in, "in is null").length == 0) {
+            throw new IllegalArgumentException("in.length is zero");
+        }
+        if (Objects.requireNonNull(out, "out is null").length == 0) {
+            throw new IllegalArgumentException("out.length is zero");
+        }
+        for (int r; (r = source.read(in)) != -1; ) {
+            while (true) {
+                try {
+                    target.write(out, 0, cipher.processBytes(in, 0, r, out, 0));
+                    break;
+                } catch (final DataLengthException dle) {
+                    out = new byte[out.length << 1];
+                }
+            }
+        }
+        return out;
     }
 
     /**
@@ -37,45 +67,20 @@ public final class JinahyaStreamCipherUtils {
      * @param cipher the cipher.
      * @param source the input stream from which bytes to process are read.
      * @param target the output stream to which processed bytes are written.
-     * @param buffer a buffer for reading bytes from {@code source} whose {@code length} should be positive.
+     * @param in     aa array of bytes for reading bytes from {@code source} whose {@code length} should be positive.
+     * @param <T>    cipher type parameter
+     * @return given {@code cipher}.
      * @throws IOException if an I/O error occurs.
      * @see StreamCipher#processBytes(byte[], int, int, byte[], int)
      * @see <a
      * href="https://downloads.bouncycastle.org/java/docs/bcprov-jdk18on-javadoc/org/bouncycastle/crypto/StreamCipher.html#processBytes-byte:A-int-int-byte:A-int-">StreamCipher#processBytes(byte[],
      * int, int, byte[],int)</a>
      */
-    public static void processAllBytes(final StreamCipher cipher, final InputStream source, final OutputStream target,
-                                       final byte[] buffer)
+    public static <T extends StreamCipher> T processAllBytes(final T cipher, final InputStream source,
+                                                             final OutputStream target, final byte[] in)
             throws IOException {
-        Objects.requireNonNull(cipher, "cipher is null");
-        Objects.requireNonNull(source, "source is null");
-        Objects.requireNonNull(target, "target is null");
-        if (Objects.requireNonNull(buffer, "buffer is null").length == 0) {
-            throw new IllegalArgumentException("buffer.length is zero");
-        }
-        for (int r; (r = source.read(buffer)) != -1; ) {
-            for (var out = new byte[buffer.length]; ; ) {
-                try {
-                    target.write(out, 0, cipher.processBytes(buffer, 0, r, out, 0));
-                    break;
-                } catch (final DataLengthException dle) {
-                    out = new byte[out.length << 1];
-                }
-            }
-        }
-        Arrays.clear(buffer);
-    }
-
-    public static void processAllBytes(final StreamCipher cipher, final InputStream source, final OutputStream target,
-                                       final int buflen)
-            throws IOException {
-        Objects.requireNonNull(cipher, "cipher is null");
-        Objects.requireNonNull(source, "source is null");
-        Objects.requireNonNull(target, "target is null");
-        if (buflen <= 0) {
-            throw new IllegalArgumentException("non-positive buflen: " + buflen);
-        }
-        processAllBytes(cipher, source, target, new byte[buflen]);
+        processAllBytes(cipher, source, target, in, new byte[in.length]);
+        return cipher;
     }
 
     // -----------------------------------------------------------------------------------------------------------------

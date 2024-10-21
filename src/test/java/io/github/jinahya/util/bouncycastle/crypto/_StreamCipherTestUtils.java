@@ -37,7 +37,7 @@ public final class _StreamCipherTestUtils {
         cipher.init(false, params);
         final var decrypted = JinahyaStreamCipherUtils.processBytes(cipher, encrypted);
         // -------------------------------------------------------------------------------------------------------- then
-        _LogUtils.log(plain, encrypted, decrypted);
+//        _LogUtils.log(plain, encrypted, decrypted);
         assertThat(decrypted).isEqualTo(plain);
     }
 
@@ -56,7 +56,7 @@ public final class _StreamCipherTestUtils {
         final var encrypted = File.createTempFile("tmp", null, dir);
         try (var source = new FileInputStream(plain);
              var target = new FileOutputStream(encrypted)) {
-            JinahyaStreamCipherUtils.processAllBytes(cipher, source, target, 1);
+            JinahyaStreamCipherUtils.processAllBytes(cipher, source, target, new byte[1]);
             target.flush();
         }
         // ----------------------------------------------------------------------------------------------------- decrypt
@@ -64,11 +64,11 @@ public final class _StreamCipherTestUtils {
         final var decrypted = File.createTempFile("tmp", null, dir);
         try (var source = new FileInputStream(encrypted);
              var target = new FileOutputStream(decrypted)) {
-            JinahyaStreamCipherUtils.processAllBytes(cipher, source, target, 1);
+            JinahyaStreamCipherUtils.processAllBytes(cipher, source, target, new byte[1]);
             target.flush();
         }
         // -------------------------------------------------------------------------------------------------------- then
-        _LogUtils.log(plain, encrypted, decrypted);
+//        _LogUtils.log(plain, encrypted, decrypted);
         assertThat(decrypted).hasSize(plain.length());
         for (var algorithm : new String[]{"SHA-1", "SHA-256"}) {
             final var digest = MessageDigest.getInstance(algorithm);
