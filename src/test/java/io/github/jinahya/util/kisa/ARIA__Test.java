@@ -10,6 +10,8 @@ import java.util.stream.IntStream;
 @Slf4j
 abstract class ARIA__Test {
 
+    static final int BLOCK_SIZE = 128;
+
     static IntStream getKeySizeStream() {
         return IntStream.of(
                 128,
