@@ -12,17 +12,26 @@ import java.util.stream.Stream;
 
 public final class _RandomTestUtils {
 
-    static SecureRandom newSecureRandom() {
-        try {
-            return SecureRandom.getInstanceStrong();
-        } catch (final NoSuchAlgorithmException nsae) {
-            throw new RuntimeException("failed to get a strong secure random instance", nsae);
+    private static SecureRandom random = null;
+
+    static SecureRandom random() {
+        if (random == null) {
+            try {
+                random = SecureRandom.getInstanceStrong();
+            } catch (final NoSuchAlgorithmException nsae) {
+                throw new RuntimeException("failed to get a strong secure random instance", nsae);
+            }
         }
+        return random;
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
     public static byte[] newRandomBytes(final int length) {
+        if (length < 0) {
+            throw new IllegalArgumentException("negative length: " + length);
+        }
         final var bytes = new byte[length];
-        newSecureRandom().nextBytes(bytes);
+        random().nextBytes(bytes);
         return bytes;
     }
 
