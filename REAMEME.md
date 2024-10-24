@@ -14,6 +14,7 @@ Examples with [Bouncy Castle for Java](https://www.bouncycastle.org/documentatio
 ## Links
 
 * [Bouncy Castle – Open-source cryptographic APIs](https://www.bouncycastle.org/)
+  * [Bouncy Castle Specification & Interoperability](https://www.bouncycastle.org/documentation/specification_interoperability/)
   * [Bouncy Castle for Java  Documentation](https://www.bouncycastle.org/documentation/documentation-java/)
     * [org.bouncycastle.crypto.modes.CFBBlockCipher](https://downloads.bouncycastle.org/java/docs/bcprov-jdk18on-javadoc/org/bouncycastle/crypto/modes/CFBBlockCipher.html)
 * [NIST](https://www.nist.gov/)
