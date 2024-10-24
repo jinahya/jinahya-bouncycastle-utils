@@ -6,7 +6,6 @@ import io.github.jinahya.util._CBC_TestUtils;
 import io.github.jinahya.util._RandomTestUtils;
 import io.github.jinahya.util.bouncycastle.crypto._BufferedBlockCipherTestUtils;
 import io.github.jinahya.util.bouncycastle.crypto.params._KeyParametersTestUtils;
-import io.github.jinahya.util.bouncycastle.jce.provider.JinahyaBouncyCastleProviderUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -90,7 +89,6 @@ class ARIA_CBC_Test
             );
             final var params = new IvParameterSpec(_RandomTestUtils.newRandomBytes(BLOCK_BYTES));
             _Cipher_TestUtils.__(cipher, key, params, dir);
-            JinahyaBouncyCastleProviderUtils.removeBouncyCastleProvider();
             return null;
         });
     }

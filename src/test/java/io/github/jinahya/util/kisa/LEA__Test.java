@@ -10,6 +10,12 @@ import java.util.stream.IntStream;
 @Slf4j
 abstract class LEA__Test {
 
+    static final String ALGORITHM = "LEA";
+
+    static final int BLOCK_SIZE = 128;
+
+    static final int BLOCK_BYTES = BLOCK_SIZE >> 3;
+
     static IntStream getKeySizeStream() {
         return IntStream.of(
                 128,
