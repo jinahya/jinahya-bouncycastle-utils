@@ -1,6 +1,7 @@
 package io.github.jinahya.util.kisa;
 
 import _javax.crypto._Cipher_TestUtils;
+import _org.bouncycastle.jce.provider._BouncyCastleProvider_TestUtils;
 import io.github.jinahya.util._CBC_TestUtils;
 import io.github.jinahya.util._RandomTestUtils;
 import io.github.jinahya.util.bouncycastle.crypto._BufferedBlockCipherTestUtils;
@@ -59,15 +60,38 @@ class ARIA_CBC_Test
             256
     })
     @ParameterizedTest
+    void __(final int keySize) throws Throwable {
+        _BouncyCastleProvider_TestUtils.callWithinBouncyCastleProvider(() -> {
+            final var transformation = ALGORITHM + "/CBC/PKCS5Padding";
+            final var cipher = Cipher.getInstance(transformation, BouncyCastleProvider.PROVIDER_NAME);
+            final var key = new SecretKeySpec(
+                    _KeyParametersTestUtils.newRandomKey(null, keySize),
+                    ALGORITHM
+            );
+            final var params = new IvParameterSpec(_RandomTestUtils.newRandomBytes(BLOCK_BYTES));
+            _Cipher_TestUtils.__(cipher, key, params);
+            return null;
+        });
+    }
+
+    @ValueSource(ints = {
+            128,
+            192,
+            256
+    })
+    @ParameterizedTest
     void __(final int keySize, @TempDir final Path dir) throws Throwable {
-        JinahyaBouncyCastleProviderUtils.addBouncyCastleProvider();
-        final var transformation = ALGORITHM + "/CBC/PKCS5Padding";
-        final var cipher = Cipher.getInstance(transformation, BouncyCastleProvider.PROVIDER_NAME);
-        final var key = new SecretKeySpec(
-                _KeyParametersTestUtils.newRandomKey(null, keySize),
-                ALGORITHM
-        );
-        final var params = new IvParameterSpec(_RandomTestUtils.newRandomBytes(BLOCK_BYTES));
-        _Cipher_TestUtils.__(cipher, key, params);
+        _BouncyCastleProvider_TestUtils.callWithinBouncyCastleProvider(() -> {
+            final var transformation = ALGORITHM + "/CBC/PKCS5Padding";
+            final var cipher = Cipher.getInstance(transformation, BouncyCastleProvider.PROVIDER_NAME);
+            final var key = new SecretKeySpec(
+                    _KeyParametersTestUtils.newRandomKey(null, keySize),
+                    ALGORITHM
+            );
+            final var params = new IvParameterSpec(_RandomTestUtils.newRandomBytes(BLOCK_BYTES));
+            _Cipher_TestUtils.__(cipher, key, params, dir);
+            JinahyaBouncyCastleProviderUtils.removeBouncyCastleProvider();
+            return null;
+        });
     }
 }

@@ -1,5 +1,7 @@
 package io.github.jinahya.util.bouncycastle.jce.provider;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
 import java.security.Provider;
 import java.security.Security;
 import java.util.concurrent.atomic.AtomicReference;
@@ -15,10 +17,9 @@ public final class JinahyaBouncyCastleProviderUtils {
      * Returns a new instance of {@value #BOUNCY_CASTLE_PROVIDER_CLASS_NAME}.
      *
      * @return a new instance of {@value #BOUNCY_CASTLE_PROVIDER_CLASS_NAME}.
-     * @throws ReflectiveOperationException if failed to instantiate.
      */
     // when the bouncycastle is a runtime-scoped dependency.
-    public static Provider getBouncyCastleProvider() throws ReflectiveOperationException {
+    public static Provider getBouncyCastleProvider() {
         return provider.accumulateAndGet(null, (current, given) -> {
             if (current != null) {
                 return current;
@@ -33,13 +34,20 @@ public final class JinahyaBouncyCastleProviderUtils {
 
     private static boolean added = false;
 
-    public static void addBouncyCastleProvider() throws ReflectiveOperationException {
+    public static void addBouncyCastleProvider() {
         synchronized (JinahyaBouncyCastleProviderUtils.class) {
             if (added) {
                 return;
             }
             Security.addProvider(getBouncyCastleProvider());
             added = true;
+        }
+    }
+
+    public static void removeBouncyCastleProvider() {
+        synchronized (JinahyaBouncyCastleProviderUtils.class) {
+            Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
+            added = false;
         }
     }
 

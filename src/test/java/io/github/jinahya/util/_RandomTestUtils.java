@@ -3,6 +3,8 @@ package io.github.jinahya.util;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Objects;
@@ -51,6 +53,12 @@ public final class _RandomTestUtils {
 
     public static <T extends File> T writeRandomBytes(final T file) throws IOException {
         return writeRandomBytesWhile(file, f -> false);
+    }
+
+    public static Path createTempFileWithRandomBytesWritten(final Path dir) throws IOException {
+        final var file = Files.createTempFile(dir, null, null);
+        writeRandomBytes(file.toFile());
+        return file;
     }
 
     // -----------------------------------------------------------------------------------------------------------------

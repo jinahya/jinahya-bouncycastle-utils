@@ -107,6 +107,12 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>io.vavr</groupId>
+      <artifactId>vavr</artifactId>
+      <version>0.10.4</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>nl.jqno.equalsverifier</groupId>
       <artifactId>equalsverifier-nodep</artifactId>
       <version>3.17.1</version>
