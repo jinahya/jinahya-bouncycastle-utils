@@ -31,6 +31,8 @@ import java.util.stream.Stream;
 class ARIA_CBC_Test
         extends ARIA__Test {
 
+    private static final String MODE = "CBC";
+
     private static Stream<Arguments> getArgumentsStream() {
         return _CBC_TestUtils.getArgumentsStream(
                 ARIA__Test::getKeySizeStream,
@@ -61,7 +63,7 @@ class ARIA_CBC_Test
     @ParameterizedTest
     void __(final int keySize) throws Throwable {
         _BouncyCastleProvider_TestUtils.callWithinBouncyCastleProvider(() -> {
-            final var transformation = ALGORITHM + "/CBC/PKCS5Padding";
+            final var transformation = ALGORITHM + '/' + MODE + "/PKCS5Padding";
             final var cipher = Cipher.getInstance(transformation, BouncyCastleProvider.PROVIDER_NAME);
             final var key = new SecretKeySpec(
                     _KeyParametersTestUtils.newRandomKey(null, keySize),
@@ -81,7 +83,7 @@ class ARIA_CBC_Test
     @ParameterizedTest
     void __(final int keySize, @TempDir final Path dir) throws Throwable {
         _BouncyCastleProvider_TestUtils.callWithinBouncyCastleProvider(() -> {
-            final var transformation = ALGORITHM + "/CBC/PKCS5Padding";
+            final var transformation = ALGORITHM + '/' + MODE + "/PKCS5Padding";
             final var cipher = Cipher.getInstance(transformation, BouncyCastleProvider.PROVIDER_NAME);
             final var key = new SecretKeySpec(
                     _KeyParametersTestUtils.newRandomKey(null, keySize),
