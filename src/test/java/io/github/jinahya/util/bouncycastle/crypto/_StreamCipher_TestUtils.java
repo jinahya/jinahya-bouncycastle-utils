@@ -1,7 +1,6 @@
 package io.github.jinahya.util.bouncycastle.crypto;
 
-import io.github.jinahya.util._LogUtils;
-import io.github.jinahya.util._RandomTestUtils;
+import _javax.security._Random_TestUtils;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.StreamCipher;
@@ -15,7 +14,7 @@ import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public final class _StreamCipherTestUtils {
+public final class _StreamCipher_TestUtils {
 
     public static String cipherName(final StreamCipher cipher) {
         return Objects.requireNonNull(cipher, "cipher is null").getAlgorithmName();
@@ -42,7 +41,7 @@ public final class _StreamCipherTestUtils {
     }
 
     public static void __(final StreamCipher cipher, final CipherParameters params) throws Exception {
-        _RandomTestUtils.getRandomBytesStream().forEach(b -> {
+        _Random_TestUtils.getRandomBytesStream().forEach(b -> {
             __(cipher, params, b);
         });
     }
@@ -77,7 +76,7 @@ public final class _StreamCipherTestUtils {
     }
 
     public static void __(final StreamCipher cipher, final CipherParameters params, final File dir) throws IOException {
-        _RandomTestUtils.getRandomFileStream(dir).forEach(f -> {
+        _Random_TestUtils.getRandomFileStream(dir).forEach(f -> {
             try {
                 __(cipher, params, dir, f);
             } catch (final Exception e) {
@@ -87,7 +86,7 @@ public final class _StreamCipherTestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private _StreamCipherTestUtils() {
+    private _StreamCipher_TestUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

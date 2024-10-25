@@ -10,7 +10,7 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
 import java.util.Objects;
 
 @Slf4j
-public final class _CipherParametersTestUtils {
+public final class _CipherParameters_TestUtils {
 
     // -----------------------------------------------------------------------------------------------------------------
     public static String paramsName(final CipherParameters params) {
@@ -25,7 +25,7 @@ public final class _CipherParametersTestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private _CipherParametersTestUtils() {
+    private _CipherParameters_TestUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

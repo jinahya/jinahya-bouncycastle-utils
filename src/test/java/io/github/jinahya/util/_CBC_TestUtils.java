@@ -17,6 +17,8 @@ import static io.github.jinahya.util.bouncycastle.crypto.padding._BlockCipherPad
 @Slf4j
 public final class _CBC_TestUtils {
 
+    public static final String MODE = "CBC";
+
     public static Stream<Arguments> getArgumentsStream(final Supplier<? extends IntStream> keySizeStreamSupplier,
                                                        final Supplier<? extends BlockCipher> cipherSupplier) {
         Objects.requireNonNull(keySizeStreamSupplier, "keySizeStreamSupplier is null");

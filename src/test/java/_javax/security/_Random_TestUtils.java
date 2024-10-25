@@ -1,4 +1,4 @@
-package io.github.jinahya.util;
+package _javax.security;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -12,7 +12,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-public final class _RandomTestUtils {
+public final class _Random_TestUtils {
 
     private static SecureRandom random = null;
 
@@ -79,7 +79,7 @@ public final class _RandomTestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private _RandomTestUtils() {
+    private _Random_TestUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

@@ -1,7 +1,7 @@
 package io.github.jinahya.util.kisa;
 
 import io.github.jinahya.util._TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto._StreamCipherTestUtils;
+import io.github.jinahya.util.bouncycastle.crypto._StreamCipher_TestUtils;
 import io.github.jinahya.util.bouncycastle.crypto.params._ParametersWithIVTestUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -58,7 +58,7 @@ class LEA_OFB_Test
     @MethodSource({"getArgumentsStream"})
     @ParameterizedTest
     void __(final StreamCipher cipher, final CipherParameters params) throws Exception {
-        _StreamCipherTestUtils.__(cipher, params);
+        _StreamCipher_TestUtils.__(cipher, params);
 //        // ------------------------------------------------------------------------------------------------------- plain
 //        final byte[] plain = _RandomTestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(16));
 //        // ----------------------------------------------------------------------------------------------------- encrypt
@@ -85,7 +85,7 @@ class LEA_OFB_Test
     @ParameterizedTest
     void __(final StreamBlockCipher cipher, final CipherParameters params, @TempDir final File dir)
             throws Exception {
-        _StreamCipherTestUtils.__(cipher, params, dir);
+        _StreamCipher_TestUtils.__(cipher, params, dir);
 //        // ------------------------------------------------------------------------------------------------------- plain
 //        final var plain = _RandomTestUtils.writeRandomBytes(File.createTempFile("tmp", null, dir));
 //        // ----------------------------------------------------------------------------------------------------- encrypt

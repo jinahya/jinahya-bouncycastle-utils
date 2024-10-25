@@ -1,8 +1,8 @@
 package io.github.jinahya.util.kisa;
 
-import io.github.jinahya.util._RandomTestUtils;
-import io.github.jinahya.util.bouncycastle.crypto._BufferedBlockCipherTestUtils;
-import io.github.jinahya.util.bouncycastle.crypto._CipherParametersTestUtils;
+import _javax.security._Random_TestUtils;
+import io.github.jinahya.util.bouncycastle.crypto._BufferedBlockCipher_TestUtils;
+import io.github.jinahya.util.bouncycastle.crypto._CipherParameters_TestUtils;
 import io.github.jinahya.util.bouncycastle.crypto.params._KeyParametersTestUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -32,8 +32,8 @@ class ARIA_CTS_Test
             final var cipher = new CTSBlockCipher(engine);
             final var params = _KeyParametersTestUtils.newRandomInstanceOfKeyParameter(null, ks);
             return Arguments.of(
-                    Named.of(_BufferedBlockCipherTestUtils.cipherName(cipher), cipher),
-                    Named.of(_CipherParametersTestUtils.paramsName(params), params)
+                    Named.of(_BufferedBlockCipher_TestUtils.cipherName(cipher), cipher),
+                    Named.of(_CipherParameters_TestUtils.paramsName(params), params)
             );
         });
     }
@@ -44,7 +44,7 @@ class ARIA_CTS_Test
     void __(final BufferedBlockCipher cipher, final CipherParameters params) throws Exception {
         final var plain = new byte[ThreadLocalRandom.current().nextInt(16) + cipher.getBlockSize()];
         ThreadLocalRandom.current().nextBytes(plain);
-        _BufferedBlockCipherTestUtils.__(cipher, params, plain);
+        _BufferedBlockCipher_TestUtils.__(cipher, params, plain);
     }
 
     @MethodSource({"getArgumentsStream"})
@@ -52,7 +52,7 @@ class ARIA_CTS_Test
     void __(final BufferedBlockCipher cipher, final CipherParameters params, @TempDir final File dir)
             throws Exception {
         final var plain = File.createTempFile("tmp", null, dir);
-        _RandomTestUtils.writeRandomBytesWhile(plain, f -> f.length() < cipher.getBlockSize());
-        _BufferedBlockCipherTestUtils.__(cipher, params, dir, plain);
+        _Random_TestUtils.writeRandomBytesWhile(plain, f -> f.length() < cipher.getBlockSize());
+        _BufferedBlockCipher_TestUtils.__(cipher, params, dir, plain);
     }
 }

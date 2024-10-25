@@ -1,7 +1,7 @@
 package _javax.crypto;
 
+import _javax.security._Random_TestUtils;
 import io.github.jinahya.util._LogUtils;
-import io.github.jinahya.util._RandomTestUtils;
 import io.github.jinahya.util.bouncycastle.jce.provider.JinahyaBouncyCastleProviderUtils;
 
 import javax.crypto.Cipher;
@@ -28,7 +28,7 @@ public final class _Cipher_TestUtils {
     public static void __(final Cipher cipher, final Key key, final AlgorithmParameterSpec params)
             throws Exception {
         JinahyaBouncyCastleProviderUtils.addBouncyCastleProvider();
-        final var plain = _RandomTestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(1024));
+        final var plain = _Random_TestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(1024));
         cipher.init(Cipher.ENCRYPT_MODE, key, params);
         final var encrypted = cipher.doFinal(plain);
         cipher.init(Cipher.DECRYPT_MODE, key, params);
@@ -42,7 +42,7 @@ public final class _Cipher_TestUtils {
             throws Exception {
         JinahyaBouncyCastleProviderUtils.addBouncyCastleProvider();
         // ------------------------------------------------------------------------------------------------------- plain
-        final var plain = _RandomTestUtils.createTempFileWithRandomBytesWritten(dir);
+        final var plain = _Random_TestUtils.createTempFileWithRandomBytesWritten(dir);
         final var input = ByteBuffer.allocate(ThreadLocalRandom.current().nextInt(1024) + 1);
         var output = ByteBuffer.allocate(ThreadLocalRandom.current().nextInt(1024) + 1);
         // ----------------------------------------------------------------------------------------------------- encrypt
@@ -120,7 +120,7 @@ public final class _Cipher_TestUtils {
             throws Exception {
         JinahyaBouncyCastleProviderUtils.addBouncyCastleProvider();
         // ------------------------------------------------------------------------------------------------------- plain
-        final var plain = _RandomTestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(1024));
+        final var plain = _Random_TestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(1024));
         cipher.init(Cipher.ENCRYPT_MODE, key);
         final var encrypted = cipher.doFinal(plain);
         cipher.init(Cipher.DECRYPT_MODE, key);
@@ -134,7 +134,7 @@ public final class _Cipher_TestUtils {
             throws Exception {
         JinahyaBouncyCastleProviderUtils.addBouncyCastleProvider();
         // ------------------------------------------------------------------------------------------------------- plain
-        final var plain = _RandomTestUtils.createTempFileWithRandomBytesWritten(dir);
+        final var plain = _Random_TestUtils.createTempFileWithRandomBytesWritten(dir);
         final var input = ByteBuffer.allocate(ThreadLocalRandom.current().nextInt(1024) + 1);
         var output = ByteBuffer.allocate(ThreadLocalRandom.current().nextInt(1024) + 1);
         // ----------------------------------------------------------------------------------------------------- encrypt

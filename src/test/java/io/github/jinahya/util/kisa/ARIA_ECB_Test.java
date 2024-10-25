@@ -3,7 +3,7 @@ package io.github.jinahya.util.kisa;
 import _javax.crypto._Cipher_TestUtils;
 import _org.bouncycastle.jce.provider._BouncyCastleProvider_TestUtils;
 import io.github.jinahya.util._ECB_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto._BufferedBlockCipherTestUtils;
+import io.github.jinahya.util.bouncycastle.crypto._BufferedBlockCipher_TestUtils;
 import io.github.jinahya.util.bouncycastle.crypto.params._KeyParametersTestUtils;
 import io.github.jinahya.util.bouncycastle.jce.provider.JinahyaBouncyCastleProviderUtils;
 import lombok.AccessLevel;
@@ -41,14 +41,14 @@ class ARIA_ECB_Test
     @MethodSource({"getArgumentsStream"})
     @ParameterizedTest
     void __(final BufferedBlockCipher cipher, final CipherParameters params) throws Exception {
-        _BufferedBlockCipherTestUtils.__(cipher, params);
+        _BufferedBlockCipher_TestUtils.__(cipher, params);
     }
 
     @MethodSource({"getArgumentsStream"})
     @ParameterizedTest
     void __(final BufferedBlockCipher cipher, final CipherParameters params, @TempDir final File dir)
             throws Exception {
-        _BufferedBlockCipherTestUtils.__(cipher, params, dir);
+        _BufferedBlockCipher_TestUtils.__(cipher, params, dir);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

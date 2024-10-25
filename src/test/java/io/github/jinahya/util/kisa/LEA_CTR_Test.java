@@ -1,7 +1,7 @@
 package io.github.jinahya.util.kisa;
 
-import io.github.jinahya.util.bouncycastle.crypto._CipherParametersTestUtils;
-import io.github.jinahya.util.bouncycastle.crypto._StreamCipherTestUtils;
+import io.github.jinahya.util.bouncycastle.crypto._CipherParameters_TestUtils;
+import io.github.jinahya.util.bouncycastle.crypto._StreamCipher_TestUtils;
 import io.github.jinahya.util.bouncycastle.crypto.params._ParametersWithIVTestUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -30,8 +30,8 @@ class LEA_CTR_Test
             final var cipher = SICBlockCipher.newInstance(engine);
             final var params = _ParametersWithIVTestUtils.newRandomInstanceOfParametersWithIV(null, ks, cipher);
             return Arguments.of(
-                    Named.of(_StreamCipherTestUtils.cipherName(cipher), cipher),
-                    Named.of(_CipherParametersTestUtils.paramsName(params), params)
+                    Named.of(_StreamCipher_TestUtils.cipherName(cipher), cipher),
+                    Named.of(_CipherParameters_TestUtils.paramsName(params), params)
             );
         });
     }
@@ -40,13 +40,13 @@ class LEA_CTR_Test
     @MethodSource({"getArgumentsStream"})
     @ParameterizedTest
     void __(final StreamCipher cipher, final CipherParameters params) throws Exception {
-        _StreamCipherTestUtils.__(cipher, params);
+        _StreamCipher_TestUtils.__(cipher, params);
     }
 
     @MethodSource({"getArgumentsStream"})
     @ParameterizedTest
     void __(final StreamCipher cipher, final CipherParameters params, @TempDir final File dir)
             throws Exception {
-        _StreamCipherTestUtils.__(cipher, params, dir);
+        _StreamCipher_TestUtils.__(cipher, params, dir);
     }
 }

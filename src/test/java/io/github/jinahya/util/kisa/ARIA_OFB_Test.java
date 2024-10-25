@@ -1,7 +1,7 @@
 package io.github.jinahya.util.kisa;
 
 import io.github.jinahya.util._TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto._StreamCipherTestUtils;
+import io.github.jinahya.util.bouncycastle.crypto._StreamCipher_TestUtils;
 import io.github.jinahya.util.bouncycastle.crypto.params._ParametersWithIVTestUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -58,12 +58,12 @@ class ARIA_OFB_Test
     @MethodSource({"getArgumentsStream"})
     @ParameterizedTest
     void __(final StreamCipher cipher, final CipherParameters params) throws Exception {
-        _StreamCipherTestUtils.__(cipher, params);
+        _StreamCipher_TestUtils.__(cipher, params);
     }
 
     @MethodSource({"getArgumentsStream"})
     @ParameterizedTest
     void __(final StreamCipher cipher, final CipherParameters params, @TempDir final File dir) throws Exception {
-        _StreamCipherTestUtils.__(cipher, params, dir);
+        _StreamCipher_TestUtils.__(cipher, params, dir);
     }
 }

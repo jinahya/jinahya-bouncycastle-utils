@@ -1,7 +1,7 @@
 package io.github.jinahya.util.kisa;
 
 import io.github.jinahya.util._CBC_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto._BufferedBlockCipherTestUtils;
+import io.github.jinahya.util.bouncycastle.crypto._BufferedBlockCipher_TestUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.engines.SEEDEngine;
@@ -29,13 +29,13 @@ class SEED_CBC_Test
     @MethodSource({"getArgumentsStream"})
     @ParameterizedTest
     void __(final PaddedBufferedBlockCipher cipher, final CipherParameters params) throws Exception {
-        _BufferedBlockCipherTestUtils.__(cipher, params);
+        _BufferedBlockCipher_TestUtils.__(cipher, params);
     }
 
     @MethodSource({"getArgumentsStream"})
     @ParameterizedTest
     void __(final PaddedBufferedBlockCipher cipher, final CipherParameters params, @TempDir final File dir)
             throws Exception {
-        _BufferedBlockCipherTestUtils.__(cipher, params, dir);
+        _BufferedBlockCipher_TestUtils.__(cipher, params, dir);
     }
 }

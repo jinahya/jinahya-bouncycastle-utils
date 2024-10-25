@@ -1,8 +1,7 @@
 package io.github.jinahya.util.bouncycastle.crypto;
 
-import _javax.security._MessageDigestTestUtils;
-import io.github.jinahya.util._LogUtils;
-import io.github.jinahya.util._RandomTestUtils;
+import _javax.security._MessageDigest_TestUtils;
+import _javax.security._Random_TestUtils;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.paddings.BlockCipherPadding;
@@ -15,14 +14,15 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public final class _BufferedBlockCipherTestUtils {
+public final class _BufferedBlockCipher_TestUtils {
 
     public static String cipherName(final BufferedBlockCipher cipher) {
-        return _BlockCipherTestUtils.cipherName(Objects.requireNonNull(cipher, "cipher is null").getUnderlyingCipher());
+        return _BlockCipher_TestUtils.cipherName(
+                Objects.requireNonNull(cipher, "cipher is null").getUnderlyingCipher());
     }
 
     public static String cipherName(final BufferedBlockCipher cipher, final BlockCipherPadding padding) {
-        return _BlockCipherTestUtils.cipherName(
+        return _BlockCipher_TestUtils.cipherName(
                 Objects.requireNonNull(cipher, "cipher is null").getUnderlyingCipher(),
                 padding
         );
@@ -45,8 +45,8 @@ public final class _BufferedBlockCipherTestUtils {
     public static void __(final BufferedBlockCipher cipher, final CipherParameters params) throws Exception {
         __(cipher, params, new byte[0]); // empty
         __(cipher, params, new byte[1]); // single-zero
-        __(cipher, params, _RandomTestUtils.newRandomBytes(1)); // single-random
-        __(cipher, params, _RandomTestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(1024)));
+        __(cipher, params, _Random_TestUtils.newRandomBytes(1)); // single-random
+        __(cipher, params, _Random_TestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(1024)));
     }
 
     public static void __(final BufferedBlockCipher cipher, final CipherParameters params, final File dir,
@@ -71,17 +71,17 @@ public final class _BufferedBlockCipherTestUtils {
         // -------------------------------------------------------------------------------------------------------- then
 //        _LogUtils.log(plain, encrypted, decrypted);
         assertThat(decrypted).hasSize(plain.length());
-        _MessageDigestTestUtils.__(plain, decrypted);
+        _MessageDigest_TestUtils.__(plain, decrypted);
     }
 
     public static void __(final BufferedBlockCipher cipher, final CipherParameters params, final File dir)
             throws Exception {
         __(cipher, params, dir, File.createTempFile("tmp", null, dir));
-        __(cipher, params, dir, _RandomTestUtils.writeRandomBytes(File.createTempFile("tmp", null, dir)));
+        __(cipher, params, dir, _Random_TestUtils.writeRandomBytes(File.createTempFile("tmp", null, dir)));
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private _BufferedBlockCipherTestUtils() {
+    private _BufferedBlockCipher_TestUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

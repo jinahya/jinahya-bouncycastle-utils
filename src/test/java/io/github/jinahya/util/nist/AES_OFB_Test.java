@@ -1,7 +1,7 @@
 package io.github.jinahya.util.nist;
 
 import io.github.jinahya.util._OFB_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto._StreamCipherTestUtils;
+import io.github.jinahya.util.bouncycastle.crypto._StreamCipher_TestUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,20 +38,20 @@ class AES_OFB_Test
     @MethodSource({"getArgumentsStream"})
     @ParameterizedTest
     void __(final StreamCipher cipher, final CipherParameters params) throws Exception {
-        _StreamCipherTestUtils.__(cipher, params);
+        _StreamCipher_TestUtils.__(cipher, params);
     }
 
     @MethodSource({"getArgumentsStream"})
     @ParameterizedTest
     void __(final StreamBlockCipher cipher, final CipherParameters params, @TempDir final File dir)
             throws Exception {
-        _StreamCipherTestUtils.__(cipher, params, dir);
+        _StreamCipher_TestUtils.__(cipher, params, dir);
     }
 
     @Test
     void __() throws Exception {
         Security.addProvider(new BouncyCastleProvider());
-        _OFB_TestUtils.getBitBlockSizeStream()
+        _OFB_TestUtils.getBitWidthStream()
                 .peek(bbs -> {
                     log.debug("bitBlockSize: {}", bbs);
                 })

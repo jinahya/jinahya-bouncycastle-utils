@@ -19,8 +19,12 @@ abstract class LEA__Test {
     static IntStream getKeySizeStream() {
         return IntStream.of(
                 128,
-                196,
+                192,
                 256
         );
+    }
+
+    static IntStream getKeyBytesStream() {
+        return getKeySizeStream().map(ks -> ks >> 3);
     }
 }

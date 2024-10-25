@@ -1,7 +1,7 @@
 package _org.junit.jupiter.api;
 
 import io.github.jinahya.util.bouncycastle.crypto.JinahyaCipherParametersUtils;
-import io.github.jinahya.util.bouncycastle.crypto._CipherParametersTestUtils;
+import io.github.jinahya.util.bouncycastle.crypto._CipherParameters_TestUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.BlockCipher;
 import org.bouncycastle.crypto.BufferedBlockCipher;
@@ -86,7 +86,7 @@ public final class _Named_TestUtils {
     }
 
     public static <T extends CipherParameters> Named<T> namedOf(final T params) {
-        return Named.of(_CipherParametersTestUtils.paramsName(params), params);
+        return Named.of(_CipherParameters_TestUtils.paramsName(params), params);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

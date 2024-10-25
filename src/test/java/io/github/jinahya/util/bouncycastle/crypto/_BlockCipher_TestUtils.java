@@ -12,7 +12,7 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
 import java.util.Objects;
 
 @Slf4j
-public final class _BlockCipherTestUtils {
+public final class _BlockCipher_TestUtils {
 
     // -----------------------------------------------------------------------------------------------------------------
     static String cipherName(final BlockCipher cipher, final int keySize) {
@@ -43,7 +43,7 @@ public final class _BlockCipherTestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private _BlockCipherTestUtils() {
+    private _BlockCipher_TestUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }
