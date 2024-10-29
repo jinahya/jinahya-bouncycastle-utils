@@ -31,7 +31,7 @@ public final class _OFB_TestUtils {
                     try {
                         return new OFBBlockCipher(engine, bs);
                     } catch (final Exception e) {
-                        log.error("failed to create OFBBlockCipher for bitBlockSize: {}", bs, e);
+                        log.error("failed to create CFBBlockCipher with cipher({}) and bit width: {}", engine, bs, e);
                         return null;
                     }
                 })

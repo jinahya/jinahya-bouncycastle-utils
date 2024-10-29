@@ -67,12 +67,12 @@ class SEED_CFB_Test
     @ParameterizedTest
     void __(final int keySize) throws Throwable {
         _BouncyCastleProvider_TestUtils.callWithinBouncyCastleProvider(() -> {
-            final var transformation = ALGORITHM + '/' + _CFB_TestUtils.MODE + "/PKCS5Padding";
+            final var transformation = ALGORITHM + '/' + _CFB_TestUtils.MODE + "/NoPadding";
             final Cipher cipher;
             try {
                 cipher = Cipher.getInstance(transformation, BouncyCastleProvider.PROVIDER_NAME);
-            } catch (final NoSuchAlgorithmException naae) {
-                log.error("no such algorithm: {}", transformation);
+            } catch (final NoSuchAlgorithmException nsae) {
+                log.error("no such algorithm: {}", transformation, nsae);
                 return null;
             }
             final var key = new SecretKeySpec(
@@ -85,17 +85,17 @@ class SEED_CFB_Test
         });
     }
 
-    @DisplayName("CBC/CFB")
+    @DisplayName("SEED/CFB")
     @MethodSource({"getKeySizeStream_"})
     @ParameterizedTest
     void __(final int keySize, @TempDir final Path dir) throws Throwable {
         _BouncyCastleProvider_TestUtils.callWithinBouncyCastleProvider(() -> {
-            final var transformation = ALGORITHM + '/' + _CFB_TestUtils.MODE + "/PKCS5Padding";
+            final var transformation = ALGORITHM + '/' + _CFB_TestUtils.MODE + "/NoPadding";
             final Cipher cipher;
             try {
                 cipher = Cipher.getInstance(transformation, BouncyCastleProvider.PROVIDER_NAME);
-            } catch (final NoSuchAlgorithmException naae) {
-                log.error("no such algorithm: " + transformation);
+            } catch (final NoSuchAlgorithmException nsae) {
+                log.error("no such algorithm: " + transformation, nsae);
                 return null;
             }
             final var key = new SecretKeySpec(
@@ -109,7 +109,7 @@ class SEED_CFB_Test
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private static Stream<Arguments> getKeySizeAndBitWidthArgumentsStream() {
+    private static Stream<Arguments> getBitWidthAndKeySizeArgumentsStream() {
         return _CFB_TestUtils.getBitWidthStream().mapToObj(bw -> {
             return getKeySizeStream()
                     .mapToObj(ks -> Arguments.of(
@@ -120,12 +120,11 @@ class SEED_CFB_Test
     }
 
     @DisplayName("SEED/CFB<W>")
-    @MethodSource({"getKeySizeAndBitWidthArgumentsStream"})
+    @MethodSource({"getBitWidthAndKeySizeArgumentsStream"})
     @ParameterizedTest
     void __(final int bitWidth, final int keySize) throws Throwable {
         _BouncyCastleProvider_TestUtils.callWithinBouncyCastleProvider(() -> {
-//            final var transformation = ALGORITHM + '/' + _CFB_TestUtils.mode(bitWidth) + "/PKCS5Padding";
-            final var transformation = ALGORITHM + '/' + _CFB_TestUtils.mode(bitWidth);
+            final var transformation = ALGORITHM + '/' + _CFB_TestUtils.mode(bitWidth) + "/NoPadding";
             final Cipher cipher;
             try {
                 cipher = Cipher.getInstance(
@@ -147,12 +146,11 @@ class SEED_CFB_Test
     }
 
     @DisplayName("SEED/CFB<W>")
-    @MethodSource({"getKeySizeAndBitWidthArgumentsStream"})
+    @MethodSource({"getBitWidthAndKeySizeArgumentsStream"})
     @ParameterizedTest
     void __(final int bitWidth, final int keySize, @TempDir final Path dir) throws Throwable {
         _BouncyCastleProvider_TestUtils.callWithinBouncyCastleProvider(() -> {
-//            final var transformation = ALGORITHM + '/' + _CFB_TestUtils.mode(bitWidth) + "/PKCS5Padding";
-            final var transformation = ALGORITHM + '/' + _CFB_TestUtils.mode(bitWidth);
+            final var transformation = ALGORITHM + '/' + _CFB_TestUtils.mode(bitWidth) + "/NoPadding";
             final Cipher cipher;
             try {
                 cipher = Cipher.getInstance(
