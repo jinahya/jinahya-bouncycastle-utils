@@ -19,9 +19,6 @@ abstract class SEED__Test {
     static IntStream getKeySizeStream() {
         return IntStream.of(
                 128
-//                ,
-//                196,
-//                256
         );
     }
 
