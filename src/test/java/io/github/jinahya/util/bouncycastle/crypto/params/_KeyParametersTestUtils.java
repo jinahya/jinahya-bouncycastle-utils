@@ -34,7 +34,7 @@ public final class _KeyParametersTestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    public static CipherParameters newRandomInstanceOfKeyParameter(final Random random, final int keySizeInBits) {
+    public static KeyParameter newRandomInstanceOfKeyParameter(final Random random, final int keySizeInBits) {
         return new KeyParameter(newRandomKey(random, keySizeInBits));
     }
 

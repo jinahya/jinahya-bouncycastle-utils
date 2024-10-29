@@ -36,10 +36,6 @@ import java.util.stream.Stream;
 class SEED_CFB_Test
         extends SEED__Test {
 
-    private static IntStream getKeySizeStream_() {
-        return getKeySizeStream();
-    }
-
     private static Stream<Arguments> getArgumentsStream() {
         return _CFB_TestUtils.getArgumentsStream(
                 SEED__Test::getKeySizeStream,
@@ -62,7 +58,11 @@ class SEED_CFB_Test
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @DisplayName("SEED/CFB")
+    private static IntStream getKeySizeStream_() {
+        return getKeySizeStream();
+    }
+
+    @DisplayName("SEED/CFB/NoPadding")
     @MethodSource({"getKeySizeStream_"})
     @ParameterizedTest
     void __(final int keySize) throws Throwable {
@@ -85,7 +85,7 @@ class SEED_CFB_Test
         });
     }
 
-    @DisplayName("SEED/CFB")
+    @DisplayName("SEED/CFB/NoPadding")
     @MethodSource({"getKeySizeStream_"})
     @ParameterizedTest
     void __(final int keySize, @TempDir final Path dir) throws Throwable {

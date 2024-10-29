@@ -16,6 +16,7 @@ import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.StreamCipher;
 import org.bouncycastle.crypto.engines.AESEngine;
 import org.bouncycastle.crypto.modes.CFBBlockCipher;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Named;
 import org.junit.jupiter.api.io.TempDir;
@@ -31,6 +32,7 @@ import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
@@ -65,6 +67,57 @@ class AES_CFB_Test
     void __(final StreamCipher cipher, final CipherParameters params, @TempDir final File dir)
             throws Exception {
         _StreamCipher_TestUtils.__(cipher, params, dir);
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    private static IntStream getKeySizeStream_() {
+        return getKeySizeStream();
+    }
+
+    @DisplayName("AES/CFB/NoPadding")
+    @MethodSource({"getKeySizeStream_"})
+    @ParameterizedTest
+    void __(final int keySize) throws Throwable {
+        _BouncyCastleProvider_TestUtils.callWithinBouncyCastleProvider(() -> {
+            final var transformation = ALGORITHM + '/' + _CFB_TestUtils.MODE + "/NoPadding";
+            final Cipher cipher;
+            try {
+                cipher = Cipher.getInstance(transformation, BouncyCastleProvider.PROVIDER_NAME);
+            } catch (final NoSuchAlgorithmException nsae) {
+                log.error("no such algorithm: {}", transformation, nsae);
+                return null;
+            }
+            final var key = new SecretKeySpec(
+                    _KeyParametersTestUtils.newRandomKey(null, keySize),
+                    ALGORITHM
+            );
+            final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
+            _Cipher_TestUtils.__(cipher, key, params);
+            return null;
+        });
+    }
+
+    @DisplayName("AES/CFB/NoPadding")
+    @MethodSource({"getKeySizeStream_"})
+    @ParameterizedTest
+    void __(final int keySize, @TempDir final Path dir) throws Throwable {
+        _BouncyCastleProvider_TestUtils.callWithinBouncyCastleProvider(() -> {
+            final var transformation = ALGORITHM + '/' + _CFB_TestUtils.MODE + "/NoPadding";
+            final Cipher cipher;
+            try {
+                cipher = Cipher.getInstance(transformation, BouncyCastleProvider.PROVIDER_NAME);
+            } catch (final NoSuchAlgorithmException nsae) {
+                log.error("no such algorithm: " + transformation, nsae);
+                return null;
+            }
+            final var key = new SecretKeySpec(
+                    _KeyParametersTestUtils.newRandomKey(null, keySize),
+                    ALGORITHM
+            );
+            final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
+            _Cipher_TestUtils.__(cipher, key, params, dir);
+            return null;
+        });
     }
 
     // -----------------------------------------------------------------------------------------------------------------

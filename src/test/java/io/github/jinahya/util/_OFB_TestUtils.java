@@ -15,6 +15,8 @@ import java.util.stream.Stream;
 @Slf4j
 public final class _OFB_TestUtils {
 
+    public static final String MODE = "OFB";
+
     public static IntStream getBitWidthStream() {
         return IntStream.of(
                 1,
@@ -22,6 +24,10 @@ public final class _OFB_TestUtils {
                 64,
                 128
         );
+    }
+
+    public static String mode(final int bitWidth) {
+        return MODE + bitWidth;
     }
 
     public static Stream<Arguments> getArgumentsStream(final Supplier<? extends IntStream> keyStreamSupplier,
