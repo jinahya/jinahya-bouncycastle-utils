@@ -1,7 +1,7 @@
 package io.github.jinahya.util.nist;
 
 import _javax.security._Random_TestUtils;
-import io.github.jinahya.util._GCM_TestUtils;
+import io.github.jinahya.util._CCM_TestUtils;
 import io.github.jinahya.util.bouncycastle.crypto.modes.JinahyaAEADCipherUtils;
 import io.github.jinahya.util.bouncycastle.crypto.modes._AEADCipher_TestUtils;
 import lombok.AccessLevel;
@@ -10,11 +10,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.engines.AESEngine;
 import org.bouncycastle.crypto.modes.AEADCipher;
-import org.bouncycastle.crypto.modes.GCMBlockCipher;
+import org.bouncycastle.crypto.modes.CCMBlockCipher;
 import org.bouncycastle.crypto.params.AEADParameters;
 import org.bouncycastle.crypto.params.KeyParameter;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -24,24 +22,32 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 @Slf4j
-class AES_GCM_Test
+class AES_CCM_Test
         extends AES__Test {
 
-    @Test
-    void __() throws Exception {
+    private static IntStream getTagLengthStream() {
+        return _CCM_TestUtils.getBouncyCastleTagLengthStream();
+    }
+
+    @MethodSource({
+            "getTagLengthStream"
+    })
+    @ParameterizedTest
+    void __(final int tagLength) throws Exception {
         // ------------------------------------------------------------------------------------------------------- given
         final var key = _Random_TestUtils.newRandomBytes(16);
-        final var macSize = ThreadLocalRandom.current().nextInt(32, 129) >> 3 << 3;
-        final var nonce = _Random_TestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(1024) + 1);
+        final var macSize = tagLength << 3;
+        final var nonce = _Random_TestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(7, 14));
         final var associatedText = ThreadLocalRandom.current().nextBoolean() ?
                 null : _Random_TestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(1024));
-        final var cipher = GCMBlockCipher.newInstance(AESEngine.newInstance());
+        final var cipher = CCMBlockCipher.newInstance(AESEngine.newInstance());
         final var params = new AEADParameters(new KeyParameter(key), macSize, nonce, associatedText);
         final var plain = _Random_TestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(1024));
         // ----------------------------------------------------------------------------------------------------- encrypt
@@ -71,19 +77,21 @@ class AES_GCM_Test
             decryptionMac = cipher.getMac();
         }
         // -------------------------------------------------------------------------------------------------------- then
-        Assertions.assertArrayEquals(plain, decrypted);
-        Assertions.assertArrayEquals(encryptionMac, decryptionMac);
+        assertThat(decrypted).isEqualTo(plain);
+        assertThat(decryptionMac).isEqualTo(encryptionMac);
     }
 
-    @Test
-    void __(@TempDir final File dir) throws Exception {
+    @MethodSource({
+            "getTagLengthStream"
+    })
+    void __(final int tagLength, @TempDir final File dir) throws Exception {
         // ------------------------------------------------------------------------------------------------------- given
         final var key = _Random_TestUtils.newRandomBytes(16);
-        final var macSize = ThreadLocalRandom.current().nextInt(32, 129) >> 3 << 3;
-        final var nonce = _Random_TestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(1024) + 1);
+        final var macSize = tagLength << 3;
+        final var nonce = _Random_TestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(7, 14));
         final var associatedText = ThreadLocalRandom.current().nextBoolean() ?
                 null : _Random_TestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(1024));
-        final var cipher = GCMBlockCipher.newInstance(AESEngine.newInstance());
+        final var cipher = CCMBlockCipher.newInstance(AESEngine.newInstance());
         final var params = new AEADParameters(new KeyParameter(key), macSize, nonce, associatedText);
         final var plain = _Random_TestUtils.createTempFileWithRandomBytesWritten(dir);
         // ----------------------------------------------------------------------------------------------------- encrypt
@@ -121,7 +129,7 @@ class AES_GCM_Test
 
     // -----------------------------------------------------------------------------------------------------------------
     private static Stream<Arguments> getArgumentsStream() {
-        return _GCM_TestUtils.getArgumentsStream(
+        return _CCM_TestUtils.getArgumentsStream(
                 AES__Test::getKeySizeStream,
                 AESEngine::newInstance
         );
