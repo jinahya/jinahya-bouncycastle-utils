@@ -9,13 +9,13 @@ import org.bouncycastle.crypto.params.AEADParameters;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.junit.jupiter.params.provider.Arguments;
 
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-
-import static io.github.jinahya.util.bouncycastle.crypto.padding._BlockCipherPaddingTestUtils.getBlockCipherPaddingStream;
 
 @Slf4j
 public final class _GCM_TestUtils {
@@ -25,20 +25,44 @@ public final class _GCM_TestUtils {
     public static IntStream getTLenStream() {
         return IntStream.of(
                 128, 120, 112, 104, 96,
-                64, 32
+                64, 32 // for certain applications
         );
+    }
+
+    private static final Set<byte[]> keys = new HashSet<>();
+
+    private static final Set<byte[]> nonces = new HashSet<>();
+
+    private static byte[] key(final int keySize) {
+        byte[] key;
+        do {
+            key = _KeyParametersTestUtils.newRandomKey(null, keySize);
+        } while (keys.contains(key));
+        return key;
+    }
+
+    private static byte[] nonce() {
+        byte[] nonce;
+        do {
+            nonce = _Random_TestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(1024) + 1);
+        } while (nonces.contains(nonce));
+        return nonce;
     }
 
     public static Stream<Arguments> getArgumentsStream(final Supplier<? extends IntStream> keySizeStreamSupplier,
                                                        final Supplier<? extends BlockCipher> cipherSupplier) {
         Objects.requireNonNull(keySizeStreamSupplier, "keySizeStreamSupplier is null");
         Objects.requireNonNull(cipherSupplier, "cipherSupplier is null");
-        return getBlockCipherPaddingStream().flatMap(p -> keySizeStreamSupplier.get().mapToObj(ks -> {
+        return keySizeStreamSupplier.get().mapToObj(ks -> {
             final var cipher = GCMBlockCipher.newInstance(cipherSupplier.get());
-            final var key = _KeyParametersTestUtils.newRandomKey(null, ks);
+//            final var key = _KeyParametersTestUtils.newRandomKey(null, ks);
+            final var key = key(ks);
             final var macSize = ThreadLocalRandom.current().nextInt(12, 17) << 3; // [96...128]
-            final var nonce = _Random_TestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(128));
-            final var associatedText = _Random_TestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(128));
+//            final var nonce = _Random_TestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(1024) + 1);
+            final var nonce = nonce();
+            final var associatedText = ThreadLocalRandom.current().nextBoolean()
+                    ? null
+                    : _Random_TestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(1024));
             final var params = new AEADParameters(
                     new KeyParameter(key),
                     macSize,
@@ -51,7 +75,7 @@ public final class _GCM_TestUtils {
                     cipher,
                     params
             );
-        }));
+        });
     }
 
     // -----------------------------------------------------------------------------------------------------------------

@@ -17,13 +17,21 @@ import java.util.Objects;
  */
 public final class JinahyaAEADCipherUtils {
 
+    public static void processAADBytes(final AEADCipher cipher, final byte[] additionalText) {
+        Objects.requireNonNull(cipher, "cipher is null");
+        Objects.requireNonNull(additionalText, "additionalText is null");
+        cipher.processAADBytes(additionalText, 0, additionalText.length);
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
     /**
      * Processes and finalizes specified input using specified cipher.
      *
      * @param cipher the cipher.
      * @param in     the input to process and finalize.
-     * @return an array of bytes processed.
-     * @throws InvalidCipherTextException if padding is expected and not found.
+     * @return an array of result bytes.
+     * @throws InvalidCipherTextException if thrown by {@link AEADCipher#doFinal(byte[], int)} method.
      * @see AEADCipher#processBytes(byte[], int, int, byte[], int)
      * @see AEADCipher#doFinal(byte[], int)
      */
@@ -42,8 +50,9 @@ public final class JinahyaAEADCipherUtils {
         assert cipher != null : "cipher shouldn't be null";
         assert source != null : "source shouldn't be null";
         assert target != null : "target shouldn't be null";
+        assert in != null;
+        assert in.length > 0;
         assert out != null : "out shouldn't be null";
-        assert out.length > 0 : "out.length shouldn't be zero";
         for (int r; (r = source.read(in)) != -1; ) {
             final var outputSize = cipher.getOutputSize(r);
             if (out.length < outputSize) {
@@ -56,7 +65,7 @@ public final class JinahyaAEADCipherUtils {
     }
 
     /**
-     * Process, using specified cipher, all bytes from specified input stream, and writes processed bytes to specified
+     * Processes, using specified cipher, all bytes from specified input stream, and writes processed bytes to specified
      * output stream.
      *
      * @param cipher the cipher.
@@ -73,8 +82,9 @@ public final class JinahyaAEADCipherUtils {
     private static byte[] processAllBytes(final AEADCipher cipher, final InputStream source,
                                           final OutputStream target, final byte[] in)
             throws IOException {
+        assert cipher != null;
         assert in != null;
-        assert in.length > 0 : "out.length shouldn't be zero";
+        assert in.length > 0 : "in.length shouldn't be zero";
         return processAllBytes(
                 cipher,
                 source,
@@ -91,7 +101,7 @@ public final class JinahyaAEADCipherUtils {
         Objects.requireNonNull(source, "source is null");
         Objects.requireNonNull(target, "target is null");
         if (inlen < 1) {
-            throw new IllegalArgumentException("non-positive length: " + inlen);
+            throw new IllegalArgumentException("non-positive inlen: " + inlen);
         }
         for (var out = processAllBytes(cipher, source, target, new byte[inlen]); ; ) {
             try {

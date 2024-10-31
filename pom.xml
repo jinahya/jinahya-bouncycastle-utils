@@ -459,7 +459,7 @@
       <dependencies>
         <dependency>
           <groupId>org.bouncycastle</groupId>
-          <artifactId>bcprov-jdk18on</artifactId>
+          <artifactId>bcprov-debug-jdk18on</artifactId>
           <version>${version.org.bouncycastle}</version>
           <scope>provided</scope>
         </dependency>

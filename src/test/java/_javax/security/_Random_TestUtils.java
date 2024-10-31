@@ -55,6 +55,12 @@ public final class _Random_TestUtils {
         return writeRandomBytesWhile(file, f -> false);
     }
 
+    public static File createTempFileWithRandomBytesWritten(final File dir) throws IOException {
+        final var file = File.createTempFile("tmp", null, dir);
+        writeRandomBytes(file);
+        return file;
+    }
+
     public static Path createTempFileWithRandomBytesWritten(final Path dir) throws IOException {
         final var file = Files.createTempFile(dir, null, null);
         writeRandomBytes(file.toFile());
