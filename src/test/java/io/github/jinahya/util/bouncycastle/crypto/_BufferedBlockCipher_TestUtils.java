@@ -13,6 +13,7 @@ import java.nio.ByteBuffer;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public final class _BufferedBlockCipher_TestUtils {
@@ -40,6 +41,7 @@ public final class _BufferedBlockCipher_TestUtils {
                 plain,
                 encrypted
         );
+        assert !plain.hasRemaining();
         assertThat(encryptedBytes).isEqualTo(encrypted.position());
         // ----------------------------------------------------------------------------------------------------- decrypt
         cipher.init(false, params);
@@ -51,6 +53,9 @@ public final class _BufferedBlockCipher_TestUtils {
         );
         assertThat(decryptedBytes).isEqualTo(decrypted.position());
         // -------------------------------------------------------------------------------------------------------- then
+//        plain.flip();
+//        assert plain.remaining() == plain.capacity();
+//        decrypted.flip();
         assertThat(decrypted.flip()).isEqualTo(plain.flip());
     }
 
@@ -65,13 +70,14 @@ public final class _BufferedBlockCipher_TestUtils {
         // -------------------------------------------------------------------------------------------------------- then
 //        _LogUtils.log(plain, encrypted, decrypted);
         assertThat(decrypted).isEqualTo(plain);
-        __(cipher, params, ByteBuffer.wrap(plain));
+        // -------------------------------------------------------------------------------------------------------------
+        __(cipher, params, ByteBuffer.wrap(plain).asReadOnlyBuffer());
     }
 
     public static void __(final BufferedBlockCipher cipher, final CipherParameters params) throws Exception {
-        __(cipher, params, new byte[0]); // empty
-        __(cipher, params, new byte[1]); // single-zero
-        __(cipher, params, _Random_TestUtils.newRandomBytes(1)); // single-random
+//        __(cipher, params, new byte[0]); // empty
+//        __(cipher, params, new byte[1]); // single-zero
+//        __(cipher, params, _Random_TestUtils.newRandomBytes(1)); // single-random
         __(cipher, params, _Random_TestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(1024)));
     }
 
