@@ -6,7 +6,7 @@ import _org.bouncycastle.jce.provider._BouncyCastleProvider_TestUtils;
 import io.github.jinahya.util._CBC_TestUtils;
 import io.github.jinahya.util.bouncycastle.crypto._BufferedBlockCipher_TestUtils;
 import io.github.jinahya.util.bouncycastle.crypto._CipherParameters_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto.padding._BlockCipherPaddingTestUtils;
+import io.github.jinahya.util.bouncycastle.crypto.paddings._BlockCipherPaddingTestUtils;
 import io.github.jinahya.util.bouncycastle.crypto.params._KeyParametersTestUtils;
 import io.github.jinahya.util.bouncycastle.crypto.params._ParametersWithIVTestUtils;
 import io.github.jinahya.util.bouncycastle.jce.provider.JinahyaBouncyCastleProviderUtils;

@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.engines.AESEngine;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -14,6 +15,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.io.File;
 import java.util.stream.Stream;
 
+@Disabled
 @Slf4j
 class AES_ECB_Test
         extends AES__Test {

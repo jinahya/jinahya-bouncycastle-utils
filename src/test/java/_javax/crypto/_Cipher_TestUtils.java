@@ -37,75 +37,83 @@ public final class _Cipher_TestUtils {
             throws Exception {
         // ------------------------------------------------------------------------------------------------------- plain
         final var plain = _Random_TestUtils.createTempFileWithRandomBytesWritten(dir);
-        final var input = ByteBuffer.allocate(ThreadLocalRandom.current().nextInt(1024) + 1);
-        var output = ByteBuffer.allocate(ThreadLocalRandom.current().nextInt(1024) + 1);
+        final var inbuf = ByteBuffer.allocate(ThreadLocalRandom.current().nextInt(1024) + 1);
+        var outbuf = ByteBuffer.allocate(ThreadLocalRandom.current().nextInt(1024) + 1);
         // ----------------------------------------------------------------------------------------------------- encrypt
-        input.clear();
-        output.clear();
         cipher.init(Cipher.ENCRYPT_MODE, key, params);
         final var encrypted = Files.createTempFile(dir, null, null);
-        try (var readable = FileChannel.open(plain, StandardOpenOption.READ);
-             var writable = FileChannel.open(encrypted, StandardOpenOption.WRITE)) {
-            while (readable.read(input) != -1) {
-                input.flip();
-                try {
-                    final var stored = cipher.update(input, output);
-                    assert stored >= 0;
-                } catch (final ShortBufferException sbe) {
-                    output = ByteBuffer.allocate(output.capacity() << 1);
+        try (var input = FileChannel.open(plain, StandardOpenOption.READ);
+             var output = FileChannel.open(encrypted, StandardOpenOption.WRITE)) {
+            while (input.read(inbuf) != -1) {
+                for (inbuf.flip(); ; ) {
+                    try {
+                        final var stored = cipher.update(inbuf, outbuf);
+                        assert stored >= 0;
+                        break;
+                    } catch (final ShortBufferException sbe) {
+                        outbuf = ByteBuffer.allocate(outbuf.capacity() << 1);
+                    }
                 }
-                for (output.flip(); output.hasRemaining(); ) {
-                    final var written = writable.write(output);
+                inbuf.compact();
+                for (outbuf.flip(); outbuf.hasRemaining(); ) {
+                    final var written = output.write(outbuf);
                     assert written >= 0;
                 }
-                output.clear();
-                input.compact();
+                outbuf.clear();
             }
-            try {
-                final var stored = cipher.doFinal(input.flip(), output);
-                assert stored >= 0;
-            } catch (final ShortBufferException sbe) {
-                output = ByteBuffer.allocate(output.capacity() << 1);
+            for (inbuf.flip(); ; ) {
+                try {
+                    final var stored = cipher.doFinal(inbuf, outbuf);
+                    assert stored >= 0;
+                    break;
+                } catch (final ShortBufferException sbe) {
+                    outbuf = ByteBuffer.allocate(outbuf.capacity() << 1);
+                }
             }
-            for (output.flip(); output.hasRemaining(); ) {
-                final var written = writable.write(output);
+            for (outbuf.flip(); outbuf.hasRemaining(); ) {
+                final var written = output.write(outbuf);
                 assert written >= 0;
             }
-            writable.force(false);
+            output.force(false);
         }
         // ----------------------------------------------------------------------------------------------------- decrypt
-        input.clear();
-        output.clear();
+        inbuf.clear();
+        outbuf.clear();
         cipher.init(Cipher.DECRYPT_MODE, key, params);
         final var decrypted = Files.createTempFile(dir, null, null);
-        try (var readable = FileChannel.open(encrypted, StandardOpenOption.READ);
-             var writable = FileChannel.open(decrypted, StandardOpenOption.WRITE)) {
-            while (readable.read(input) != -1) {
-                input.flip();
-                try {
-                    final var stored = cipher.update(input, output);
-                    assert stored >= 0;
-                } catch (final ShortBufferException sbe) {
-                    output = ByteBuffer.allocate(output.capacity() << 1);
+        try (var input = FileChannel.open(encrypted, StandardOpenOption.READ);
+             var output = FileChannel.open(decrypted, StandardOpenOption.WRITE)) {
+            while (input.read(inbuf) != -1) {
+                for (inbuf.flip();;) {
+                    try {
+                        final var stored = cipher.update(inbuf, outbuf);
+                        assert stored >= 0;
+                        break;
+                    } catch (final ShortBufferException sbe) {
+                        outbuf = ByteBuffer.allocate(outbuf.capacity() << 1);
+                    }
                 }
-                for (output.flip(); output.hasRemaining(); ) {
-                    final var written = writable.write(output);
+                inbuf.compact();
+                for (outbuf.flip(); outbuf.hasRemaining(); ) {
+                    final var written = output.write(outbuf);
                     assert written >= 0;
                 }
-                output.clear();
-                input.compact();
+                outbuf.clear();
             }
-            try {
-                final var stored = cipher.doFinal(input.flip(), output);
-                assert stored >= 0;
-            } catch (final ShortBufferException sbe) {
-                output = ByteBuffer.allocate(output.capacity() << 1);
+            for (inbuf.flip();;) {
+                try {
+                    final var stored = cipher.doFinal(inbuf, outbuf);
+                    assert stored >= 0;
+                    break;
+                } catch (final ShortBufferException sbe) {
+                    outbuf = ByteBuffer.allocate(outbuf.capacity() << 1);
+                }
             }
-            for (output.flip(); output.hasRemaining(); ) {
-                final var written = writable.write(output);
+            for (outbuf.flip(); outbuf.hasRemaining(); ) {
+                final var written = output.write(outbuf);
                 assert written >= 0;
             }
-            writable.force(false);
+            output.force(false);
         }
     }
 

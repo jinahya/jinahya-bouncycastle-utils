@@ -12,7 +12,7 @@ import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static io.github.jinahya.util.bouncycastle.crypto.padding._BlockCipherPaddingTestUtils.getBlockCipherPaddingStream;
+import static io.github.jinahya.util.bouncycastle.crypto.paddings._BlockCipherPaddingTestUtils.getBlockCipherPaddingStream;
 
 @Slf4j
 public final class _CBC_TestUtils {

@@ -4,20 +4,9 @@ import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.Objects;
-import java.util.Random;
 
 public class JinahyaCipherParametersUtils {
-
-    private static Random random() {
-        try {
-            return SecureRandom.getInstanceStrong();
-        } catch (final NoSuchAlgorithmException nsae) {
-            throw new RuntimeException("failed to get a strong instance of " + SecureRandom.class, nsae);
-        }
-    }
 
     // -----------------------------------------------------------------------------------------------------------------
     public static byte[] getKey(final CipherParameters params) {

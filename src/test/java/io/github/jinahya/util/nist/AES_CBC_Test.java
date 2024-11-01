@@ -5,7 +5,7 @@ import _javax.security._Random_TestUtils;
 import _org.bouncycastle.jce.provider._BouncyCastleProvider_TestUtils;
 import io.github.jinahya.util._CBC_TestUtils;
 import io.github.jinahya.util.bouncycastle.crypto._BufferedBlockCipher_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto.padding._BlockCipherPaddingTestUtils;
+import io.github.jinahya.util.bouncycastle.crypto.paddings._BlockCipherPaddingTestUtils;
 import io.github.jinahya.util.bouncycastle.crypto.params._KeyParametersTestUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.BufferedBlockCipher;
