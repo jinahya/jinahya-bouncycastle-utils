@@ -154,6 +154,7 @@ class AES_CBC_Test
     @ParameterizedTest
     void __(final BufferedBlockCipher cipher, final CipherParameters params, @TempDir final File dir) throws Exception {
         _BufferedBlockCipher_TestUtils.__(cipher, params, dir);
+        _BufferedBlockCipher_TestUtils.__(cipher, params, dir.toPath());
     }
 
     // -----------------------------------------------------------------------------------------------------------------

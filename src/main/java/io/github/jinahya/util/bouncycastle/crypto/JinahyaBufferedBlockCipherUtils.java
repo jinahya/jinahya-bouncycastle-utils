@@ -4,7 +4,6 @@ import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.bouncycastle.util.Arrays;
 
-import javax.crypto.ShortBufferException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -36,7 +35,6 @@ public final class JinahyaBufferedBlockCipherUtils {
                                                  final int len)
             throws InvalidCipherTextException {
         final var out = new byte[cipher.getOutputSize(in.length)];
-//        final var processed = cipher.processBytes(in, off, len, out, 0);
         final var processed = processBytes(cipher, in, off, len, out, 0);
         final var finalized = cipher.doFinal(out, processed);
         return Arrays.copyOf(out, (processed + finalized));
@@ -56,18 +54,6 @@ public final class JinahyaBufferedBlockCipherUtils {
             throws InvalidCipherTextException {
         return processBytesAndDoFinal(cipher, in, 0, in.length);
     }
-
-//    public static ByteBuffer processBytesAndDoFinal(final BufferedBlockCipher cipher, final ByteBuffer input)
-//            throws InvalidCipherTextException, ShortBufferException {
-//        Objects.requireNonNull(input, "input is null");
-//        final var output = ByteBuffer.allocate(cipher.getOutputSize(input.remaining()));
-//        final var bytes = processBytesAndDoFinal(
-//                cipher,
-//                input,
-//                output
-//        );
-//        return output.flip();
-//    }
 
     // -----------------------------------------------------------------------------------------------------------------
     private static byte[] processAllBytes(final BufferedBlockCipher cipher, final InputStream source,
@@ -95,9 +81,9 @@ public final class JinahyaBufferedBlockCipherUtils {
         return out;
     }
 
-    public static <T extends BufferedBlockCipher> T processAllBytesAndDoFinal(final T cipher, final InputStream source,
-                                                                              final OutputStream target,
-                                                                              final byte[] in, byte[] out)
+    private static <T extends BufferedBlockCipher> T processAllBytesAndDoFinal(final T cipher, final InputStream source,
+                                                                               final OutputStream target,
+                                                                               final byte[] in, byte[] out)
             throws IOException, InvalidCipherTextException {
         out = processAllBytes(cipher, source, target, in, out);
         final var finalized = cipher.doFinal(out, 0);
@@ -137,70 +123,78 @@ public final class JinahyaBufferedBlockCipherUtils {
                                                                               final OutputStream target)
             throws IOException, InvalidCipherTextException {
         Objects.requireNonNull(cipher, "cipher is null");
-//        for (var out = processAllBytes(cipher, source, target, new byte[cipher.getBlockSize()]); ; ) {
-//            try {
-//                target.write(out, 0, cipher.doFinal(out, 0));
-//                break;
-//            } catch (final DataLengthException dle) {
-//                System.err.println("doubling up out.length from " + out.length);
-//                out = new byte[out.length << 1];
-//            }
-//        }
-        return processAllBytesAndDoFinal(cipher, source, target, new byte[cipher.getBlockSize()]);
+        return processAllBytesAndDoFinal(
+                cipher,
+                source,
+                target,
+                new byte[cipher.getBlockSize()]
+        );
     }
 
     // -----------------------------------------------------------------------------------------------------------------
     private static int processBytes(final BufferedBlockCipher cipher, final ByteBuffer input,
-                                    final ByteBuffer output)
-            throws ShortBufferException {
+                                    final ByteBuffer output) {
         final var updateSize = cipher.getUpdateOutputSize(Objects.requireNonNull(input, "input is null").remaining());
         if (Objects.requireNonNull(output, "output is null").remaining() < updateSize) {
-            throw new ShortBufferException(
-                    "output.remaining(" + output.remaining() + ") shouldn't be less than "
-                            + updateSize + " derived from input.remaining(" + input.remaining() + ")"
+            throw new IllegalArgumentException(
+                    "output.remaining(" + output.remaining() + ") shouldn't be less than the updateSize("
+                            + updateSize + ") derived from input.remaining(" + input.remaining() + ")"
             );
         }
+        // -------------------------------------------------------------------------------------------------------------
         final byte[] in;
         final int inoff;
         final int inlen;
-        final var inputPosition = input.position(); // TODO: remove
-        {
-            if (input.hasArray()) {
-                in = input.array();
-                inoff = input.arrayOffset();
-                inlen = input.remaining();
-            } else {
-                in = new byte[input.remaining()];
-                var i = input.position();
-                for (int j = 0; j < in.length; j++) {
-                    in[j] = input.get(i++);
-                }
-                inoff = 0;
-                inlen = in.length;
+        if (input.hasArray()) {
+            in = input.array();
+            inoff = input.arrayOffset();
+            inlen = input.remaining();
+        } else {
+            in = new byte[input.remaining()];
+            var i = input.position();
+            for (int j = 0; j < in.length; j++) {
+                in[j] = input.get(i++);
             }
+            inoff = 0;
+            inlen = in.length;
         }
-        assert input.position() == inputPosition; // TODO: remove
+        // -------------------------------------------------------------------------------------------------------------
         final byte[] out;
         final int outoff;
-        final var outputPosition = output.position(); // TODO: remove
-        {
-            if (output.hasArray()) {
-                out = output.array();
-                outoff = output.arrayOffset();
-            } else {
-                out = new byte[updateSize];
-                var i = output.position();
-                for (int j = 0; j < in.length; j++) {
-                    in[j] = output.get(i++);
-                }
-                outoff = 0;
+        if (output.hasArray()) {
+            out = output.array();
+            outoff = output.arrayOffset();
+        } else {
+            out = new byte[updateSize];
+            var i = output.position();
+            for (int j = 0; j < in.length; j++) {
+                in[j] = output.get(i++);
             }
+            outoff = 0;
         }
-        assert output.position() == outputPosition; // TODO: remove
+        // -------------------------------------------------------------------------------------------------------------
         final var processed = processBytes(cipher, in, inoff, inlen, out, outoff);
         input.position(input.position() + inlen);
+        assert !input.hasRemaining();
         output.position(output.position() + processed);
         return processed;
+    }
+
+    private static int doFinal(final BufferedBlockCipher cipher, final ByteBuffer output)
+            throws InvalidCipherTextException {
+        final byte[] out;
+        final int outoff;
+        if (output.hasArray()) {
+            out = output.array();
+            outoff = output.arrayOffset() + output.position();
+        } else {
+            out = new byte[output.remaining()];
+            output.get(output.position(), out, 0, out.length);
+            outoff = 0;
+        }
+        final var finalized = cipher.doFinal(out, outoff);
+        output.position(output.position() + finalized);
+        return finalized;
     }
 
     /**
@@ -211,84 +205,35 @@ public final class JinahyaBufferedBlockCipherUtils {
      * @param output .
      * @return the number of bytes stored in {@code output}.
      * @throws InvalidCipherTextException if padding is expected and not found.
-     * @throws ShortBufferException       if there is insufficient space in the output buffer
      */
     public static int processBytesAndDoFinal(final BufferedBlockCipher cipher, final ByteBuffer input,
                                              final ByteBuffer output)
-            throws InvalidCipherTextException, ShortBufferException {
-        Objects.requireNonNull(input, "input is null");
+            throws InvalidCipherTextException {
         Objects.requireNonNull(output, "output is null");
-        final var outputSize = cipher.getOutputSize(input.remaining());
-        if (output.remaining() < outputSize) {
-            throw new ShortBufferException(
-                    "output.remaining(" + output.remaining() + ") shouldn't be less than "
-                            + outputSize + " derived from input.remaining(" + input.remaining() + ")"
-            );
-        }
-        if (true) {
-            final var processed = processBytes(cipher, input, output);
-            final byte[] out;
-            int outoff;
-            final var p = output.position(); // TODO: remove
-            {
-                if (output.hasArray()) {
-                    out = output.array();
-                    outoff = output.arrayOffset() + output.position();
-                } else {
-                    out = new byte[output.remaining()];
-                    var i = output.position();
-                    for (int j = 0; j < out.length; j++) {
-                        out[j] = output.get(i++);
-                    }
-                    outoff = 0;
-                }
-            }
-            assert output.position() == p; // TODO: remove
-            final var finalized = cipher.doFinal(out, outoff);
-            for (int i = 0; i < finalized; i++) {
-                output.put(out[outoff++]);
-            }
-            return processed + finalized;
-        }
-        Objects.requireNonNull(input, "input is null");
-        Objects.requireNonNull(output, "output is null");
-        final byte[] in;
-        final int off;
-        final int len;
-        final var inputPosition = input.position(); // TODO: remove
-        {
-            if (input.hasArray()) {
-                in = input.array();
-                off = input.arrayOffset();
-                len = input.remaining();
-            } else {
-                in = new byte[input.remaining()];
-                var i = input.position();
-                for (int j = 0; j < in.length; j++) {
-                    in[j] = input.get(i++);
-                }
-                off = 0;
-                len = in.length;
-            }
-        }
-        assert input.position() == inputPosition; // TODO: remove
-        final var out = processBytesAndDoFinal(cipher, in, off, len);
-        if (output.remaining() < out.length) {
-            throw new ShortBufferException();
-        }
-        final var outputPosition = output.position(); // TODO: remove
-        output.put(out);
-        assert output.position() == outputPosition + out.length; // TODO: remove
-        input.position(input.position() + input.remaining());
-        return out.length;
+        final var processed = processBytes(cipher, input, output);
+        final var finalized = doFinal(cipher, output);
+//        final int outoff;
+//        if (output.hasArray()) {
+//            out = output.array();
+//            outoff = output.arrayOffset() + output.position();
+//        } else {
+//            out = new byte[output.remaining()];
+//            var i = output.position();
+//            for (int j = 0; j < out.length; j++) {
+//                out[j] = output.get(i++);
+//            }
+//            outoff = 0;
+//        }
+//        final var finalized = cipher.doFinal(out, outoff);
+//        output.put(out, outoff, finalized);
+        return processed + finalized;
     }
 
     public static long processAllBytesAndDoFinal(final BufferedBlockCipher cipher,
                                                  final ReadableByteChannel source,
                                                  final WritableByteChannel target,
-                                                 final ByteBuffer input,
-                                                 final ByteBuffer output)
-            throws ShortBufferException {
+                                                 final ByteBuffer input, final ByteBuffer output)
+            throws IOException, InvalidCipherTextException {
         Objects.requireNonNull(cipher, "cipher is null");
         Objects.requireNonNull(source, "source is null");
         Objects.requireNonNull(target, "target is null");
@@ -297,14 +242,57 @@ public final class JinahyaBufferedBlockCipherUtils {
         }
         final var outputSize = cipher.getOutputSize(input.capacity());
         if (Objects.requireNonNull(output, "output is null").capacity() < outputSize) {
-            throw new ShortBufferException(
-                    "output.capacity(" + output.capacity() + ") shouldn't be less than "
-                            + outputSize + " derived from input.capacity(" + input.capacity() + ")"
+            throw new IllegalArgumentException(
+                    "output.capacity(" + output.capacity() + ") shouldn't be less than the outputSize("
+                            + outputSize + ") derived from input.capacity(" + input.capacity() + ")"
             );
         }
-        long count = 0L;
+        long written = 0L;
+        input.clear();
+        output.clear();
+        while (source.read(input) != -1) {
+            final var processed = processBytes(cipher, input.flip(), output);
+            input.clear();
+            for (output.flip(); output.hasRemaining(); ) {
+                target.write(output);
+            }
+            output.clear();
+            written += processed;
+        }
+        final var finalized = doFinal(cipher, output);
+        for (output.flip(); output.hasRemaining(); ) {
+            target.write(output);
+        }
+        output.clear();
+        written += finalized;
+        return written;
+    }
 
-        return count;
+    /**
+     * Process and finalizes, using specified cipher, from specified input channel, and write all processed bytes to
+     * specified output channel.
+     *
+     * @param cipher the cipher.
+     * @param source the input channel from which bytes are read.
+     * @param target the output channel to which processed bytes are written.
+     * @param input  a buffer for reading bytes from the {@code source}.
+     * @return the number of processed bytes written the {@code target}.
+     * @throws IOException                if an I/O error occurs.
+     * @throws InvalidCipherTextException if padding is expected and not found.
+     */
+    public static long processAllBytesAndDoFinal(final BufferedBlockCipher cipher,
+                                                 final ReadableByteChannel source,
+                                                 final WritableByteChannel target,
+                                                 final ByteBuffer input)
+            throws IOException, InvalidCipherTextException {
+        Objects.requireNonNull(cipher, "cipher is null");
+        return processAllBytesAndDoFinal(
+                cipher,
+                source,
+                target,
+                input,
+                ByteBuffer.allocate(cipher.getOutputSize(input.capacity()))
+        );
     }
 
     // -----------------------------------------------------------------------------------------------------------------
