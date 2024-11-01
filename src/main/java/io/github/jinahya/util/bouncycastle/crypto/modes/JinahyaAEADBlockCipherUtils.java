@@ -52,7 +52,7 @@ public final class JinahyaAEADBlockCipherUtils {
             }
             target.write(out, 0, cipher.processBytes(in, 0, r, out, 0));
         }
-        Arrays.clear(out);
+        Arrays.fill(out, (byte) 0);
         return out;
     }
 

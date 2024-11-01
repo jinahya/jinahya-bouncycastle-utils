@@ -8,6 +8,9 @@ import java.util.Objects;
  * A utility class for {@link BlockCipher}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ * @see <a
+ * href="https://downloads.bouncycastle.org/java/docs/bcprov-jdk18on-javadoc/org/bouncycastle/crypto/BlockCipher.html">org.bouncycastle.crypto.BlockCipher</a>
+ * (bcprov-jdk18on-javadoc)
  */
 public final class JinahyaBlockCipherUtils {
 

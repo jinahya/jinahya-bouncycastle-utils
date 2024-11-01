@@ -15,47 +15,53 @@ import java.util.Objects;
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @see <a
  * href="https://downloads.bouncycastle.org/java/docs/bcprov-jdk18on-javadoc/index.html?org/bouncycastle/crypto/StreamCipher.html">org.bouncycastle.crypto.StreamCipher</a>
+ * (bcprov-jdk18on-javadoc)
  */
 public final class JinahyaStreamCipherUtils {
 
     static byte[] processBytes(final StreamCipher cipher, final byte[] in, byte[] out) {
-        Objects.requireNonNull(cipher, "cipher is null");
-        Objects.requireNonNull(in, "in is null");
+        assert cipher != null : "cipher shouldn't be null";
+        assert in != null : "in shouldn't be null";
+        assert out != null : "out shouldn't be null";
+        assert out.length > 0 : "out.length shouldn't be zero";
         while (true) {
             try {
-                return Arrays.copyOf(out, cipher.processBytes(in, 0, in.length, out, 0));
+                final var processed = cipher.processBytes(in, 0, in.length, out, 0);
+                return Arrays.copyOf(out, processed);
             } catch (final DataLengthException dle) {
                 System.err.println("doubling up out.length from " + out.length);
-                out = new byte[out.length << 1];
+                out = Arrays.copyOf(out, out.length << 1);
             }
         }
     }
 
     public static byte[] processBytes(final StreamCipher cipher, final byte[] in) {
-        return processBytes(cipher, in, new byte[in.length]);
+        return processBytes(cipher, in, new byte[1]);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    static <T extends StreamCipher> T processAllBytes(final T cipher, final InputStream source,
-                                                      final OutputStream target, final byte[] in, byte[] out)
+    public static <T extends StreamCipher> T processAllBytes(final T cipher, final InputStream source,
+                                                             final OutputStream target, final byte[] in, byte[] out)
             throws IOException {
         Objects.requireNonNull(cipher, "cipher is null");
         Objects.requireNonNull(source, "source is null");
         Objects.requireNonNull(target, "target is null");
         if (Objects.requireNonNull(in, "in is null").length == 0) {
-            throw new IllegalArgumentException("in.length is zero");
+            throw new IllegalArgumentException("in.length shouldn't be zero");
         }
         if (Objects.requireNonNull(out, "out is null").length == 0) {
-            throw new IllegalArgumentException("out.length is zero");
+            throw new IllegalArgumentException("out.length shouldn't be zero");
         }
         for (int r; (r = source.read(in)) != -1; ) {
             while (true) {
                 try {
-                    target.write(out, 0, cipher.processBytes(in, 0, r, out, 0));
+                    final var processed = cipher.processBytes(in, 0, r, out, 0);
+                    target.write(out, 0, processed);
                     break;
                 } catch (final DataLengthException dle) {
                     System.err.println("doubling up out.length from " + out.length);
-                    out = new byte[out.length << 1];
+                    Arrays.fill(out, (byte) 0);
+                    out = Arrays.copyOf(out, out.length << 1);
                 }
             }
         }
@@ -81,7 +87,15 @@ public final class JinahyaStreamCipherUtils {
     public static <T extends StreamCipher> T processAllBytes(final T cipher, final InputStream source,
                                                              final OutputStream target, final byte[] in)
             throws IOException {
-        return processAllBytes(cipher, source, target, in, new byte[in.length]);
+        if (Objects.requireNonNull(in, "in is null").length == 0) {
+            throw new IllegalArgumentException("in.length shouldn't be zero");
+        }
+        return processAllBytes(
+                cipher,
+                source, target,
+                in,
+                new byte[in.length]
+        );
     }
 
     // -----------------------------------------------------------------------------------------------------------------

@@ -9,6 +9,7 @@ import org.bouncycastle.crypto.paddings.BlockCipherPadding;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.nio.ByteBuffer;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -29,6 +30,30 @@ public final class _BufferedBlockCipher_TestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    private static void __(final BufferedBlockCipher cipher, final CipherParameters params, final ByteBuffer plain)
+            throws Exception {
+        // ----------------------------------------------------------------------------------------------------- encrypt
+        cipher.init(true, params);
+        final var encrypted = ByteBuffer.allocate(cipher.getOutputSize(plain.remaining()));
+        final var encryptedBytes = JinahyaBufferedBlockCipherUtils.processBytesAndDoFinal(
+                cipher,
+                plain,
+                encrypted
+        );
+        assertThat(encryptedBytes).isEqualTo(encrypted.position());
+        // ----------------------------------------------------------------------------------------------------- decrypt
+        cipher.init(false, params);
+        final var decrypted = ByteBuffer.allocate(cipher.getOutputSize(encrypted.flip().remaining()));
+        final var decryptedBytes = JinahyaBufferedBlockCipherUtils.processBytesAndDoFinal(
+                cipher,
+                encrypted,
+                decrypted
+        );
+        assertThat(decryptedBytes).isEqualTo(decrypted.position());
+        // -------------------------------------------------------------------------------------------------------- then
+        assertThat(decrypted.flip()).isEqualTo(plain.flip());
+    }
+
     public static void __(final BufferedBlockCipher cipher, final CipherParameters params, final byte[] plain)
             throws Exception {
         // ----------------------------------------------------------------------------------------------------- encrypt
@@ -40,6 +65,7 @@ public final class _BufferedBlockCipher_TestUtils {
         // -------------------------------------------------------------------------------------------------------- then
 //        _LogUtils.log(plain, encrypted, decrypted);
         assertThat(decrypted).isEqualTo(plain);
+        __(cipher, params, ByteBuffer.wrap(plain));
     }
 
     public static void __(final BufferedBlockCipher cipher, final CipherParameters params) throws Exception {
@@ -49,6 +75,7 @@ public final class _BufferedBlockCipher_TestUtils {
         __(cipher, params, _Random_TestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(1024)));
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
     public static void __(final BufferedBlockCipher cipher, final CipherParameters params, final File dir,
                           final File plain)
             throws Exception {
