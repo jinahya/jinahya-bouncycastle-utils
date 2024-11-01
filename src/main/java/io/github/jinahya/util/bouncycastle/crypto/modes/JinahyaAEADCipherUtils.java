@@ -17,81 +17,83 @@ import java.util.Objects;
  */
 public final class JinahyaAEADCipherUtils {
 
-    public static void processAADBytes(final AEADCipher cipher, final byte[] additionalText) {
-        Objects.requireNonNull(cipher, "cipher is null");
-        Objects.requireNonNull(additionalText, "additionalText is null");
-        cipher.processAADBytes(additionalText, 0, additionalText.length);
+    // -----------------------------------------------------------------------------------------------------------------
+
+    private static int processBytes(final AEADCipher cipher, final byte[] in, final int inoff,
+                                    final int inlen, final byte[] out, final int outoff) {
+        return cipher.processBytes(in, inoff, inlen, out, outoff); // DataLengthException
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
+    public static int processBytesAndDoFinal(final AEADCipher cipher, final byte[] input, final byte[] output)
+            throws InvalidCipherTextException {
+        final var processed = processBytes(cipher, input, 0, input.length, output, 0);
+        final var finalized = cipher.doFinal(output, processed); // InvalidCipherTextException
+        return processed + finalized;
+    }
 
     /**
      * Processes and finalizes specified input using specified cipher.
      *
      * @param cipher the cipher.
-     * @param in     the input to process and finalize.
+     * @param input  the input to process and finalize.
      * @return an array of result bytes.
      * @throws InvalidCipherTextException if thrown by {@link AEADCipher#doFinal(byte[], int)} method.
      * @see AEADCipher#processBytes(byte[], int, int, byte[], int)
      * @see AEADCipher#doFinal(byte[], int)
      */
-    public static byte[] processBytesAndDoFinal(final AEADCipher cipher, final byte[] in)
+    public static byte[] processBytesAndDoFinal(final AEADCipher cipher, final byte[] input)
             throws InvalidCipherTextException {
-        final var out = new byte[cipher.getOutputSize(in.length)];
-        final var processed = cipher.processBytes(in, 0, in.length, out, 0);
-        final var finalized = cipher.doFinal(out, processed);
-        return Arrays.copyOf(out, (processed + finalized));
+        final var output = new byte[cipher.getOutputSize(input.length)];
+        final var outlen = processBytesAndDoFinal(cipher, input, output);
+        return Arrays.copyOf(output, outlen);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private static byte[] processAllBytes(final AEADCipher cipher, final InputStream source,
-                                          final OutputStream target, final byte[] in, byte[] out)
+    private static byte[] processAllBytes(final AEADCipher cipher, final InputStream input,
+                                          final OutputStream output, final byte[] inbuf, byte[] outbuf)
             throws IOException {
         assert cipher != null : "cipher shouldn't be null";
-        assert source != null : "source shouldn't be null";
-        assert target != null : "target shouldn't be null";
-        assert in != null;
-        assert in.length > 0;
-        assert out != null : "out shouldn't be null";
-        for (int r; (r = source.read(in)) != -1; ) {
-            final var outputSize = cipher.getOutputSize(r);
-            if (out.length < outputSize) {
-                out = new byte[outputSize];
+        assert input != null : "input shouldn't be null";
+        assert output != null : "output shouldn't be null";
+        assert inbuf != null;
+        assert inbuf.length > 0;
+        assert outbuf != null : "outbuf shouldn't be null";
+        for (int r; (r = input.read(inbuf)) != -1; ) {
+            final var outputSize = cipher.getOutputSize(r); // don't use <cipher.getUpdateOutputSize(r)>; finalization!!
+            if (outbuf.length < outputSize) {
+                outbuf = new byte[outputSize];
             }
-            target.write(out, 0, cipher.processBytes(in, 0, r, out, 0));
+            final var outlen = processBytes(cipher, inbuf, 0, r, outbuf, 0);
+            output.write(outbuf, 0, outlen);
         }
-        Arrays.clear(out);
-        return out;
+        return outbuf;
     }
 
-    /**
-     * Processes, using specified cipher, all bytes from specified input stream, and writes processed bytes to specified
-     * output stream.
-     *
-     * @param cipher the cipher.
-     * @param source the input stream from which bytes to process are read.
-     * @param target the output stream to which processed bytes are written.
-     * @param in     a buffer for reading bytes from {@code source} whose {@code length} should be positive.
-     * @return an array of bytes suitable for the {@code out} of
-     * @throws IOException if an I/O error occurs.
-     * @see AEADCipher#processBytes(byte[], int, int, byte[], int)
-     * @see <a
-     * href="https://downloads.bouncycastle.org/java/docs/bcprov-jdk18on-javadoc/org/bouncycastle/crypto/AEADCipher.html">org.bouncycastle.crypto.AEADCipher</a>
-     * (bcprov-jdk18on-javadoc)
-     */
     private static byte[] processAllBytes(final AEADCipher cipher, final InputStream source,
-                                          final OutputStream target, final byte[] in)
+                                          final OutputStream target, final byte[] inbuf)
             throws IOException {
         assert cipher != null;
-        assert in != null;
-        assert in.length > 0 : "in.length shouldn't be zero";
+        assert inbuf != null;
+        assert inbuf.length > 0 : "inbuf.length shouldn't be zero";
+        final var outbuf = new byte[cipher.getOutputSize(inbuf.length)];
         return processAllBytes(
                 cipher,
                 source,
                 target,
-                in,
-                new byte[cipher.getOutputSize(in.length)]
+                inbuf,
+                outbuf
         );
+    }
+
+    public static int processAllBytesAndDoFinal(final AEADCipher cipher, final InputStream input,
+                                                final OutputStream output, final byte[] inbuf)
+            throws IOException, InvalidCipherTextException {
+        Objects.requireNonNull(cipher, "cipher is null");
+        Objects.requireNonNull(input, "input is null");
+        Objects.requireNonNull(output, "output is null");
+        final var out = processAllBytes(cipher, input, output, inbuf);
+        output.write(out, 0, cipher.doFinal(out, 0));
+        return 0;
     }
 
     public static <T extends AEADCipher> T processAllBytesAndDoFinal(final T cipher, final InputStream source,
