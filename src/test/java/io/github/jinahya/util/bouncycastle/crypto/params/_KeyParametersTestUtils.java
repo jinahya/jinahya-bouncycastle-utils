@@ -21,14 +21,14 @@ public final class _KeyParametersTestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    public static byte[] newRandomKey(Random random, final int keySizeInBits) {
+    public static byte[] newRandomKey(Random random, final int keyLengthInBits) {
         if (random == null) {
             random = random();
         }
-        if (keySizeInBits <= 0) {
-            throw new IllegalArgumentException("non-positive keySizeInBits: " + keySizeInBits);
+        if (keyLengthInBits <= 0) {
+            throw new IllegalArgumentException("non-positive keyLengthInBits: " + keyLengthInBits);
         }
-        final var key = new byte[keySizeInBits >> 3];
+        final var key = new byte[keyLengthInBits >> 3];
         random.nextBytes(key);
         return key;
     }
