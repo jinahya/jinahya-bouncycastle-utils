@@ -23,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public final class _Cipher_TestUtils {
 
+    // -----------------------------------------------------------------------------------------------------------------
     public static void __(final Cipher cipher, final Key key, final AlgorithmParameterSpec params)
             throws Exception {
         final var plain = _Random_TestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(1024));
@@ -84,7 +85,7 @@ public final class _Cipher_TestUtils {
         try (var input = FileChannel.open(encrypted, StandardOpenOption.READ);
              var output = FileChannel.open(decrypted, StandardOpenOption.WRITE)) {
             while (input.read(inbuf) != -1) {
-                for (inbuf.flip();;) {
+                for (inbuf.flip(); ; ) {
                     try {
                         final var stored = cipher.update(inbuf, outbuf);
                         assert stored >= 0;
@@ -100,7 +101,7 @@ public final class _Cipher_TestUtils {
                 }
                 outbuf.clear();
             }
-            for (inbuf.flip();;) {
+            for (inbuf.flip(); ; ) {
                 try {
                     final var stored = cipher.doFinal(inbuf, outbuf);
                     assert stored >= 0;
@@ -117,6 +118,7 @@ public final class _Cipher_TestUtils {
         }
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
     public static void __(final Cipher cipher, final Key key) throws Exception {
         // ------------------------------------------------------------------------------------------------------- plain
         final var plain = _Random_TestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(1024));

@@ -41,7 +41,7 @@ class ARIA_CFB_Test
     }
 
     private static Stream<Arguments> getArgumentsStream() {
-        return _CFB_TestUtils.getArgumentsStream(
+        return _CFB_TestUtils.getCipherAndParamsArgumentsStream(
                 ARIA__Test::getKeySizeStream,
                 ARIAEngine::new
         );

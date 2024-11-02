@@ -14,12 +14,17 @@ Utilities for [Bouncy Castle for Java](https://www.bouncycastle.org/documentatio
 * Wikipedia
     * [Block cipher mode of operation](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation)
       * [Cipher block chaining (CBC)](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Cipher_block_chaining_(CBC))
+      * [CCM mode](https://en.wikipedia.org/wiki/CCM_mode)
       * [Cipher feedback (CFB)](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Cipher_feedback_(CFB))
 * [KISA 암호이용활성화](https://seed.kisa.or.kr)
     * [LEA](https://seed.kisa.or.kr/kisa/algorithm/EgovLeaInfo.do)
 * GitHub
     * [The Bouncy Castle Crypto Package For Java](https://github.com/bcgit/bc-java)
         * [[QUESTION] ZeroBytePadding with Zero-Ending Input? #1871](https://github.com/bcgit/bc-java/issues/1871)
+* [StackExchange](https://stackexchange.com)
+  * [Is it possible to combine true streaming with AEAD?](https://crypto.stackexchange.com/questions/24876/is-it-possible-to-combine-true-streaming-with-aead)
+
+[//]: # ( end::tagname[]
 * https://data-make.tistory.com/
     * [[JAVA] KISA SEED CBC 암/복호화](https://data-make.tistory.com/759)
 * [RetroTV's Dev Blog](https://blog.retrotv.dev/)

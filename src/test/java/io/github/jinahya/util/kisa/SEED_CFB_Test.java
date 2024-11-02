@@ -37,7 +37,7 @@ class SEED_CFB_Test
         extends SEED__Test {
 
     private static Stream<Arguments> getArgumentsStream() {
-        return _CFB_TestUtils.getArgumentsStream(
+        return _CFB_TestUtils.getCipherAndParamsArgumentsStream(
                 SEED__Test::getKeySizeStream,
                 SEEDEngine::new
         );

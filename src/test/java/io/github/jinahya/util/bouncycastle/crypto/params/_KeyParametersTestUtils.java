@@ -1,7 +1,7 @@
 package io.github.jinahya.util.bouncycastle.crypto.params;
 
+import _javax.security._Random_TestUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.params.KeyParameter;
 
 import java.security.NoSuchAlgorithmException;
@@ -21,16 +21,9 @@ public final class _KeyParametersTestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    @Deprecated(forRemoval = true)
     public static byte[] newRandomKey(Random random, final int keyLengthInBits) {
-        if (random == null) {
-            random = random();
-        }
-        if (keyLengthInBits <= 0) {
-            throw new IllegalArgumentException("non-positive keyLengthInBits: " + keyLengthInBits);
-        }
-        final var key = new byte[keyLengthInBits >> 3];
-        random.nextBytes(key);
-        return key;
+        return _Random_TestUtils.newRandomBytes(keyLengthInBits >> 3);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

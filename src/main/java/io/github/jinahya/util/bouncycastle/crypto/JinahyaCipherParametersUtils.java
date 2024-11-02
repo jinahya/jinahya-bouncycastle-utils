@@ -1,6 +1,7 @@
 package io.github.jinahya.util.bouncycastle.crypto;
 
 import org.bouncycastle.crypto.CipherParameters;
+import org.bouncycastle.crypto.params.AEADParameters;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 
@@ -18,6 +19,9 @@ public class JinahyaCipherParametersUtils {
         }
         if (params instanceof KeyParameter) {
             return ((KeyParameter) params).getKey();
+        }
+        if (params instanceof AEADParameters) {
+            return ((AEADParameters) params).getKey().getKey();
         }
         throw new IllegalArgumentException("failed to get key from " + params);
     }

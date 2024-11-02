@@ -30,8 +30,9 @@ public final class _CFB_TestUtils {
         return MODE + bitWidth;
     }
 
-    public static Stream<Arguments> getArgumentsStream(final Supplier<? extends IntStream> keySizeStreamSupplier,
-                                                       final Supplier<? extends BlockCipher> cipherSupplier) {
+    public static Stream<Arguments> getCipherAndParamsArgumentsStream(
+            final Supplier<? extends IntStream> keySizeStreamSupplier,
+            final Supplier<? extends BlockCipher> cipherSupplier) {
         return getBitWidthStream()
                 .mapToObj(bs -> {
                     final var engine = cipherSupplier.get();

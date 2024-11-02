@@ -2,7 +2,7 @@ package io.github.jinahya.util.nist;
 
 import _javax.security._Random_TestUtils;
 import io.github.jinahya.util._GCM_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto.modes.JinahyaAEADCipherUtils2;
+import io.github.jinahya.util.bouncycastle.crypto.modes.JinahyaAEADCipherUtils;
 import io.github.jinahya.util.bouncycastle.crypto.modes._AEADCipher_TestUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -91,7 +91,7 @@ class AES_GCM_Test
         try (var input = new FileInputStream(plain);
              var output = new FileOutputStream(encrypted)) {
             cipher.init(true, params);
-            JinahyaAEADCipherUtils2.processAllBytesAndDoFinal(
+            JinahyaAEADCipherUtils.processAllBytesAndDoFinal(
                     cipher,
                     input,
                     output,
@@ -105,7 +105,7 @@ class AES_GCM_Test
         try (var input = new FileInputStream(encrypted);
              var output = new FileOutputStream(decrypted)) {
             cipher.init(false, params);
-            JinahyaAEADCipherUtils2.processAllBytesAndDoFinal(
+            JinahyaAEADCipherUtils.processAllBytesAndDoFinal(
                     cipher,
                     input,
                     output,

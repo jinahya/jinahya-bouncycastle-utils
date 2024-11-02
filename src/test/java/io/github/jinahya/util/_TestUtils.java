@@ -7,7 +7,9 @@ import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.StreamBlockCipher;
 import org.bouncycastle.crypto.StreamCipher;
+import org.bouncycastle.crypto.modes.AEADCipher;
 import org.bouncycastle.crypto.paddings.BlockCipherPadding;
+import org.bouncycastle.crypto.params.AEADParameters;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 
@@ -17,6 +19,10 @@ import java.util.Objects;
 public final class _TestUtils {
 
     // -----------------------------------------------------------------------------------------------------------------
+    static String cipherName(final AEADCipher cipher, final int keySize) {
+        return String.format("%1$s/%2$d", cipher.getAlgorithmName(), keySize);
+    }
+
     static String cipherName(final StreamCipher cipher, final int keySize) {
         return String.format("%1$s/%2$d", cipher.getAlgorithmName(), keySize);
     }
@@ -74,7 +80,11 @@ public final class _TestUtils {
             final var key = JinahyaCipherParametersUtils.getKey(p);
             return keyName(key);
         }
-        throw new RuntimeException("failed to get key from " + params);
+        if (params instanceof AEADParameters p) {
+            final var key = JinahyaCipherParametersUtils.getKey(p);
+            return keyName(key);
+        }
+        return params.toString();
     }
 
     // -----------------------------------------------------------------------------------------------------------------
