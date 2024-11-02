@@ -41,6 +41,11 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * A class for testing {@link AESEngine} with {@link CFBModeCipher}.
+ *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ */
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 @Slf4j
 class AES_CFB_Test
@@ -86,7 +91,7 @@ class AES_CFB_Test
                 final var processed = cipher.processBytes(encrypted, 0, encrypted.length, decrypted, 0);
                 assertThat(processed).isEqualTo(decrypted.length);
             }
-            // ---------------------------------------------------------------------------------------------------- then
+            // -------------------------------------------------------------------------------------------------- verify
             assertThat(decrypted).isEqualTo(plain);
         }
 
@@ -129,11 +134,10 @@ class AES_CFB_Test
                 }
                 assertThat(decrypted).hasSize(encrypted.length());
             }
-            // ---------------------------------------------------------------------------------------------------- then
+            // -------------------------------------------------------------------------------------------------- verify
             assertThat(decrypted).hasSameBinaryContentAs(plain);
         }
 
-        // -----------------------------------------------------------------------------------------------------------------
         private static Stream<Arguments> getCipherAndParamsArgumentsStream_() {
             return _CFB_TestUtils.getCipherAndParamsArgumentsStream(
                     AES__Test::getKeySizeStream,
@@ -155,7 +159,6 @@ class AES_CFB_Test
         }
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
     @Nested
     class JCEProviderTest {
 
@@ -178,13 +181,10 @@ class AES_CFB_Test
                 try {
                     cipher = Cipher.getInstance(transformation);
                 } catch (final NoSuchAlgorithmException nsae) {
-                    log.error("no such algorithm: {}", transformation, nsae);
+                    log.error("failed to get cipher for '{}'", transformation, nsae);
                     return null;
                 }
-                final var key = new SecretKeySpec(
-                        _Random_TestUtils.newRandomBytes(keySize >> 3),
-                        ALGORITHM
-                );
+                final var key = new SecretKeySpec(_Random_TestUtils.newRandomBytes(keySize >> 3), ALGORITHM);
                 final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
                 _Cipher_TestUtils.__(cipher, key, params);
                 return null;
@@ -199,13 +199,10 @@ class AES_CFB_Test
                 try {
                     cipher = Cipher.getInstance(transformation);
                 } catch (final NoSuchAlgorithmException nsae) {
-                    log.error("no such algorithm: " + transformation, nsae);
+                    log.error("failed to get cipher for '{}'", transformation, nsae);
                     return null;
                 }
-                final var key = new SecretKeySpec(
-                        _Random_TestUtils.newRandomBytes(keySize >> 3),
-                        ALGORITHM
-                );
+                final var key = new SecretKeySpec(_Random_TestUtils.newRandomBytes(keySize >> 3), ALGORITHM);
                 final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
                 _Cipher_TestUtils.__(cipher, key, params, dir);
                 return null;
@@ -234,7 +231,7 @@ class AES_CFB_Test
                 try {
                     cipher = Cipher.getInstance(transformation);
                 } catch (final NoSuchAlgorithmException naae) {
-                    log.error("no such algorithm: {}", transformation);
+                    log.error("failed to get cipher for '{}'", transformation);
                     return null;
                 }
                 final var key = new SecretKeySpec(_Random_TestUtils.newRandomBytes(keySize >> 3), ALGORITHM);
@@ -252,7 +249,7 @@ class AES_CFB_Test
                 try {
                     cipher = Cipher.getInstance(transformation);
                 } catch (final NoSuchAlgorithmException naae) {
-                    log.error("no such algorithm: {}", transformation);
+                    log.error("failed to get cipher for '{}'", transformation);
                     return null;
                 }
                 final var key = new SecretKeySpec(_Random_TestUtils.newRandomBytes(keySize >> 3), ALGORITHM);
