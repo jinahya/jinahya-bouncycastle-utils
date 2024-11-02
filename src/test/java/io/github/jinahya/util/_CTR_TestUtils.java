@@ -18,8 +18,8 @@ public final class _CTR_TestUtils {
 
     public static final String MODE = "CTR";
 
-    public static Stream<Arguments> getArgumentsStream(final Supplier<? extends IntStream> keyStreamSupplier,
-                                                       final Supplier<? extends BlockCipher> cipherSupplier) {
+    public static Stream<Arguments> getCipherAndParamsArgumentsStream(final Supplier<? extends IntStream> keyStreamSupplier,
+                                                                      final Supplier<? extends BlockCipher> cipherSupplier) {
         return keyStreamSupplier.get().mapToObj(ks -> {
             final var engine = cipherSupplier.get();
             final var cipher = SICBlockCipher.newInstance(engine);

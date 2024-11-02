@@ -5,9 +5,11 @@ import io.github.jinahya.util.bouncycastle.crypto.params._ParametersWithIVTestUt
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.BlockCipher;
 import org.bouncycastle.crypto.modes.CFBBlockCipher;
+import org.junit.jupiter.api.Named;
 import org.junit.jupiter.params.provider.Arguments;
 
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -28,6 +30,18 @@ public final class _CFB_TestUtils {
 
     public static String mode(final int bitWidth) {
         return MODE + bitWidth;
+    }
+
+    public static Stream<Arguments> getKeySizeAndBitWidthArgumentsStream(
+            final Supplier<? extends IntStream> keySizeStreamSupplier) {
+        return keySizeStreamSupplier.get().mapToObj(ks -> {
+            return getBitWidthStream().mapToObj(bw -> {
+                return Arguments.of(
+                        Named.named("keySize: " + ks, ks),
+                        Named.named("bitWidth: " + bw, bw)
+                );
+            });
+        }).flatMap(Function.identity());
     }
 
     public static Stream<Arguments> getCipherAndParamsArgumentsStream(

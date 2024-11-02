@@ -27,14 +27,22 @@ abstract class AES__Test {
         );
     }
 
-    static IntStream getKeyBytesStream() {
-        return getKeySizeStream().map(ks -> ks >> 3);
-    }
-
     static Stream<Arguments> getKeySizeArgumentsStream() {
         return getKeySizeStream().mapToObj(ks -> {
             return Arguments.of(
                     Named.of("keySize: " + ks, ks)
+            );
+        });
+    }
+
+    static IntStream getKeyBytesStream() {
+        return getKeySizeStream().map(ks -> ks >> 3);
+    }
+
+    static Stream<Arguments> getKeyBytesArgumentsStream() {
+        return getKeyBytesStream().mapToObj(ks -> {
+            return Arguments.of(
+                    Named.of("keyBytes: " + ks, ks)
             );
         });
     }

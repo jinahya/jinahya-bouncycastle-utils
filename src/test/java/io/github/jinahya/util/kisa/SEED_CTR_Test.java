@@ -34,7 +34,7 @@ class SEED_CTR_Test
         extends SEED__Test {
 
     private static Stream<Arguments> getArgumentsStream() {
-        return _CTR_TestUtils.getArgumentsStream(
+        return _CTR_TestUtils.getCipherAndParamsArgumentsStream(
                 SEED__Test::getKeySizeStream,
                 SEEDEngine::new
         );

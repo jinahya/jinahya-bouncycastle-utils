@@ -30,6 +30,18 @@ public final class _CCM_TestUtils {
         );
     }
 
+    public static Stream<Arguments> getKeySizeAndTagLengthArgumentsStream(
+            final Supplier<? extends IntStream> keySizeStreamSupplier) {
+        return keySizeStreamSupplier.get().mapToObj(ks -> {
+            return getBouncyCastleTagLengthStream().mapToObj(tl -> {
+                return Arguments.of(
+                        Named.of("keySize: " + ks, ks),
+                        Named.of("tagLength: " + tl, tl)
+                );
+            });
+        }).flatMap(Function.identity());
+    }
+
     public static byte[] newBouncyCastleNonce() {
         // once must have length from 7 to 13 octets
         return _Random_TestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(7, 14));

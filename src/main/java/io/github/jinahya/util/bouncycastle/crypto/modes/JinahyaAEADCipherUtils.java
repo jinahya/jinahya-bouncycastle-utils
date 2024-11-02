@@ -24,16 +24,18 @@ public final class JinahyaAEADCipherUtils {
      *
      * @param cipher the cipher.
      * @param input  the input array to process.
-     * @param output the output array.
-     * @return the number of bytes set on the {@code output}.
+     * @param output the output array on which processed bytes are set.
+     * @return the number of bytes processed, and set on the {@code output}.
      * @throws InvalidCipherTextException if thrown by {@link AEADCipher#doFinal(byte[], int)} method.
+     * @see AEADCipher#processBytes(byte[], int, int, byte[], int)
+     * @see AEADCipher#doFinal(byte[], int)
      */
     public static int processBytesAndDoFinal(final AEADCipher cipher, final byte[] input, final byte[] output)
             throws InvalidCipherTextException {
         Objects.requireNonNull(cipher, "cipher is null");
         int length = 0;
-        length += cipher.processBytes(input, 0, input.length, output, length);
-        length += cipher.doFinal(output, length);
+        length += cipher.processBytes(input, 0, input.length, output, length); // DataLengthException
+        length += cipher.doFinal(output, length); // InvalidCipherTextException
         return length;
     }
 
@@ -49,7 +51,7 @@ public final class JinahyaAEADCipherUtils {
             throws InvalidCipherTextException {
         Objects.requireNonNull(cipher, "cipher is null");
         Objects.requireNonNull(input, "input is null");
-        final var output = new byte[cipher.getOutputSize(input.length)];
+        final var output = new byte[Math.max(cipher.getOutputSize(input.length), 1)];
         final var length = processBytesAndDoFinal(cipher, input, output);
         return Arrays.copyOf(output, length);
     }
@@ -95,6 +97,7 @@ public final class JinahyaAEADCipherUtils {
     public static long processAllBytesAndDoFinal(final AEADCipher cipher, final InputStream input,
                                                  final OutputStream output, final byte[] inbuf)
             throws IOException, InvalidCipherTextException {
+        Objects.requireNonNull(cipher, "cipher is null");
         if (Objects.requireNonNull(inbuf, "inbuf is null").length == 0) {
             throw new IllegalArgumentException("inbuf.length is zero");
         }
