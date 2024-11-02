@@ -2,7 +2,7 @@ package io.github.jinahya.util.nist;
 
 import _javax.security._Random_TestUtils;
 import io.github.jinahya.util._GCM_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto.modes.JinahyaAEADCipherUtils;
+import io.github.jinahya.util.bouncycastle.crypto.modes.JinahyaAEADCipherUtils2;
 import io.github.jinahya.util.bouncycastle.crypto.modes._AEADCipher_TestUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -88,30 +88,30 @@ class AES_GCM_Test
         final var plain = _Random_TestUtils.createTempFileWithRandomBytesWritten(dir);
         // ----------------------------------------------------------------------------------------------------- encrypt
         final var encrypted = File.createTempFile("tmp", null, dir);
-        try (var source = new FileInputStream(plain);
-             var target = new FileOutputStream(encrypted)) {
+        try (var input = new FileInputStream(plain);
+             var output = new FileOutputStream(encrypted)) {
             cipher.init(true, params);
-            JinahyaAEADCipherUtils.processAllBytesAndDoFinal(
+            JinahyaAEADCipherUtils2.processAllBytesAndDoFinal(
                     cipher,
-                    source,
-                    target,
-                    ThreadLocalRandom.current().nextInt(1, 8192)
+                    input,
+                    output,
+                    new byte[1]
             );
-            target.flush();
+            output.flush();
         }
         final var encryptionMac = cipher.getMac();
         // ----------------------------------------------------------------------------------------------------- decrypt
         final var decrypted = File.createTempFile("tmp", null, dir);
-        try (var source = new FileInputStream(encrypted);
-             var target = new FileOutputStream(decrypted)) {
+        try (var input = new FileInputStream(encrypted);
+             var output = new FileOutputStream(decrypted)) {
             cipher.init(false, params);
-            JinahyaAEADCipherUtils.processAllBytesAndDoFinal(
+            JinahyaAEADCipherUtils2.processAllBytesAndDoFinal(
                     cipher,
-                    source,
-                    target,
-                    ThreadLocalRandom.current().nextInt(1, 8192)
+                    input,
+                    output,
+                    new byte[1]
             );
-            target.flush();
+            output.flush();
         }
         final var decryptionMac = cipher.getMac();
         // -------------------------------------------------------------------------------------------------------- then

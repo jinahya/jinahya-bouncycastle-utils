@@ -12,6 +12,8 @@ import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.bouncycastle.crypto.engines.AESEngine;
+import org.bouncycastle.crypto.io.CipherInputStream;
+import org.bouncycastle.crypto.io.CipherOutputStream;
 import org.bouncycastle.crypto.modes.CBCBlockCipher;
 import org.bouncycastle.crypto.paddings.BlockCipherPadding;
 import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
@@ -33,6 +35,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
@@ -88,7 +91,7 @@ class AES_CBC_Test
 
     @MethodSource({"getKeySizeAndPaddingArgumentsStream"})
     @ParameterizedTest
-    void __(final int keySize, final BlockCipherPadding padding, @TempDir final File dir) throws Exception {
+    void __(final int keySize, final BlockCipherPadding padding, @TempDir final Path dir) throws Exception {
         // ------------------------------------------------------------------------------------------------------- given
         final var cipher = new PaddedBufferedBlockCipher(CBCBlockCipher.newInstance(AESEngine.newInstance()), padding);
         final var key = _Random_TestUtils.newRandomBytes(keySize >>> 3);
@@ -96,41 +99,24 @@ class AES_CBC_Test
         final var params = ThreadLocalRandom.current().nextBoolean()
                 ? new KeyParameter(key)
                 : new ParametersWithIV(new KeyParameter(key), iv);
-        final var plain = File.createTempFile("tmp", null, dir);
+        final var plain = Files.createTempFile(dir, null, null);
         {
             final var bytes = new byte[ThreadLocalRandom.current().nextInt(1024)];
             ThreadLocalRandom.current().nextBytes(bytes);
-            Files.write(plain.toPath(), bytes);
+            Files.write(plain, bytes);
         }
         // ----------------------------------------------------------------------------------------------------- encrypt
-        final var encrypted = File.createTempFile("tmp", null, dir);
-        try (var source = new FileInputStream(plain);
-             var target = new FileOutputStream(encrypted)) {
-            final var in = new byte[ThreadLocalRandom.current().nextInt(1024) + 1];
-            cipher.init(true, params);
-            final var out = new byte[cipher.getOutputSize(in.length)];
-            for (int r; (r = source.read(in)) != -1; ) {
-                final var processed = cipher.processBytes(in, 0, r, out, 0);
-                target.write(out, 0, processed);
-            }
-            final var finalized = cipher.doFinal(out, 0);
-            target.write(out, 0, finalized);
-            target.flush();
+        cipher.init(true, params);
+        final var encrypted = Files.createTempFile(dir, null, null);
+        try (var out = new CipherOutputStream(new FileOutputStream(encrypted.toFile()), cipher)) {
+            Files.copy(plain, out);
+            out.flush();
         }
         // ----------------------------------------------------------------------------------------------------- decrypt
-        final var decrypted = File.createTempFile("tmp", null, dir);
-        try (var source = new FileInputStream(encrypted);
-             var target = new FileOutputStream(decrypted)) {
-            final var in = new byte[ThreadLocalRandom.current().nextInt(1024) + 1];
-            cipher.init(false, params);
-            final var out = new byte[cipher.getOutputSize(in.length)];
-            for (int r; (r = source.read(in)) != -1; ) {
-                final var processed = cipher.processBytes(in, 0, r, out, 0);
-                target.write(out, 0, processed);
-            }
-            final var finalized = cipher.doFinal(out, 0);
-            target.write(out, 0, finalized);
-            target.flush();
+        final var decrypted = Files.createTempFile(dir, null, null);
+        cipher.init(false, params);
+        try (var in = new CipherInputStream(new FileInputStream(encrypted.toFile()), cipher)) {
+            Files.copy(in, decrypted, StandardCopyOption.REPLACE_EXISTING);
         }
         // -------------------------------------------------------------------------------------------------------- then
         assertThat(decrypted).hasSameBinaryContentAs(plain);

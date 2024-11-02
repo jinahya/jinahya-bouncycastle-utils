@@ -2,8 +2,12 @@ package io.github.jinahya.util.bouncycastle.crypto;
 
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.InvalidCipherTextException;
+import org.bouncycastle.crypto.io.CipherInputStream;
+import org.bouncycastle.crypto.io.CipherOutputStream;
 import org.bouncycastle.util.Arrays;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -53,7 +57,10 @@ public final class JinahyaBufferedBlockCipherUtils {
      */
     public static byte[] processBytesAndDoFinal(final BufferedBlockCipher cipher, final byte[] input)
             throws InvalidCipherTextException {
-        return processBytesAndDoFinal(cipher, input, 0, input.length);
+        final var output = new byte[cipher.getOutputSize(input.length)];
+        final var processed = cipher.processBytes(input, 0, input.length, output, 0);
+        final var finalized = cipher.doFinal(output, processed);
+        return java.util.Arrays.copyOf(output, processed + finalized);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -122,6 +129,8 @@ public final class JinahyaBufferedBlockCipherUtils {
                                                                               final OutputStream output)
             throws IOException, InvalidCipherTextException {
         Objects.requireNonNull(cipher, "cipher is null");
+        Objects.requireNonNull(input, "input is null");
+        Objects.requireNonNull(output, "output is null");
         return processAllBytesAndDoFinal(
                 cipher,
                 input,
@@ -130,16 +139,47 @@ public final class JinahyaBufferedBlockCipherUtils {
         );
     }
 
+    public static long encrypt(final BufferedBlockCipher cipher, final InputStream input,
+                               final File target, final byte[] buffer)
+            throws IOException {
+        Objects.requireNonNull(cipher, "cipher is null");
+        Objects.requireNonNull(input, "input is null");
+        Objects.requireNonNull(target, "target is null");
+        if (Objects.requireNonNull(buffer, "buffer is null").length == 0) {
+            throw new IllegalArgumentException("buffer.length is zero");
+        }
+        var count = 0L;
+        try (var output = new FileOutputStream(target);
+             var cos = new CipherOutputStream(output, cipher)) {
+            for (int r; (r = input.read(buffer)) != -1; count += r) {
+                cos.write(buffer, 0, r);
+            }
+            cos.flush();
+        }
+        return count;
+    }
+
+    public static long decrypt(final BufferedBlockCipher cipher, final InputStream input,
+                               final OutputStream output, final byte[] buffer)
+            throws IOException {
+        Objects.requireNonNull(cipher, "cipher is null");
+        Objects.requireNonNull(input, "input is null");
+        Objects.requireNonNull(output, "output is null");
+        if (Objects.requireNonNull(buffer, "buffer is null").length == 0) {
+            throw new IllegalArgumentException("buffer.length is zero");
+        }
+        var count = 0L;
+        final var cis = new CipherInputStream(input, cipher);
+        for (int r; (r = cis.read(buffer)) != -1; count += r) {
+            output.write(buffer, 0, r);
+        }
+        output.flush();
+        return count;
+    }
+
     // -----------------------------------------------------------------------------------------------------------------
     private static int processBytes(final BufferedBlockCipher cipher, final ByteBuffer input,
                                     final ByteBuffer output) {
-        final var updateSize = cipher.getUpdateOutputSize(Objects.requireNonNull(input, "input is null").remaining());
-        if (Objects.requireNonNull(output, "output is null").remaining() < updateSize) {
-            throw new IllegalArgumentException(
-                    "output.remaining(" + output.remaining() + ") shouldn't be less than the updateSize("
-                            + updateSize + ") derived from input.remaining(" + input.remaining() + ")"
-            );
-        }
         // -------------------------------------------------------------------------------------------------------------
         final byte[] in;
         final int inoff;
@@ -185,7 +225,6 @@ public final class JinahyaBufferedBlockCipherUtils {
             outoff = output.arrayOffset() + output.position();
         } else {
             out = new byte[output.remaining()];
-            output.get(output.position(), out);
             outoff = 0;
         }
         final var outlen = cipher.doFinal(out, outoff);

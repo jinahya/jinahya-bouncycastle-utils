@@ -34,11 +34,11 @@ public final class _AEADCipher_TestUtils {
             throws Exception {
         // ----------------------------------------------------------------------------------------------------- encrypt
         cipher.init(true, params);
-        final var encrypted = JinahyaAEADCipherUtils.processBytesAndDoFinal(cipher, plain);
+        final var encrypted = JinahyaAEADCipherUtils2.processBytesAndDoFinal(cipher, plain);
         final var encryptionMac = cipher.getMac();
         // ----------------------------------------------------------------------------------------------------- decrypt
         cipher.init(false, params);
-        final var decrypted = JinahyaAEADCipherUtils.processBytesAndDoFinal(cipher, encrypted);
+        final var decrypted = JinahyaAEADCipherUtils2.processBytesAndDoFinal(cipher, encrypted);
         final var decryptionMac = cipher.getMac();
         // -------------------------------------------------------------------------------------------------------- then
         assertThat(decrypted).isEqualTo(plain);
