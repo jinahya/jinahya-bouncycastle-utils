@@ -66,7 +66,7 @@ class SEED_CFB_Test
     @MethodSource({"getKeySizeStream_"})
     @ParameterizedTest
     void __(final int keySize) throws Throwable {
-        _BouncyCastleProvider_TestUtils.callWithinBouncyCastleProvider(() -> {
+        _BouncyCastleProvider_TestUtils.callForBouncyCastleProvider(() -> {
             final var transformation = ALGORITHM + '/' + _CFB_TestUtils.MODE + "/NoPadding";
             final Cipher cipher;
             try {
@@ -89,7 +89,7 @@ class SEED_CFB_Test
     @MethodSource({"getKeySizeStream_"})
     @ParameterizedTest
     void __(final int keySize, @TempDir final Path dir) throws Throwable {
-        _BouncyCastleProvider_TestUtils.callWithinBouncyCastleProvider(() -> {
+        _BouncyCastleProvider_TestUtils.callForBouncyCastleProvider(() -> {
             final var transformation = ALGORITHM + '/' + _CFB_TestUtils.MODE + "/NoPadding";
             final Cipher cipher;
             try {
@@ -123,7 +123,7 @@ class SEED_CFB_Test
     @MethodSource({"getBitWidthAndKeySizeArgumentsStream"})
     @ParameterizedTest
     void __(final int bitWidth, final int keySize) throws Throwable {
-        _BouncyCastleProvider_TestUtils.callWithinBouncyCastleProvider(() -> {
+        _BouncyCastleProvider_TestUtils.callForBouncyCastleProvider(() -> {
             final var transformation = ALGORITHM + '/' + _CFB_TestUtils.mode(bitWidth) + "/NoPadding";
             final Cipher cipher;
             try {
@@ -149,7 +149,7 @@ class SEED_CFB_Test
     @MethodSource({"getBitWidthAndKeySizeArgumentsStream"})
     @ParameterizedTest
     void __(final int bitWidth, final int keySize, @TempDir final Path dir) throws Throwable {
-        _BouncyCastleProvider_TestUtils.callWithinBouncyCastleProvider(() -> {
+        _BouncyCastleProvider_TestUtils.callForBouncyCastleProvider(() -> {
             final var transformation = ALGORITHM + '/' + _CFB_TestUtils.mode(bitWidth) + "/NoPadding";
             final Cipher cipher;
             try {

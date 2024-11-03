@@ -2,13 +2,18 @@ package _javax.crypto;
 
 import _javax.security._Random_TestUtils;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.ShortBufferException;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.concurrent.ThreadLocalRandom;
@@ -25,7 +30,8 @@ public final class _Cipher_TestUtils {
 
     // -----------------------------------------------------------------------------------------------------------------
     public static void __(final Cipher cipher, final Key key, final AlgorithmParameterSpec params)
-            throws Exception {
+            throws InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException,
+                   BadPaddingException {
         final var plain = _Random_TestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(1024));
         cipher.init(Cipher.ENCRYPT_MODE, key, params);
         final var encrypted = cipher.doFinal(plain);
@@ -35,8 +41,8 @@ public final class _Cipher_TestUtils {
     }
 
     public static void __(final Cipher cipher, final Key key, final AlgorithmParameterSpec params, final Path dir)
-            throws Exception {
-        // ------------------------------------------------------------------------------------------------------- plain
+            throws IOException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException,
+                   BadPaddingException {
         final var plain = _Random_TestUtils.createTempFileWithRandomBytesWritten(dir);
         final var inbuf = ByteBuffer.allocate(ThreadLocalRandom.current().nextInt(1024) + 1);
         var outbuf = ByteBuffer.allocate(ThreadLocalRandom.current().nextInt(1024) + 1);
@@ -67,7 +73,7 @@ public final class _Cipher_TestUtils {
                     final var stored = cipher.doFinal(inbuf, outbuf);
                     assert stored >= 0;
                     break;
-                } catch (final ShortBufferException sbe) {
+                } catch (final ShortBufferException | IllegalBlockSizeException | BadPaddingException sbe) {
                     outbuf = ByteBuffer.allocate(outbuf.capacity() << 1);
                 }
             }
@@ -119,18 +125,21 @@ public final class _Cipher_TestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    public static void __(final Cipher cipher, final Key key) throws Exception {
-        // ------------------------------------------------------------------------------------------------------- plain
+    public static void __(final Cipher cipher, final Key key)
+            throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         final var plain = _Random_TestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(1024));
+        // ----------------------------------------------------------------------------------------------------- encrypt
         cipher.init(Cipher.ENCRYPT_MODE, key);
         final var encrypted = cipher.doFinal(plain);
+        // ----------------------------------------------------------------------------------------------------- decrypt
         cipher.init(Cipher.DECRYPT_MODE, key);
         final var decrypted = cipher.doFinal(encrypted);
         assertThat(decrypted).isEqualTo(plain);
     }
 
-    public static void __(final Cipher cipher, final Key key, final Path dir) throws Exception {
-        // ------------------------------------------------------------------------------------------------------- plain
+    public static void __(final Cipher cipher, final Key key, final Path dir)
+            throws IOException, InvalidKeyException, ShortBufferException, IllegalBlockSizeException,
+                   BadPaddingException {
         final var plain = _Random_TestUtils.createTempFileWithRandomBytesWritten(dir);
         final var input = ByteBuffer.allocate(ThreadLocalRandom.current().nextInt(1024) + 1);
         var output = ByteBuffer.allocate(ThreadLocalRandom.current().nextInt(1024) + 1);
@@ -159,7 +168,7 @@ public final class _Cipher_TestUtils {
             try {
                 final var stored = cipher.doFinal(input.flip(), output);
                 assert stored >= 0;
-            } catch (final ShortBufferException sbe) {
+            } catch (final ShortBufferException | IllegalBlockSizeException | BadPaddingException sbe) {
                 output = ByteBuffer.allocate(output.capacity() << 1);
             }
             for (output.flip(); output.hasRemaining(); ) {
@@ -190,12 +199,8 @@ public final class _Cipher_TestUtils {
                 output.clear();
                 input.compact();
             }
-            try {
-                final var stored = cipher.doFinal(input.flip(), output);
-                assert stored >= 0;
-            } catch (final ShortBufferException sbe) {
-                output = ByteBuffer.allocate(output.capacity() << 1);
-            }
+            final var stored = cipher.doFinal(input.flip(), output);
+            assert stored >= 0;
             for (output.flip(); output.hasRemaining(); ) {
                 final var written = writable.write(output);
                 assert written >= 0;
@@ -204,7 +209,6 @@ public final class _Cipher_TestUtils {
         }
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
     private _Cipher_TestUtils() {
         throw new AssertionError("instantiation is not allowed");
     }

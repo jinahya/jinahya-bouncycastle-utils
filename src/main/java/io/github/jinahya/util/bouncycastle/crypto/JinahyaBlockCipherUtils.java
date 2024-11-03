@@ -14,19 +14,15 @@ import java.util.Objects;
  */
 public final class JinahyaBlockCipherUtils {
 
-    static int getBlockSizeInBits_(final BlockCipher cipher) {
-        assert cipher != null;
-        return cipher.getBlockSize() << 3;
-    }
-
     /**
-     * Returns the block size of specified cipher in bits.
+     * Returns the block size of specified cipher, in bits.
      *
      * @param cipher the cipher.
      * @return the block size of {@code cipher} in bits.
+     * @see BlockCipher#getBlockSize()
      */
     public static int getBlockSizeInBits(final BlockCipher cipher) {
-        return getBlockSizeInBits_(Objects.requireNonNull(cipher, "cipher is null"));
+        return Objects.requireNonNull(cipher, "cipher is null").getBlockSize() >> 3;
     }
 
     // -----------------------------------------------------------------------------------------------------------------

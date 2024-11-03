@@ -77,6 +77,17 @@ public final class JinahyaStreamCipherUtils {
         return written;
     }
 
+    /**
+     * Process all bytes, using specified cipher, from specified input stream, and writes processed bytes to specified
+     * output.
+     *
+     * @param cipher the cipher.
+     * @param input  the input stream from which bytes are read.
+     * @param output the output stream to which processed bytes are written.
+     * @param inbuf  a buffer for reading bytes from {@code input}.
+     * @return the number of bytes written to the {@code output}.
+     * @throws IOException if an I/O error occurs.
+     */
     public static long processAllBytes(final StreamCipher cipher, final InputStream input, final OutputStream output,
                                        final byte[] inbuf)
             throws IOException {

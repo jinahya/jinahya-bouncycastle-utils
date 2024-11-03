@@ -7,13 +7,11 @@ import java.util.concurrent.Callable;
 
 public final class _BouncyCastleProvider_TestUtils {
 
-    public static <R> R callWithinBouncyCastleProvider(final Callable<? extends R> callable) {
+    public static <R> R callForBouncyCastleProvider(final Callable<? extends R> callable) throws Exception {
         Objects.requireNonNull(callable, "callable is null");
         JinahyaBouncyCastleProviderUtils.addBouncyCastleProvider();
         try {
             return callable.call();
-        } catch (final Throwable e) {
-            throw new RuntimeException("failed to call " + callable, e);
         } finally {
             JinahyaBouncyCastleProviderUtils.removeBouncyCastleProvider();
         }

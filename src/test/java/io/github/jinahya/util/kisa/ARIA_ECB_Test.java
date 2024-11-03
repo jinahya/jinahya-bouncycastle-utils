@@ -76,7 +76,7 @@ class ARIA_ECB_Test
         @MethodSource({"getKeySizeAndTransformationArgumentsStream"})
         @ParameterizedTest
         void __(final int keySize, final String transformation) throws Throwable {
-            _BouncyCastleProvider_TestUtils.callWithinBouncyCastleProvider(() -> {
+            _BouncyCastleProvider_TestUtils.callForBouncyCastleProvider(() -> {
                 final var cipher = Cipher.getInstance(transformation);
                 final var key = new SecretKeySpec(
                         _KeyParametersTestUtils.newRandomKey(null, keySize),
@@ -90,7 +90,7 @@ class ARIA_ECB_Test
         @MethodSource({"getKeySizeAndTransformationArgumentsStream"})
         @ParameterizedTest
         void __(final int keySize, final String transformation, @TempDir final Path dir) throws Throwable {
-            _BouncyCastleProvider_TestUtils.callWithinBouncyCastleProvider(() -> {
+            _BouncyCastleProvider_TestUtils.callForBouncyCastleProvider(() -> {
                 JinahyaBouncyCastleProviderUtils.addBouncyCastleProvider();
                 final var cipher = Cipher.getInstance(transformation);
                 final var key = new SecretKeySpec(

@@ -81,7 +81,7 @@ class LEA_CBC_Test
     })
     @ParameterizedTest
     void __(final int keySize) throws Throwable {
-        _BouncyCastleProvider_TestUtils.callWithinBouncyCastleProvider(() -> {
+        _BouncyCastleProvider_TestUtils.callForBouncyCastleProvider(() -> {
             Security.addProvider(new BouncyCastleProvider());
             final var transformation = ALGORITHM + '/' + _CBC_TestUtils.MODE + "/PKCS5Padding";
             final var cipher = Cipher.getInstance(
@@ -107,7 +107,7 @@ class LEA_CBC_Test
     })
     @ParameterizedTest
     void __(final int keySize, @TempDir final Path dir) throws Throwable {
-        _BouncyCastleProvider_TestUtils.callWithinBouncyCastleProvider(() -> {
+        _BouncyCastleProvider_TestUtils.callForBouncyCastleProvider(() -> {
             final var transformation = ALGORITHM + '/' + _CBC_TestUtils.MODE + "/PKCS5Padding";
             final var cipher = Cipher.getInstance(
                     transformation,

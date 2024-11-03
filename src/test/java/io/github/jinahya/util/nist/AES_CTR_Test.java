@@ -147,7 +147,7 @@ class AES_CTR_Test
         @MethodSource({"getKeySizeAndTransformationArgumentsStream"})
         @ParameterizedTest
         void __(final int keySize, final String transformation) throws Throwable {
-            _BouncyCastleProvider_TestUtils.callWithinBouncyCastleProvider(() -> {
+            _BouncyCastleProvider_TestUtils.callForBouncyCastleProvider(() -> {
                 final var cipher = Cipher.getInstance(transformation);
                 final var key = new SecretKeySpec(_Random_TestUtils.newRandomBytes(keySize >> 3), ALGORITHM);
                 final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
@@ -159,7 +159,7 @@ class AES_CTR_Test
         @MethodSource({"getKeySizeAndTransformationArgumentsStream"})
         @ParameterizedTest
         void __(final int keySize, final String transformation, @TempDir final Path dir) throws Throwable {
-            _BouncyCastleProvider_TestUtils.callWithinBouncyCastleProvider(() -> {
+            _BouncyCastleProvider_TestUtils.callForBouncyCastleProvider(() -> {
                 final var cipher = Cipher.getInstance(transformation);
                 final var key = new SecretKeySpec(_Random_TestUtils.newRandomBytes(keySize >> 3), ALGORITHM);
                 final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));

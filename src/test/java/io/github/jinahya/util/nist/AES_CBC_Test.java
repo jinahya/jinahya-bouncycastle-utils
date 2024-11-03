@@ -31,6 +31,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -41,6 +42,11 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * A class for testing {@link AESEngine} with {@link CBCBlockCipher}.
+ *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ */
 @Slf4j
 class AES_CBC_Test
         extends AES__Test {
@@ -74,7 +80,7 @@ class AES_CBC_Test
                         : new ParametersWithIV(new KeyParameter(key), iv);
             }
             final var plain = _Random_TestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(1024));
-            // ----------------------------------------------------------------------------------------------------- encrypt
+            // ------------------------------------------------------------------------------------------------- encrypt
             cipher.init(true, params);
             var encrypted = new byte[cipher.getOutputSize(plain.length)];
             {
@@ -83,7 +89,7 @@ class AES_CBC_Test
                 encrypted = Arrays.copyOf(encrypted, (processed + finalized));
                 assertThat(encrypted).hasSizeGreaterThanOrEqualTo(plain.length);
             }
-            // ----------------------------------------------------------------------------------------------------- decrypt
+            // ------------------------------------------------------------------------------------------------- decrypt
             cipher.init(false, params);
             byte[] decrypted = new byte[cipher.getOutputSize(encrypted.length)];
             {
@@ -91,13 +97,13 @@ class AES_CBC_Test
                 final var finalized = cipher.doFinal(decrypted, processed);
                 decrypted = Arrays.copyOf(decrypted, (processed + finalized));
             }
-            // -------------------------------------------------------------------------------------------------------- then
+            // -------------------------------------------------------------------------------------------------- verify
             assertThat(decrypted).isEqualTo(plain);
         }
 
         @MethodSource({"getKeySizeAndPaddingArgumentsStream"})
         @ParameterizedTest
-        void __(final int keySize, final BlockCipherPadding padding, @TempDir final File dir) throws Exception {
+        void __(final int keySize, final BlockCipherPadding padding, @TempDir final File dir) throws IOException {
             final var cipher = new PaddedBufferedBlockCipher(
                     CBCBlockCipher.newInstance(AESEngine.newInstance()),
                     padding
@@ -111,21 +117,25 @@ class AES_CBC_Test
                         : new ParametersWithIV(new KeyParameter(key), iv);
             }
             final var plain = _Random_TestUtils.createTempFileWithRandomBytesWritten(dir);
-            // ----------------------------------------------------------------------------------------------------- encrypt
+            // ------------------------------------------------------------------------------------------------- encrypt
             final var encrypted = File.createTempFile("tmp", null, dir);
-            cipher.init(true, params);
-            try (var out = new CipherOutputStream(new FileOutputStream(encrypted), cipher)) {
-                Files.copy(plain.toPath(), out);
-                out.flush();
+            {
+                cipher.init(true, params);
+                try (var out = new CipherOutputStream(new FileOutputStream(encrypted), cipher)) {
+                    Files.copy(plain.toPath(), out);
+                    out.flush();
+                }
+                assertThat(encrypted.length()).isGreaterThanOrEqualTo(plain.length());
             }
-            assertThat(encrypted.length()).isGreaterThanOrEqualTo(plain.length());
-            // ----------------------------------------------------------------------------------------------------- decrypt
+            // ------------------------------------------------------------------------------------------------- decrypt
             final var decrypted = File.createTempFile("tmp", null, dir);
-            cipher.init(false, params);
-            try (var in = new CipherInputStream(new FileInputStream(encrypted), cipher)) {
-                Files.copy(in, decrypted.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            {
+                cipher.init(false, params);
+                try (var in = new CipherInputStream(new FileInputStream(encrypted), cipher)) {
+                    Files.copy(in, decrypted.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                }
             }
-            // -------------------------------------------------------------------------------------------------------- then
+            // -------------------------------------------------------------------------------------------------- verify
             assertThat(decrypted).hasSameBinaryContentAs(plain);
         }
 
@@ -166,13 +176,10 @@ class AES_CBC_Test
 
         @MethodSource({"getKeySizeAndTransformationArgumentsStream"})
         @ParameterizedTest
-        void __(final int keySize, final String transformation) throws Throwable {
-            _BouncyCastleProvider_TestUtils.callWithinBouncyCastleProvider(() -> {
+        void __(final int keySize, final String transformation) throws Exception {
+            _BouncyCastleProvider_TestUtils.callForBouncyCastleProvider(() -> {
                 final var cipher = Cipher.getInstance(transformation);
-                final var key = new SecretKeySpec(
-                        _Random_TestUtils.newRandomBytes(keySize >> 3),
-                        ALGORITHM
-                );
+                final var key = new SecretKeySpec(_Random_TestUtils.newRandomBytes(keySize >> 3), ALGORITHM);
                 final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
                 _Cipher_TestUtils.__(cipher, key, params);
                 return null;
@@ -181,13 +188,10 @@ class AES_CBC_Test
 
         @MethodSource({"getKeySizeAndTransformationArgumentsStream"})
         @ParameterizedTest
-        void __(final int keySize, final String transformation, @TempDir final Path dir) throws Throwable {
-            _BouncyCastleProvider_TestUtils.callWithinBouncyCastleProvider(() -> {
+        void __(final int keySize, final String transformation, @TempDir final Path dir) throws Exception {
+            _BouncyCastleProvider_TestUtils.callForBouncyCastleProvider(() -> {
                 final var cipher = Cipher.getInstance(transformation);
-                final var key = new SecretKeySpec(
-                        _Random_TestUtils.newRandomBytes(keySize >> 3),
-                        ALGORITHM
-                );
+                final var key = new SecretKeySpec(_Random_TestUtils.newRandomBytes(keySize >> 3), ALGORITHM);
                 final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
                 _Cipher_TestUtils.__(cipher, key, params, dir);
                 return null;

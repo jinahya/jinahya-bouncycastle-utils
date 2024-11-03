@@ -176,7 +176,7 @@ class AES_CFB_Test
         @MethodSource({"getKeySizeAndTransformationArgumentsStream"})
         @ParameterizedTest
         void __(final int keySize, final String transformation) throws Throwable {
-            _BouncyCastleProvider_TestUtils.callWithinBouncyCastleProvider(() -> {
+            _BouncyCastleProvider_TestUtils.callForBouncyCastleProvider(() -> {
                 final Cipher cipher;
                 try {
                     cipher = Cipher.getInstance(transformation);
@@ -194,7 +194,7 @@ class AES_CFB_Test
         @MethodSource({"getKeySizeAndTransformationArgumentsStream"})
         @ParameterizedTest
         void __(final int keySize, final String transformation, @TempDir final Path dir) throws Throwable {
-            _BouncyCastleProvider_TestUtils.callWithinBouncyCastleProvider(() -> {
+            _BouncyCastleProvider_TestUtils.callForBouncyCastleProvider(() -> {
                 final Cipher cipher;
                 try {
                     cipher = Cipher.getInstance(transformation);
@@ -226,7 +226,7 @@ class AES_CFB_Test
         @MethodSource({"getKeySizeAndTransformationWithBitWidthArgumentsStream"})
         @ParameterizedTest
         void __bitWidth(final int keySize, final String transformation) throws Throwable {
-            _BouncyCastleProvider_TestUtils.callWithinBouncyCastleProvider(() -> {
+            _BouncyCastleProvider_TestUtils.callForBouncyCastleProvider(() -> {
                 final Cipher cipher;
                 try {
                     cipher = Cipher.getInstance(transformation);
@@ -244,7 +244,7 @@ class AES_CFB_Test
         @MethodSource({"getKeySizeAndTransformationWithBitWidthArgumentsStream"})
         @ParameterizedTest
         void __bitWidth(final int keySize, final String transformation, @TempDir final Path dir) throws Throwable {
-            _BouncyCastleProvider_TestUtils.callWithinBouncyCastleProvider(() -> {
+            _BouncyCastleProvider_TestUtils.callForBouncyCastleProvider(() -> {
                 final Cipher cipher;
                 try {
                     cipher = Cipher.getInstance(transformation);

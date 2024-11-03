@@ -20,13 +20,6 @@ public final class _StreamCipher_TestUtils {
         return Objects.requireNonNull(cipher, "cipher is null").getAlgorithmName();
     }
 
-//    public static String cipherName(final StreamCipher cipher, final BlockCipherPadding padding) {
-//        return _BlockCipherTestUtils.cipherName(
-//                Objects.requireNonNull(cipher, "cipher is null").getUnderlyingCipher(),
-//                padding
-//        );
-//    }
-
     // -----------------------------------------------------------------------------------------------------------------
     private static void __(final StreamCipher cipher, final CipherParameters params, final byte[] plain) {
         // ----------------------------------------------------------------------------------------------------- encrypt
@@ -35,12 +28,11 @@ public final class _StreamCipher_TestUtils {
         // ----------------------------------------------------------------------------------------------------- decrypt
         cipher.init(false, params);
         final var decrypted = JinahyaStreamCipherUtils.processBytes(cipher, encrypted);
-        // -------------------------------------------------------------------------------------------------------- then
-//        _LogUtils.log(plain, encrypted, decrypted);
+        // ------------------------------------------------------------------------------------------------------ verify
         assertThat(decrypted).isEqualTo(plain);
     }
 
-    public static void __(final StreamCipher cipher, final CipherParameters params) throws Exception {
+    public static void __(final StreamCipher cipher, final CipherParameters params) {
         _Random_TestUtils.getRandomBytesStream().forEach(b -> {
             __(cipher, params, b);
         });
@@ -55,7 +47,7 @@ public final class _StreamCipher_TestUtils {
         final var encrypted = File.createTempFile("tmp", null, dir);
         try (var source = new FileInputStream(plain);
              var target = new FileOutputStream(encrypted)) {
-            JinahyaStreamCipherUtils.processAllBytes(cipher, source, target, new byte[1]);
+            final var bytes = JinahyaStreamCipherUtils.processAllBytes(cipher, source, target, new byte[1]);
             target.flush();
         }
         // ----------------------------------------------------------------------------------------------------- decrypt
@@ -63,11 +55,10 @@ public final class _StreamCipher_TestUtils {
         final var decrypted = File.createTempFile("tmp", null, dir);
         try (var source = new FileInputStream(encrypted);
              var target = new FileOutputStream(decrypted)) {
-            JinahyaStreamCipherUtils.processAllBytes(cipher, source, target, new byte[1]);
+            final var bytes = JinahyaStreamCipherUtils.processAllBytes(cipher, source, target, new byte[1]);
             target.flush();
         }
-        // -------------------------------------------------------------------------------------------------------- then
-//        _LogUtils.log(plain, encrypted, decrypted);
+        // ------------------------------------------------------------------------------------------------------ verify
         assertThat(decrypted).hasSize(plain.length());
         for (var algorithm : new String[]{"SHA-1", "SHA-256"}) {
             final var digest = MessageDigest.getInstance(algorithm);

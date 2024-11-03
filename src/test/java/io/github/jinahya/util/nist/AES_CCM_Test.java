@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.CipherParameters;
+import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.bouncycastle.crypto.engines.AESEngine;
 import org.bouncycastle.crypto.io.CipherInputStream;
 import org.bouncycastle.crypto.io.CipherOutputStream;
@@ -29,6 +30,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -54,7 +56,7 @@ class AES_CCM_Test
 
         @MethodSource({"getKeySizeAndTagLengthArgumentsStream"})
         @ParameterizedTest
-        void __(final int keySize, final int tagLength) throws Exception {
+        void __(final int keySize, final int tagLength) throws InvalidCipherTextException {
             final var key = _Random_TestUtils.newRandomBytes(keySize >> 3);
             final var macSize = tagLength << 3;
             final var nonce = _Random_TestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(7, 14));
@@ -88,20 +90,20 @@ class AES_CCM_Test
                 assert (processed + finalized) == decrypted.length;
             }
             final var decryptionMac = cipher.getMac();
-            // ---------------------------------------------------------------------------------------------------- then
+            // -------------------------------------------------------------------------------------------------- verify
             assertThat(decrypted).isEqualTo(plain);
             assertThat(decryptionMac).isEqualTo(encryptionMac);
         }
 
         @MethodSource({"getKeySizeAndTagLengthArgumentsStream"})
         @ParameterizedTest
-        void __(final int keySize, final int tagLength, @TempDir final File dir) throws Exception {
-            // ------------------------------------------------------------------------------------------------------- given
+        void __(final int keySize, final int tagLength, @TempDir final File dir) throws IOException {
             final var key = _Random_TestUtils.newRandomBytes(keySize >> 3);
             final var macSize = tagLength << 3;
             final var nonce = _Random_TestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(7, 14));
-            final var associatedText = ThreadLocalRandom.current().nextBoolean() ?
-                    null : _Random_TestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(1024));
+            final var associatedText = ThreadLocalRandom.current().nextBoolean()
+                    ? null
+                    : _Random_TestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(1024));
             final var cipher = CCMBlockCipher.newInstance(AESEngine.newInstance());
             final var params = new AEADParameters(new KeyParameter(key), macSize, nonce, associatedText);
             final var plain = File.createTempFile("tmp", null, dir);
@@ -114,9 +116,9 @@ class AES_CCM_Test
             final var encrypted = File.createTempFile("tmp", null, dir);
             {
                 cipher.init(true, params);
-                try (var target = new CipherOutputStream(new FileOutputStream(encrypted), cipher)) {
-                    Files.copy(plain.toPath(), target);
-                    target.flush();
+                try (var out = new CipherOutputStream(new FileOutputStream(encrypted), cipher)) {
+                    Files.copy(plain.toPath(), out);
+                    out.flush();
                 }
             }
             final var encryptionMac = cipher.getMac();
@@ -124,12 +126,12 @@ class AES_CCM_Test
             final var decrypted = File.createTempFile("tmp", null, dir);
             {
                 cipher.init(false, params);
-                try (var source = new CipherInputStream(new FileInputStream(encrypted), cipher)) {
-                    Files.copy(source, decrypted.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                try (var in = new CipherInputStream(new FileInputStream(encrypted), cipher)) {
+                    Files.copy(in, decrypted.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 }
             }
             final var decryptionMac = cipher.getMac();
-            // ---------------------------------------------------------------------------------------------------- then
+            // -------------------------------------------------------------------------------------------------- verify
             assertThat(decrypted).hasSameBinaryContentAs(plain);
             assertThat(decryptionMac).isEqualTo(encryptionMac);
         }
@@ -172,8 +174,8 @@ class AES_CCM_Test
 
         @MethodSource({"getKeySizeAndTransformationArgumentsStream"})
         @ParameterizedTest
-        void __(final int keySize, final String transformation) throws Throwable {
-            _BouncyCastleProvider_TestUtils.callWithinBouncyCastleProvider(() -> {
+        void __(final int keySize, final String transformation) throws Exception {
+            _BouncyCastleProvider_TestUtils.callForBouncyCastleProvider(() -> {
                 final var cipher = Cipher.getInstance(transformation);
                 final var key = new SecretKeySpec(_Random_TestUtils.newRandomBytes(keySize >> 3), ALGORITHM);
                 final var params = new IvParameterSpec(_CCM_TestUtils.newBouncyCastleNonce());
@@ -184,8 +186,8 @@ class AES_CCM_Test
 
         @MethodSource({"getKeySizeAndTransformationArgumentsStream"})
         @ParameterizedTest
-        void __(final int keySize, final String transformation, @TempDir final Path dir) throws Throwable {
-            _BouncyCastleProvider_TestUtils.callWithinBouncyCastleProvider(() -> {
+        void __(final int keySize, final String transformation, @TempDir final Path dir) throws Exception {
+            _BouncyCastleProvider_TestUtils.callForBouncyCastleProvider(() -> {
                 final var cipher = Cipher.getInstance(transformation);
                 final var key = new SecretKeySpec(_Random_TestUtils.newRandomBytes(keySize >> 3), ALGORITHM);
                 final var params = new IvParameterSpec(_CCM_TestUtils.newBouncyCastleNonce());

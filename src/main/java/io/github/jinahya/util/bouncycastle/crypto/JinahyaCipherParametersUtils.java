@@ -14,14 +14,13 @@ public class JinahyaCipherParametersUtils {
         Objects.requireNonNull(params, "params is null");
         if (params instanceof ParametersWithIV) {
             final var parameters = ((ParametersWithIV) params).getParameters();
-            assert parameters instanceof KeyParameter;
             return getKey(parameters);
         }
         if (params instanceof KeyParameter) {
             return ((KeyParameter) params).getKey();
         }
         if (params instanceof AEADParameters) {
-            return ((AEADParameters) params).getKey().getKey();
+            return getKey(((AEADParameters) params).getKey());
         }
         throw new IllegalArgumentException("failed to get key from " + params);
     }

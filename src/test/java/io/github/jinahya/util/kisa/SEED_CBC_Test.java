@@ -59,7 +59,7 @@ class SEED_CBC_Test
     @MethodSource({"getKeySizeStream_"})
     @ParameterizedTest
     void __(final int keySize) throws Throwable {
-        _BouncyCastleProvider_TestUtils.callWithinBouncyCastleProvider(() -> {
+        _BouncyCastleProvider_TestUtils.callForBouncyCastleProvider(() -> {
             final var transformation = ALGORITHM + '/' + _CBC_TestUtils.MODE + "/PKCS5Padding";
             final var cipher = Cipher.getInstance(transformation, BouncyCastleProvider.PROVIDER_NAME);
             final var key = new SecretKeySpec(
@@ -76,7 +76,7 @@ class SEED_CBC_Test
     @MethodSource({"getKeySizeStream_"})
     @ParameterizedTest
     void __(final int keySize, @TempDir final Path dir) throws Throwable {
-        _BouncyCastleProvider_TestUtils.callWithinBouncyCastleProvider(() -> {
+        _BouncyCastleProvider_TestUtils.callForBouncyCastleProvider(() -> {
             final var transformation = ALGORITHM + '/' + _CBC_TestUtils.MODE + "/PKCS5Padding";
             final var cipher = Cipher.getInstance(transformation, BouncyCastleProvider.PROVIDER_NAME);
             final var key = new SecretKeySpec(

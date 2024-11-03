@@ -91,26 +91,34 @@ public final class JinahyaBufferedBlockCipherUtils {
         if (Objects.requireNonNull(inbuf, "inbuf is null").length == 0) {
             throw new IllegalArgumentException("inbuf.length shouldn't be zero");
         }
-        var count = 0L;
-        var outbuf = new byte[1];
+        var written = 0L;
+        var outbuf = new byte[cipher.getOutputSize(inbuf.length)];
         for (int r; (r = input.read(inbuf)) != -1; ) {
-            while (true) {
-                try {
-                    final var processed = cipher.processBytes(inbuf, 0, r, outbuf, 0);
-                    output.write(outbuf, 0, processed);
-                    count += processed;
-                    break;
-                } catch (final DataLengthException dle) {
-                    Arrays.fill(outbuf, (byte) 0);
-                    outbuf = new byte[outbuf.length << 1];
-                }
+//            while (true) {
+//                try {
+//                    final var processed = cipher.processBytes(inbuf, 0, r, outbuf, 0);
+//                    output.write(outbuf, 0, processed);
+//                    written += processed;
+//                    break;
+//                } catch (final DataLengthException dle) {
+//                    Arrays.fill(outbuf, (byte) 0);
+//                    outbuf = new byte[outbuf.length << 1];
+//                }
+//            }
+            final var updateOutputSize = cipher.getUpdateOutputSize(r);
+            if (outbuf.length < updateOutputSize) {
+                Arrays.fill(outbuf, (byte) 0);
+                outbuf = new byte[updateOutputSize];
             }
+            final var processed = cipher.processBytes(inbuf, 0, r, outbuf, 0);
+            output.write(outbuf, 0, processed);
+            written += processed;
         }
         while (true) {
             try {
                 final var finalized = cipher.doFinal(outbuf, 0);
                 output.write(outbuf, 0, finalized);
-                count += finalized;
+                written += finalized;
                 break;
             } catch (final DataLengthException dle) {
                 Arrays.fill(outbuf, (byte) 0);
@@ -119,7 +127,7 @@ public final class JinahyaBufferedBlockCipherUtils {
         }
         Arrays.fill(inbuf, (byte) 0);
         Arrays.fill(outbuf, (byte) 0);
-        return count;
+        return written;
     }
 
     /**
