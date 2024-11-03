@@ -5,9 +5,11 @@ import io.github.jinahya.util.bouncycastle.crypto.params._ParametersWithIVTestUt
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.BlockCipher;
 import org.bouncycastle.crypto.modes.OFBBlockCipher;
+import org.junit.jupiter.api.Named;
 import org.junit.jupiter.params.provider.Arguments;
 
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -28,6 +30,17 @@ public final class _OFB_TestUtils {
 
     public static String mode(final int bitWidth) {
         return MODE + bitWidth;
+    }
+
+    public static Stream<Arguments> getBitWidthAndKeySizeStream(final Supplier<? extends IntStream> keyStreamSupplier) {
+        return getBitWidthStream().mapToObj(bw -> {
+            return keyStreamSupplier.get().mapToObj(ks -> {
+                return Arguments.of(
+                        Named.of("bitWidth: " + bw, bw),
+                        Named.of("keySize: " + ks, ks)
+                );
+            });
+        }).flatMap(Function.identity());
     }
 
     public static Stream<Arguments> getArgumentsStream(final Supplier<? extends IntStream> keyStreamSupplier,
