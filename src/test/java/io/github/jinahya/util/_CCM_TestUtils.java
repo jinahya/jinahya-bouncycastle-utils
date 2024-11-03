@@ -1,6 +1,8 @@
 package io.github.jinahya.util;
 
 import _javax.security._Random_TestUtils;
+import _org.bouncycastle.crypto._CipherParameters_TestUtils;
+import _org.bouncycastle.crypto.modes._AEADBlockCipher_TestUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.BlockCipher;
 import org.bouncycastle.crypto.modes.CCMBlockCipher;
@@ -33,10 +35,7 @@ public final class _CCM_TestUtils {
             final Supplier<? extends IntStream> keySizeStreamSupplier) {
         return keySizeStreamSupplier.get().mapToObj(ks -> {
             return getBouncyCastleTagLengthStream().mapToObj(tl -> {
-                return Arguments.of(
-                        Named.of("keySize: " + ks, ks),
-                        Named.of("tagLength: " + tl, tl)
-                );
+                return Arguments.of(ks, tl);
             });
         }).flatMap(Function.identity());
     }
@@ -66,8 +65,8 @@ public final class _CCM_TestUtils {
                             associatedText
                     );
                     return Arguments.of(
-                            Named.of(_TestUtils.cipherName(cipher.getUnderlyingCipher()), cipher),
-                            Named.of(_TestUtils.paramsName(params), params)
+                            Named.of(_AEADBlockCipher_TestUtils.cipherName(cipher), cipher),
+                            Named.of(_CipherParameters_TestUtils.paramsName(params), params)
                     );
                 })).flatMap(Function.identity());
     }

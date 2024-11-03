@@ -2,13 +2,13 @@ package io.github.jinahya.util.kisa;
 
 import _javax.crypto._Cipher_TestUtils;
 import _javax.security._Random_TestUtils;
+import _org.bouncycastle.crypto._BufferedBlockCipher_TestUtils;
+import _org.bouncycastle.crypto.paddings._BlockCipherPadding_TestUtils;
+import _org.bouncycastle.crypto.params._KeyParameters_TestUtils;
 import _org.bouncycastle.jce.provider._BouncyCastleProvider_TestUtils;
 import io.github.jinahya.util._CBC_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto._BufferedBlockCipher_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto.paddings._BlockCipherPaddingTestUtils;
 import io.github.jinahya.util.bouncycastle.crypto.params.JinahyaKeyParametersUtils;
 import io.github.jinahya.util.bouncycastle.crypto.params.JinahyaParametersWithIvUtils;
-import io.github.jinahya.util.bouncycastle.crypto.params._KeyParametersTestUtils;
 import io.github.jinahya.util.bouncycastle.jce.provider.JinahyaBouncyCastleProviderUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -41,7 +41,7 @@ class LEA_CBC_Test
         extends LEA__Test {
 
     private static Stream<Arguments> getArgumentsStream() {
-        return _BlockCipherPaddingTestUtils.getBlockCipherPaddingStream().flatMap(p -> {
+        return _BlockCipherPadding_TestUtils.getBlockCipherPaddingStream().flatMap(p -> {
             return getKeySizeStream().mapToObj(ks -> {
                 final var engine = new LEAEngine();
                 final var cipher = new PaddedBufferedBlockCipher(CBCBlockCipher.newInstance(engine), p);
@@ -90,7 +90,7 @@ class LEA_CBC_Test
                     JinahyaBouncyCastleProviderUtils.BOUNCY_CASTLE_PROVIDER_NAME
             );
             final var key = new SecretKeySpec(
-                    _KeyParametersTestUtils.newRandomKey(null, keySize),
+                    _KeyParameters_TestUtils.newRandomKey(null, keySize),
                     ALGORITHM
             );
             final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
@@ -115,7 +115,7 @@ class LEA_CBC_Test
                     JinahyaBouncyCastleProviderUtils.BOUNCY_CASTLE_PROVIDER_NAME
             );
             final var key = new SecretKeySpec(
-                    _KeyParametersTestUtils.newRandomKey(null, keySize),
+                    _KeyParameters_TestUtils.newRandomKey(null, keySize),
                     ALGORITHM
             );
             final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));

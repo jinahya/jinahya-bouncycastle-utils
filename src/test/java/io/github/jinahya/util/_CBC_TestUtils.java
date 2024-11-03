@@ -1,27 +1,27 @@
 package io.github.jinahya.util;
 
-import io.github.jinahya.util.bouncycastle.crypto.params._KeyParametersTestUtils;
+import _javax.security._Random_TestUtils;
+import _org.bouncycastle.crypto._CipherParameters_TestUtils;
+import _org.bouncycastle.crypto.paddings._PaddedBufferedBlockCipher_TestUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.BlockCipher;
+import org.bouncycastle.crypto.modes.CBCBlockCipher;
 import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
+import org.bouncycastle.crypto.params.KeyParameter;
+import org.bouncycastle.crypto.params.ParametersWithIV;
 import org.junit.jupiter.api.Named;
 import org.junit.jupiter.params.provider.Arguments;
 
 import java.util.Objects;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static io.github.jinahya.util.bouncycastle.crypto.paddings._BlockCipherPaddingTestUtils.getBlockCipherPaddingStream;
+import static _org.bouncycastle.crypto.paddings._BlockCipherPadding_TestUtils.getBlockCipherPaddingStream;
 
 @Slf4j
 public final class _CBC_TestUtils {
-
-//    private static Stream<Arguments> getPaddingAndKeySizeArgumentsStream(
-//            final Supplier<? extends IntStream> keySizeStreamSupplier) {
-//        return _BlockCipherPaddingTestUtils.getBlockCipherPaddingStream()
-//                .flatMap(p -> keySizeStreamSupplier.get().mapToObj(ks -> Arguments.of(p, ks)));
-//    }
 
     public static Stream<Arguments> getCipherAndParamsArgumentsStream(
             final Supplier<? extends IntStream> keySizeStreamSupplier,
@@ -30,11 +30,18 @@ public final class _CBC_TestUtils {
         Objects.requireNonNull(cipherSupplier, "cipherSupplier is null");
         return getBlockCipherPaddingStream()
                 .flatMap(p -> keySizeStreamSupplier.get().mapToObj(ks -> {
-                    final var cipher = new PaddedBufferedBlockCipher(cipherSupplier.get(), p);
-                    final var params = _KeyParametersTestUtils.newRandomInstanceOfKeyParameter(null, ks);
+                    final var cipher = new PaddedBufferedBlockCipher(
+                            CBCBlockCipher.newInstance(cipherSupplier.get()),
+                            p
+                    );
+                    final var key = _Random_TestUtils.newRandomBytes(ks >> 3);
+                    final var iv = _Random_TestUtils.newRandomBytes(cipher.getBlockSize());
+                    final var params = ThreadLocalRandom.current().nextBoolean()
+                            ? new KeyParameter(key)
+                            : new ParametersWithIV(new KeyParameter(key), iv);
                     return Arguments.of(
-                            Named.of(_TestUtils.cipherName(cipher, p), cipher),
-                            Named.of(_TestUtils.paramsName(params), params)
+                            Named.of(_PaddedBufferedBlockCipher_TestUtils.cipherName(cipher), cipher),
+                            Named.of(_CipherParameters_TestUtils.paramsName(params), params)
                     );
                 }));
     }

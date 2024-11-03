@@ -1,7 +1,7 @@
-package io.github.jinahya.util.bouncycastle.crypto;
+package _org.bouncycastle.crypto;
 
-import io.github.jinahya.util.bouncycastle.crypto.params._KeyParametersTestUtils;
-import io.github.jinahya.util.bouncycastle.crypto.params._ParametersWithIVTestUtils;
+import _org.bouncycastle.crypto.params._KeyParameters_TestUtils;
+import _org.bouncycastle.crypto.params._ParametersWithIV_TestUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.BlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
@@ -19,10 +19,6 @@ public final class _BlockCipher_TestUtils {
         return String.format("%1$s/%2$d", cipher.getAlgorithmName(), keySize);
     }
 
-    public static String cipherName(final BlockCipher cipher) {
-        return cipherName(cipher, cipher.getBlockSize());
-    }
-
     public static String cipherName(final BlockCipher cipher, final BlockCipherPadding padding) {
         return String.format("%1$s/%2$s", cipher.getAlgorithmName(), padding.getPaddingName());
     }
@@ -34,12 +30,17 @@ public final class _BlockCipher_TestUtils {
     public static String paramsName(final CipherParameters parameters) {
         Objects.requireNonNull(parameters, "parameters is null");
         if (parameters instanceof KeyParameter p) {
-            return _KeyParametersTestUtils.paramsName(p);
+            return _KeyParameters_TestUtils.paramsName(p);
         }
         if (parameters instanceof ParametersWithIV p) {
-            return _ParametersWithIVTestUtils.paramsName(p);
+            return _ParametersWithIV_TestUtils.paramsName(p);
         }
         throw new RuntimeException("failed to get key from " + parameters);
+    }
+
+    public static String cipherName(final BlockCipher cipher) {
+        Objects.requireNonNull(cipher, "cipher is null");
+        return String.format("%1$s", cipher.getAlgorithmName());
     }
 
     // -----------------------------------------------------------------------------------------------------------------

@@ -2,9 +2,9 @@ package io.github.jinahya.util.nist;
 
 import _javax.crypto._Cipher_TestUtils;
 import _javax.security._Random_TestUtils;
+import _org.bouncycastle.crypto.modes._AEADCipher_TestUtils;
 import io.github.jinahya.util._CCM_TestUtils;
 import io.github.jinahya.util._JCEProviderTest;
-import io.github.jinahya.util.bouncycastle.crypto.modes._AEADCipher_TestUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,7 +57,7 @@ class AES_CCM_Test
 
         @DisplayName("encrypt/decrypt bytes")
         @MethodSource({"getKeySizeAndTagLengthArgumentsStream"})
-        @ParameterizedTest
+        @ParameterizedTest(name = "[{index}] {0}-bit key with {1}-long tag length")
         void __(final int keySize, final int tagLength) throws InvalidCipherTextException {
             final var key = _Random_TestUtils.newRandomBytes(keySize >> 3);
             final var macSize = tagLength << 3;
@@ -100,7 +100,7 @@ class AES_CCM_Test
 
         @DisplayName("encrypt/decrypt file")
         @MethodSource({"getKeySizeAndTagLengthArgumentsStream"})
-        @ParameterizedTest
+        @ParameterizedTest(name = "[{index}] {0}-bit key with {1}-long tag length")
         void __(final int keySize, final int tagLength, @TempDir final File dir) throws IOException {
             final var key = _Random_TestUtils.newRandomBytes(keySize >> 3);
             final var macSize = tagLength << 3;

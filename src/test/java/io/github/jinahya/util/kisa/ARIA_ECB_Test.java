@@ -1,10 +1,10 @@
 package io.github.jinahya.util.kisa;
 
 import _javax.crypto._Cipher_TestUtils;
+import _org.bouncycastle.crypto._BufferedBlockCipher_TestUtils;
+import _org.bouncycastle.crypto.params._KeyParameters_TestUtils;
 import _org.bouncycastle.jce.provider._BouncyCastleProvider_TestUtils;
 import io.github.jinahya.util._ECB_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto._BufferedBlockCipher_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto.params._KeyParametersTestUtils;
 import io.github.jinahya.util.bouncycastle.jce.provider.JinahyaBouncyCastleProviderUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -80,7 +80,7 @@ class ARIA_ECB_Test
             _BouncyCastleProvider_TestUtils.callForBouncyCastleProvider(() -> {
                 final var cipher = Cipher.getInstance(transformation);
                 final var key = new SecretKeySpec(
-                        _KeyParametersTestUtils.newRandomKey(null, keySize),
+                        _KeyParameters_TestUtils.newRandomKey(null, keySize),
                         ALGORITHM
                 );
                 _Cipher_TestUtils.__(cipher, key, (AlgorithmParameterSpec) null, (byte[]) null);
@@ -95,7 +95,7 @@ class ARIA_ECB_Test
                 JinahyaBouncyCastleProviderUtils.addBouncyCastleProvider();
                 final var cipher = Cipher.getInstance(transformation);
                 final var key = new SecretKeySpec(
-                        _KeyParametersTestUtils.newRandomKey(null, keySize),
+                        _KeyParameters_TestUtils.newRandomKey(null, keySize),
                         ALGORITHM
                 );
                 _Cipher_TestUtils.__(cipher, key, null, (byte[]) null, dir);

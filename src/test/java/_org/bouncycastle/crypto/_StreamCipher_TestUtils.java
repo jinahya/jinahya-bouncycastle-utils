@@ -1,6 +1,7 @@
-package io.github.jinahya.util.bouncycastle.crypto;
+package _org.bouncycastle.crypto;
 
 import _javax.security._Random_TestUtils;
+import io.github.jinahya.util.bouncycastle.crypto.JinahyaStreamCipherUtils;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.StreamCipher;
@@ -17,7 +18,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 public final class _StreamCipher_TestUtils {
 
     public static String cipherName(final StreamCipher cipher) {
-        return Objects.requireNonNull(cipher, "cipher is null").getAlgorithmName();
+        Objects.requireNonNull(cipher, "cipher is null");
+        return String.format("%1$s", cipher.getAlgorithmName());
     }
 
     // -----------------------------------------------------------------------------------------------------------------

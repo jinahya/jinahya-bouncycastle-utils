@@ -2,10 +2,10 @@ package io.github.jinahya.util.kisa;
 
 import _javax.crypto._Cipher_TestUtils;
 import _javax.security._Random_TestUtils;
+import _org.bouncycastle.crypto._StreamCipher_TestUtils;
+import _org.bouncycastle.crypto.params._KeyParameters_TestUtils;
 import _org.bouncycastle.jce.provider._BouncyCastleProvider_TestUtils;
 import io.github.jinahya.util._OFB_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto._StreamCipher_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto.params._KeyParametersTestUtils;
 import io.github.jinahya.util.bouncycastle.jce.provider.JinahyaBouncyCastleProviderUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -75,7 +75,7 @@ class ARIA_OFB_Test
                 return null;
             }
             final var key = new SecretKeySpec(
-                    _KeyParametersTestUtils.newRandomKey(null, keySize),
+                    _KeyParameters_TestUtils.newRandomKey(null, keySize),
                     ALGORITHM
             );
             final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
@@ -98,7 +98,7 @@ class ARIA_OFB_Test
                 return null;
             }
             final var key = new SecretKeySpec(
-                    _KeyParametersTestUtils.newRandomKey(null, keySize),
+                    _KeyParameters_TestUtils.newRandomKey(null, keySize),
                     ALGORITHM
             );
             final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
@@ -135,7 +135,7 @@ class ARIA_OFB_Test
                 return null;
             }
             final var key = new SecretKeySpec(
-                    _KeyParametersTestUtils.newRandomKey(null, keySize),
+                    _KeyParameters_TestUtils.newRandomKey(null, keySize),
                     ALGORITHM
             );
             final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
@@ -161,7 +161,7 @@ class ARIA_OFB_Test
                 return null;
             }
             final var key = new SecretKeySpec(
-                    _KeyParametersTestUtils.newRandomKey(null, keySize),
+                    _KeyParameters_TestUtils.newRandomKey(null, keySize),
                     ALGORITHM
             );
             final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));

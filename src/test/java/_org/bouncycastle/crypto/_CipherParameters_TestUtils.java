@@ -1,9 +1,11 @@
-package io.github.jinahya.util.bouncycastle.crypto;
+package _org.bouncycastle.crypto;
 
-import io.github.jinahya.util.bouncycastle.crypto.params._KeyParametersTestUtils;
-import io.github.jinahya.util.bouncycastle.crypto.params._ParametersWithIVTestUtils;
+import _org.bouncycastle.crypto.params._AEADParameters_TestUtils;
+import _org.bouncycastle.crypto.params._KeyParameters_TestUtils;
+import _org.bouncycastle.crypto.params._ParametersWithIV_TestUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.CipherParameters;
+import org.bouncycastle.crypto.params.AEADParameters;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 
@@ -15,13 +17,16 @@ public final class _CipherParameters_TestUtils {
     // -----------------------------------------------------------------------------------------------------------------
     public static String paramsName(final CipherParameters params) {
         Objects.requireNonNull(params, "params is null");
-        if (params instanceof ParametersWithIV p) {
-            return _ParametersWithIVTestUtils.paramsName(p);
-        }
         if (params instanceof KeyParameter p) {
-            return _KeyParametersTestUtils.paramsName(p);
+            return _KeyParameters_TestUtils.paramsName(p);
         }
-        throw new RuntimeException("failed to get key from " + params);
+        if (params instanceof ParametersWithIV p) {
+            return _ParametersWithIV_TestUtils.paramsName(p);
+        }
+        if (params instanceof AEADParameters p) {
+            return _AEADParameters_TestUtils.paramsName(p);
+        }
+        throw new RuntimeException("failed to get name of " + params);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

@@ -2,10 +2,10 @@ package io.github.jinahya.util.kisa;
 
 import _javax.crypto._Cipher_TestUtils;
 import _javax.security._Random_TestUtils;
+import _org.bouncycastle.crypto._StreamCipher_TestUtils;
+import _org.bouncycastle.crypto.params._KeyParameters_TestUtils;
 import _org.bouncycastle.jce.provider._BouncyCastleProvider_TestUtils;
 import io.github.jinahya.util._CTR_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto._StreamCipher_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto.params._KeyParametersTestUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -72,7 +72,7 @@ class SEED_CTR_Test
                 throw new RuntimeException("failed to get cipher for " + transformation, nsae);
             }
             final var key = new SecretKeySpec(
-                    _KeyParametersTestUtils.newRandomKey(null, keySize),
+                    _KeyParameters_TestUtils.newRandomKey(null, keySize),
                     ALGORITHM
             );
             final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
@@ -94,7 +94,7 @@ class SEED_CTR_Test
                 throw new RuntimeException("failed to get cipher for " + transformation, nsae);
             }
             final var key = new SecretKeySpec(
-                    _KeyParametersTestUtils.newRandomKey(null, keySize),
+                    _KeyParameters_TestUtils.newRandomKey(null, keySize),
                     ALGORITHM
             );
             final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));

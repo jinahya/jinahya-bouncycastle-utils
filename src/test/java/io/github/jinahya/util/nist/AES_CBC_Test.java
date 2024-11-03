@@ -2,10 +2,10 @@ package io.github.jinahya.util.nist;
 
 import _javax.crypto._Cipher_TestUtils;
 import _javax.security._Random_TestUtils;
+import _org.bouncycastle.crypto._BufferedBlockCipher_TestUtils;
+import _org.bouncycastle.crypto.paddings._BlockCipherPadding_TestUtils;
 import io.github.jinahya.util._CBC_TestUtils;
 import io.github.jinahya.util._JCEProviderTest;
-import io.github.jinahya.util.bouncycastle.crypto._BufferedBlockCipher_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto.paddings._BlockCipherPaddingTestUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,14 +58,14 @@ class AES_CBC_Test
     class LowLevelApiTest {
 
         private static Stream<Arguments> getPaddingAndKeySizeArgumentsStream() {
-            return _BlockCipherPaddingTestUtils.getPaddingAndKeySizeArgumentsStream(
+            return _BlockCipherPadding_TestUtils.getPaddingAndKeySizeArgumentsStream(
                     AES__Test::getKeySizeStream
             );
         }
 
         @DisplayName("encrypt/decrypt bytes")
         @MethodSource({"getPaddingAndKeySizeArgumentsStream"})
-        @ParameterizedTest
+        @ParameterizedTest(name = "[{index}] {0} with {1}-bit key")
         void __(final BlockCipherPadding padding, final int keySize) throws Exception {
             final var cipher = new PaddedBufferedBlockCipher(
                     CBCBlockCipher.newInstance(AESEngine.newInstance()),
@@ -104,7 +104,7 @@ class AES_CBC_Test
 
         @DisplayName("encrypt/decrypt file")
         @MethodSource({"getPaddingAndKeySizeArgumentsStream"})
-        @ParameterizedTest
+        @ParameterizedTest(name = "[{index}] {0} with {1}-bit key")
         void __(final BlockCipherPadding padding, final int keySize, @TempDir final File dir) throws IOException {
             final var cipher = new PaddedBufferedBlockCipher(
                     CBCBlockCipher.newInstance(AESEngine.newInstance()),
@@ -148,12 +148,14 @@ class AES_CBC_Test
             );
         }
 
+        @DisplayName("encrypt/decrypt bytes")
         @MethodSource({"getCipherAndParamsArgumentsStream"})
         @ParameterizedTest
         void __(final BufferedBlockCipher cipher, final CipherParameters params) throws Exception {
             _BufferedBlockCipher_TestUtils.__(cipher, params);
         }
 
+        @DisplayName("encrypt/decrypt file")
         @MethodSource({"getCipherAndParamsArgumentsStream"})
         @ParameterizedTest
         void __(final BufferedBlockCipher cipher, final CipherParameters params, @TempDir final File dir)

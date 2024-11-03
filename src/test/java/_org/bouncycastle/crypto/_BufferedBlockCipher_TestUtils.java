@@ -1,7 +1,8 @@
-package io.github.jinahya.util.bouncycastle.crypto;
+package _org.bouncycastle.crypto;
 
 import _javax.security._MessageDigest_TestUtils;
 import _javax.security._Random_TestUtils;
+import io.github.jinahya.util.bouncycastle.crypto.JinahyaBufferedBlockCipherUtils;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.io.CipherInputStream;
@@ -21,8 +22,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 public final class _BufferedBlockCipher_TestUtils {
 
     public static String cipherName(final BufferedBlockCipher cipher) {
-        return _BlockCipher_TestUtils.cipherName(
-                Objects.requireNonNull(cipher, "cipher is null").getUnderlyingCipher());
+        Objects.requireNonNull(cipher, "cipher is null");
+        return _BlockCipher_TestUtils.cipherName(cipher.getUnderlyingCipher());
     }
 
     public static String cipherName(final BufferedBlockCipher cipher, final BlockCipherPadding padding) {

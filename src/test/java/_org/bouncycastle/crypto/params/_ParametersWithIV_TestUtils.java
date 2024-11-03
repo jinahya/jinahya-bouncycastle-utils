@@ -1,23 +1,23 @@
-package io.github.jinahya.util.bouncycastle.crypto.params;
+package _org.bouncycastle.crypto.params;
 
+import _org.bouncycastle.crypto._CipherParameters_TestUtils;
 import io.github.jinahya.util.bouncycastle.crypto.JinahyaBlockCipherUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.BlockCipher;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
-import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 
 import java.util.Objects;
 import java.util.Random;
 
 @Slf4j
-public final class _ParametersWithIVTestUtils {
+public final class _ParametersWithIV_TestUtils {
 
     // -----------------------------------------------------------------------------------------------------------------
     public static byte[] newRandomIv(Random random, final int length) {
         if (random == null) {
-            random = _KeyParametersTestUtils.random();
+            random = _KeyParameters_TestUtils.random();
         }
         if (length < 0) {
             throw new IllegalArgumentException("negative length: " + length);
@@ -38,12 +38,12 @@ public final class _ParametersWithIVTestUtils {
      * @param keySizeInBits a key size in bits.
      * @param ivSizeInBits  a block size in bits.
      * @return a new instance of {@link ParametersWithIV}.
-     * @see _ParametersWithIVTestUtils#newRandomIv(Random, int)
+     * @see _ParametersWithIV_TestUtils#newRandomIv(Random, int)
      */
     public static CipherParameters newRandomInstanceOfParametersWithIV(final Random random, final int keySizeInBits,
                                                                        final int ivSizeInBits) {
         return new ParametersWithIV(
-                _KeyParametersTestUtils.newRandomInstanceOfKeyParameter(random, keySizeInBits),
+                _KeyParameters_TestUtils.newRandomInstanceOfKeyParameter(random, keySizeInBits),
                 newRandomIv(random, ivSizeInBits)
         );
     }
@@ -68,17 +68,19 @@ public final class _ParametersWithIVTestUtils {
 
     // -----------------------------------------------------------------------------------------------------------------
     static String ivName(final byte[] iv) {
-        return String.format("iv: %1$d 0x%2$02X", iv.length << 3, iv[0]);
+        return String.format("%1$d-bit iv(%2$02x, ...)", iv.length << 3, iv[0]);
     }
 
     public static String paramsName(final ParametersWithIV params) {
         Objects.requireNonNull(params, "params is null");
-        return String.format("%1$s, %2$s", _KeyParametersTestUtils.paramsName((KeyParameter) params.getParameters()),
-                             ivName(params.getIV()));
+        final var iv = params.getIV();
+        return _CipherParameters_TestUtils.paramsName(params.getParameters())
+                + " / "
+                + ivName(iv);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private _ParametersWithIVTestUtils() {
+    private _ParametersWithIV_TestUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

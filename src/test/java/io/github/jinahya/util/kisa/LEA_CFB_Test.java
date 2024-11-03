@@ -1,7 +1,7 @@
 package io.github.jinahya.util.kisa;
 
+import _org.bouncycastle.crypto._StreamCipher_TestUtils;
 import io.github.jinahya.util._CFB_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto._StreamCipher_TestUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

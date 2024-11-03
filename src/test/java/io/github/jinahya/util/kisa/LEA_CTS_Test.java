@@ -1,9 +1,9 @@
 package io.github.jinahya.util.kisa;
 
 import _javax.security._Random_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto._BufferedBlockCipher_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto._CipherParameters_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto.params._KeyParametersTestUtils;
+import _org.bouncycastle.crypto._BufferedBlockCipher_TestUtils;
+import _org.bouncycastle.crypto._CipherParameters_TestUtils;
+import _org.bouncycastle.crypto.params._KeyParameters_TestUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +30,7 @@ class LEA_CTS_Test
         return getKeySizeStream().mapToObj(ks -> {
             final var engine = new LEAEngine();
             final var cipher = new CTSBlockCipher(engine);
-            final var params = _KeyParametersTestUtils.newRandomInstanceOfKeyParameter(null, ks);
+            final var params = _KeyParameters_TestUtils.newRandomInstanceOfKeyParameter(null, ks);
             return Arguments.of(
                     Named.of(_BufferedBlockCipher_TestUtils.cipherName(cipher), cipher),
                     Named.of(_CipherParameters_TestUtils.paramsName(params), params)

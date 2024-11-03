@@ -1,6 +1,7 @@
-package io.github.jinahya.util.bouncycastle.crypto.modes;
+package _org.bouncycastle.crypto.modes;
 
 import _javax.security._Random_TestUtils;
+import io.github.jinahya.util.bouncycastle.crypto.modes.JinahyaAEADCipherUtils;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.modes.AEADCipher;

@@ -2,9 +2,9 @@ package io.github.jinahya.util.nist;
 
 import _javax.crypto._Cipher_TestUtils;
 import _javax.security._Random_TestUtils;
+import _org.bouncycastle.crypto.modes._AEADCipher_TestUtils;
 import io.github.jinahya.util._GCM_TestUtils;
 import io.github.jinahya.util._JCEProviderTest;
-import io.github.jinahya.util.bouncycastle.crypto.modes._AEADCipher_TestUtils;
 import io.github.jinahya.util.bouncycastle.crypto.params.JinahyaKeyParametersUtils;
 import io.github.jinahya.util.bouncycastle.crypto.params.JinahyaParametersWithIvUtils;
 import lombok.AccessLevel;

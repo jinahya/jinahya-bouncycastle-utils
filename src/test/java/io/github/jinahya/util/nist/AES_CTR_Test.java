@@ -2,9 +2,9 @@ package io.github.jinahya.util.nist;
 
 import _javax.crypto._Cipher_TestUtils;
 import _javax.security._Random_TestUtils;
+import _org.bouncycastle.crypto._StreamCipher_TestUtils;
 import io.github.jinahya.util._CTR_TestUtils;
 import io.github.jinahya.util._JCEProviderTest;
-import io.github.jinahya.util.bouncycastle.crypto._StreamCipher_TestUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,6 +1,6 @@
 package io.github.jinahya.util;
 
-import io.github.jinahya.util.bouncycastle.crypto.params._ParametersWithIVTestUtils;
+import _org.bouncycastle.crypto.params._ParametersWithIV_TestUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.BlockCipher;
 import org.bouncycastle.crypto.modes.CFBBlockCipher;
@@ -58,7 +58,7 @@ public final class _CFB_TestUtils {
                 })
                 .filter(Objects::nonNull)
                 .flatMap(c -> keySizeStreamSupplier.get().mapToObj(ks -> {
-                    final var params = _ParametersWithIVTestUtils.newRandomInstanceOfParametersWithIV(null, ks, c);
+                    final var params = _ParametersWithIV_TestUtils.newRandomInstanceOfParametersWithIV(null, ks, c);
                     return Arguments.of(
                             Named.of(_TestUtils.cipherName(c), c),
                             Named.of("params: " + params, params)

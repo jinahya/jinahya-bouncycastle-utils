@@ -1,10 +1,10 @@
 package io.github.jinahya.util.kisa;
 
 import _javax.crypto._Cipher_TestUtils;
+import _org.bouncycastle.crypto._BufferedBlockCipher_TestUtils;
+import _org.bouncycastle.crypto.params._KeyParameters_TestUtils;
 import _org.bouncycastle.jce.provider._BouncyCastleProvider_TestUtils;
 import io.github.jinahya.util._ECB_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto._BufferedBlockCipher_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto.params._KeyParametersTestUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
@@ -63,7 +63,7 @@ class SEED_ECB_Test
             final var transformation = ALGORITHM + '/' + _ECB_TestUtils.MODE + "/PKCS5Padding";
             final var cipher = Cipher.getInstance(transformation, BouncyCastleProvider.PROVIDER_NAME);
             final var key = new SecretKeySpec(
-                    _KeyParametersTestUtils.newRandomKey(null, keySize),
+                    _KeyParameters_TestUtils.newRandomKey(null, keySize),
                     ALGORITHM
             );
             _Cipher_TestUtils.__(cipher, key, null, (byte[]) null);
@@ -79,7 +79,7 @@ class SEED_ECB_Test
             final var transformation = ALGORITHM + '/' + _ECB_TestUtils.MODE + "/PKCS5Padding";
             final var cipher = Cipher.getInstance(transformation, BouncyCastleProvider.PROVIDER_NAME);
             final var key = new SecretKeySpec(
-                    _KeyParametersTestUtils.newRandomKey(null, keySize),
+                    _KeyParameters_TestUtils.newRandomKey(null, keySize),
                     ALGORITHM
             );
             _Cipher_TestUtils.__(cipher, key, null, (byte[]) null, dir);

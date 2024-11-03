@@ -1,6 +1,6 @@
 package io.github.jinahya.util.kisa;
 
-import io.github.jinahya.util.bouncycastle.crypto._StreamCipher_TestUtils;
+import _org.bouncycastle.crypto._StreamCipher_TestUtils;
 import io.github.jinahya.util.bouncycastle.crypto.params.JinahyaKeyParametersUtils;
 import io.github.jinahya.util.bouncycastle.crypto.params.JinahyaParametersWithIvUtils;
 import lombok.AccessLevel;

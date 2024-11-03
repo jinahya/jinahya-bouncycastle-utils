@@ -1,11 +1,11 @@
 package io.github.jinahya.util.kisa;
 
 import _javax.security._Random_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto._BlockCipher_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto._CipherParameters_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto._StreamCipher_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto.params._KeyParametersTestUtils;
-import io.github.jinahya.util.bouncycastle.crypto.params._ParametersWithIVTestUtils;
+import _org.bouncycastle.crypto._BlockCipher_TestUtils;
+import _org.bouncycastle.crypto._CipherParameters_TestUtils;
+import _org.bouncycastle.crypto._StreamCipher_TestUtils;
+import _org.bouncycastle.crypto.params._KeyParameters_TestUtils;
+import _org.bouncycastle.crypto.params._ParametersWithIV_TestUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,8 +37,8 @@ class LEA_CCM_Test
             final var blockSize = engine.getBlockSize();
             final var blockSizeInBits = blockSize << 3;
             final var cipher = CCMBlockCipher.newInstance(engine);
-            final var key = _KeyParametersTestUtils.newRandomKey(null, ks);
-            final var iv = _ParametersWithIVTestUtils.newRandomIv(null, blockSizeInBits);
+            final var key = _KeyParameters_TestUtils.newRandomKey(null, ks);
+            final var iv = _ParametersWithIV_TestUtils.newRandomIv(null, blockSizeInBits);
             final var aad = _Random_TestUtils.newRandomBytes(blockSize);
             final var params = new AEADParameters(new KeyParameter(key), 128, iv, aad);
             return Arguments.of(
