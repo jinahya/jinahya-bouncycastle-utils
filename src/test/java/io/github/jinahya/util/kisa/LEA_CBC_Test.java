@@ -5,10 +5,10 @@ import _javax.security._Random_TestUtils;
 import _org.bouncycastle.jce.provider._BouncyCastleProvider_TestUtils;
 import io.github.jinahya.util._CBC_TestUtils;
 import io.github.jinahya.util.bouncycastle.crypto._BufferedBlockCipher_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto._CipherParameters_TestUtils;
 import io.github.jinahya.util.bouncycastle.crypto.paddings._BlockCipherPaddingTestUtils;
+import io.github.jinahya.util.bouncycastle.crypto.params.JinahyaKeyParametersUtils;
+import io.github.jinahya.util.bouncycastle.crypto.params.JinahyaParametersWithIvUtils;
 import io.github.jinahya.util.bouncycastle.crypto.params._KeyParametersTestUtils;
-import io.github.jinahya.util.bouncycastle.crypto.params._ParametersWithIVTestUtils;
 import io.github.jinahya.util.bouncycastle.jce.provider.JinahyaBouncyCastleProviderUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -21,7 +21,6 @@ import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Named;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -46,12 +45,14 @@ class LEA_CBC_Test
             return getKeySizeStream().mapToObj(ks -> {
                 final var engine = new LEAEngine();
                 final var cipher = new PaddedBufferedBlockCipher(CBCBlockCipher.newInstance(engine), p);
-                final var params = _ParametersWithIVTestUtils.newRandomInstanceOfParametersWithIV(
-                        null, ks, cipher.getUnderlyingCipher()
+                final var params = JinahyaParametersWithIvUtils.newRandomInstanceFor(
+                        JinahyaKeyParametersUtils.newRandomInstance(null, ks >> 3),
+                        null,
+                        cipher.getUnderlyingCipher()
                 );
                 return Arguments.of(
-                        Named.of(_BufferedBlockCipher_TestUtils.cipherName(cipher, p), cipher),
-                        Named.of(_CipherParameters_TestUtils.paramsName(params), params)
+                        cipher,
+                        params
                 );
             });
         });
@@ -93,7 +94,7 @@ class LEA_CBC_Test
                     ALGORITHM
             );
             final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
-            _Cipher_TestUtils.__(cipher, key, params);
+            _Cipher_TestUtils.__(cipher, key, params, (byte[]) null);
             return null;
         });
     }
@@ -118,7 +119,7 @@ class LEA_CBC_Test
                     ALGORITHM
             );
             final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
-            _Cipher_TestUtils.__(cipher, key, params, dir);
+            _Cipher_TestUtils.__(cipher, key, params, (byte[]) null, dir);
             return null;
         });
     }

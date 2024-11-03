@@ -23,6 +23,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.File;
 import java.nio.file.Path;
+import java.security.spec.AlgorithmParameterSpec;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -82,7 +83,7 @@ class ARIA_ECB_Test
                         _KeyParametersTestUtils.newRandomKey(null, keySize),
                         ALGORITHM
                 );
-                _Cipher_TestUtils.__(cipher, key);
+                _Cipher_TestUtils.__(cipher, key, (AlgorithmParameterSpec) null, (byte[]) null);
                 return null;
             });
         }
@@ -97,7 +98,7 @@ class ARIA_ECB_Test
                         _KeyParametersTestUtils.newRandomKey(null, keySize),
                         ALGORITHM
                 );
-                _Cipher_TestUtils.__(cipher, key, dir);
+                _Cipher_TestUtils.__(cipher, key, null, (byte[]) null, dir);
                 return null;
             });
         }

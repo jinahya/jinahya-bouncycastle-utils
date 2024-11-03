@@ -38,7 +38,7 @@ class SEED_OFB_Test
         extends SEED__Test {
 
     private static Stream<Arguments> getArgumentsStream() {
-        return _OFB_TestUtils.getArgumentsStream(SEED__Test::getKeySizeStream, SEEDEngine::new);
+        return _OFB_TestUtils.getCipherAndParamsArgumentsStream(SEED__Test::getKeySizeStream, SEEDEngine::new);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -78,7 +78,7 @@ class SEED_OFB_Test
                     ALGORITHM
             );
             final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
-            _Cipher_TestUtils.__(cipher, key, params);
+            _Cipher_TestUtils.__(cipher, key, params, (byte[]) null);
             return null;
         });
     }
@@ -101,7 +101,7 @@ class SEED_OFB_Test
                     ALGORITHM
             );
             final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
-            _Cipher_TestUtils.__(cipher, key, params, dir);
+            _Cipher_TestUtils.__(cipher, key, params, (byte[]) null, dir);
             return null;
         });
     }
@@ -138,7 +138,7 @@ class SEED_OFB_Test
                     ALGORITHM
             );
             final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
-            _Cipher_TestUtils.__(cipher, key, params);
+            _Cipher_TestUtils.__(cipher, key, params, (byte[]) null);
             return null;
         });
     }
@@ -164,7 +164,7 @@ class SEED_OFB_Test
                     ALGORITHM
             );
             final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
-            _Cipher_TestUtils.__(cipher, key, params, dir);
+            _Cipher_TestUtils.__(cipher, key, params, (byte[]) null, dir);
             return null;
         });
     }

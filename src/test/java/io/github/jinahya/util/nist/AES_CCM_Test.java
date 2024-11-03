@@ -2,8 +2,8 @@ package io.github.jinahya.util.nist;
 
 import _javax.crypto._Cipher_TestUtils;
 import _javax.security._Random_TestUtils;
-import _org.bouncycastle.jce.provider._BouncyCastleProvider_TestUtils;
 import io.github.jinahya.util._CCM_TestUtils;
+import io.github.jinahya.util._JCEProviderTest;
 import io.github.jinahya.util.bouncycastle.crypto.modes._AEADCipher_TestUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -17,7 +17,8 @@ import org.bouncycastle.crypto.modes.AEADCipher;
 import org.bouncycastle.crypto.modes.CCMBlockCipher;
 import org.bouncycastle.crypto.params.AEADParameters;
 import org.bouncycastle.crypto.params.KeyParameter;
-import org.junit.jupiter.api.Named;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -35,7 +36,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -45,6 +45,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class AES_CCM_Test
         extends AES__Test {
 
+    @DisplayName("Low-level API")
     @Nested
     class LowLevelApiTest {
 
@@ -54,11 +55,13 @@ class AES_CCM_Test
             );
         }
 
+        @DisplayName("encrypt/decrypt bytes")
         @MethodSource({"getKeySizeAndTagLengthArgumentsStream"})
         @ParameterizedTest
         void __(final int keySize, final int tagLength) throws InvalidCipherTextException {
             final var key = _Random_TestUtils.newRandomBytes(keySize >> 3);
             final var macSize = tagLength << 3;
+            // nonce must have length from 7 to 13 octets
             final var nonce = _Random_TestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(7, 14));
             final var associatedText = ThreadLocalRandom.current().nextBoolean()
                     ? null
@@ -95,6 +98,7 @@ class AES_CCM_Test
             assertThat(decryptionMac).isEqualTo(encryptionMac);
         }
 
+        @DisplayName("encrypt/decrypt file")
         @MethodSource({"getKeySizeAndTagLengthArgumentsStream"})
         @ParameterizedTest
         void __(final int keySize, final int tagLength, @TempDir final File dir) throws IOException {
@@ -136,7 +140,6 @@ class AES_CCM_Test
             assertThat(decryptionMac).isEqualTo(encryptionMac);
         }
 
-        // -----------------------------------------------------------------------------------------------------------------
         private static Stream<Arguments> getCipherAndParamsArgumentsStream() {
             return _CCM_TestUtils.getCipherAndParamsArgumentsStream(
                     AES__Test::getKeySizeStream,
@@ -144,12 +147,14 @@ class AES_CCM_Test
             );
         }
 
+        @DisplayName("encrypt/decrypt bytes")
         @MethodSource({"getCipherAndParamsArgumentsStream"})
         @ParameterizedTest
         void __(final AEADCipher cipher, final CipherParameters params) throws Exception {
             _AEADCipher_TestUtils.__(cipher, params);
         }
 
+        @DisplayName("encrypt/decrypt file")
         @MethodSource({"getCipherAndParamsArgumentsStream"})
         @ParameterizedTest
         void __(final AEADCipher cipher, final CipherParameters params, @TempDir final File dir) throws Exception {
@@ -157,43 +162,33 @@ class AES_CCM_Test
         }
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
+    @DisplayName("JCE Provider")
     @Nested
-    class JCEProviderTest {
+    class JCEProviderTest
+            extends _JCEProviderTest {
 
-        private static Stream<Arguments> getKeySizeAndTransformationArgumentsStream() {
-            return getKeySizeStream().mapToObj(ks -> {
-                return Stream.of("NoPadding")
-                        .map(p -> ALGORITHM + '/' + _CCM_TestUtils.MODE + '/' + p)
-                        .map(t -> Arguments.of(
-                                Named.of("keySize: " + ks, ks),
-                                Named.of("transformation: " + t, t)
-                        ));
-            }).flatMap(Function.identity());
+        private static Stream<Arguments> getTransformationAndKeySizeArgumentsStream() {
+            return Stream.of("NoPadding")
+                    .map(p -> ALGORITHM + '/' + _CCM_TestUtils.MODE + '/' + p)
+                    .flatMap(t -> getKeySizeStream().mapToObj(ks -> Arguments.of(t, ks)));
         }
 
-        @MethodSource({"getKeySizeAndTransformationArgumentsStream"})
-        @ParameterizedTest
-        void __(final int keySize, final String transformation) throws Exception {
-            _BouncyCastleProvider_TestUtils.callForBouncyCastleProvider(() -> {
-                final var cipher = Cipher.getInstance(transformation);
-                final var key = new SecretKeySpec(_Random_TestUtils.newRandomBytes(keySize >> 3), ALGORITHM);
-                final var params = new IvParameterSpec(_CCM_TestUtils.newBouncyCastleNonce());
-                _Cipher_TestUtils.__(cipher, key, params);
-                return null;
-            });
+        @MethodSource({"getTransformationAndKeySizeArgumentsStream"})
+        @ParameterizedTest(name = "[{index}] {0} with {1}-bit key")
+        void __(final String transformation, final int keySize) throws Exception {
+            final var cipher = Cipher.getInstance(transformation, BouncyCastleProvider.PROVIDER_NAME);
+            final var key = new SecretKeySpec(_Random_TestUtils.newRandomBytes(keySize >> 3), ALGORITHM);
+            final var params = new IvParameterSpec(_CCM_TestUtils.newBouncyCastleNonce());
+            _Cipher_TestUtils.__(cipher, key, params, (byte[]) null);
         }
 
-        @MethodSource({"getKeySizeAndTransformationArgumentsStream"})
-        @ParameterizedTest
-        void __(final int keySize, final String transformation, @TempDir final Path dir) throws Exception {
-            _BouncyCastleProvider_TestUtils.callForBouncyCastleProvider(() -> {
-                final var cipher = Cipher.getInstance(transformation);
-                final var key = new SecretKeySpec(_Random_TestUtils.newRandomBytes(keySize >> 3), ALGORITHM);
-                final var params = new IvParameterSpec(_CCM_TestUtils.newBouncyCastleNonce());
-                _Cipher_TestUtils.__(cipher, key, params, dir);
-                return null;
-            });
+        @MethodSource({"getTransformationAndKeySizeArgumentsStream"})
+        @ParameterizedTest(name = "[{index}] {0} with {1}-bit key")
+        void __(final String transformation, final int keySize, @TempDir final Path dir) throws Exception {
+            final var cipher = Cipher.getInstance(transformation, BouncyCastleProvider.PROVIDER_NAME);
+            final var key = new SecretKeySpec(_Random_TestUtils.newRandomBytes(keySize >> 3), ALGORITHM);
+            final var params = new IvParameterSpec(_CCM_TestUtils.newBouncyCastleNonce());
+            _Cipher_TestUtils.__(cipher, key, params, (byte[]) null, dir);
         }
     }
 }

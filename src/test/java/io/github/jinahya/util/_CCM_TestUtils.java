@@ -1,7 +1,6 @@
 package io.github.jinahya.util;
 
 import _javax.security._Random_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto.params._KeyParametersTestUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.BlockCipher;
 import org.bouncycastle.crypto.modes.CCMBlockCipher;
@@ -55,7 +54,7 @@ public final class _CCM_TestUtils {
         return keySizeStreamSupplier.get()
                 .mapToObj(ks -> getBouncyCastleTagLengthStream().map(tl -> tl << 3).mapToObj(ms -> {
                     final var cipher = CCMBlockCipher.newInstance(cipherSupplier.get());
-                    final var key = _KeyParametersTestUtils.newRandomKey(null, ks);
+                    final var key = _Random_TestUtils.newRandomBytes(ks >> 3);
                     final var nonce = newBouncyCastleNonce();
                     final var associatedText = ThreadLocalRandom.current().nextBoolean()
                             ? null

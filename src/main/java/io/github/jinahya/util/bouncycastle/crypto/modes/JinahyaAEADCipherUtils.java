@@ -1,5 +1,6 @@
 package io.github.jinahya.util.bouncycastle.crypto.modes;
 
+import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.bouncycastle.crypto.modes.AEADCipher;
 
@@ -15,6 +16,12 @@ import java.util.Objects;
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
 public final class JinahyaAEADCipherUtils {
+
+    public <T extends AEADCipher> T init(final T cipher, final boolean forEncryption, final CipherParameters params) {
+        Objects.requireNonNull(cipher, "cipher is null");
+        cipher.init(forEncryption, params);
+        return cipher;
+    }
 
     // -----------------------------------------------------------------------------------------------------------------
 

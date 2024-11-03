@@ -51,37 +51,48 @@ public final class _Random_TestUtils {
         return file;
     }
 
-    public static <T extends File> T writeRandomBytes(final T file) throws IOException {
-        return writeRandomBytesWhile(file, f -> false);
+    // -----------------------------------------------------------------------------------------------------------------
+    public static Path writeRandomBytes(final Path file) throws IOException {
+        return Files.write(
+                file,
+                newRandomBytes(ThreadLocalRandom.current().nextInt(8192))
+        );
+    }
+
+    public static File writeRandomBytes(final File file) throws IOException {
+        return writeRandomBytes(file.toPath()).toFile();
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    public static Path createTempFileWithRandomBytesWritten(final Path dir) throws IOException {
+        return writeRandomBytes(
+                Files.createTempFile(dir, null, null)
+        );
     }
 
     public static File createTempFileWithRandomBytesWritten(final File dir) throws IOException {
-        final var file = File.createTempFile("tmp", null, dir);
-        writeRandomBytes(file);
-        return file;
-    }
-
-    public static Path createTempFileWithRandomBytesWritten(final Path dir) throws IOException {
-        final var file = Files.createTempFile(dir, null, null);
-        writeRandomBytes(file.toFile());
-        return file;
+        return createTempFileWithRandomBytesWritten(dir.toPath()).toFile();
     }
 
     // -----------------------------------------------------------------------------------------------------------------
     public static Stream<byte[]> getRandomBytesStream() {
         return Stream.of(
-                new byte[0],
-                new byte[1],
-                newRandomBytes(1),
-                newRandomBytes(ThreadLocalRandom.current().nextInt(16))
+                new byte[0], // empty
+                new byte[1], // single zero
+                newRandomBytes(1), // single random
+                newRandomBytes(ThreadLocalRandom.current().nextInt(8192)) // random
+        );
+    }
+
+    public static Stream<Path> getRandomFileStream(final Path dir) throws IOException {
+        return Stream.of(
+                Files.createTempFile(dir, null, null), // empty
+                createTempFileWithRandomBytesWritten(dir) // random
         );
     }
 
     public static Stream<File> getRandomFileStream(final File dir) throws IOException {
-        return Stream.of(
-                File.createTempFile("tmp", null, dir),
-                writeRandomBytes(File.createTempFile("tmp", null, dir))
-        );
+        return getRandomFileStream(dir.toPath()).map(Path::toFile);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

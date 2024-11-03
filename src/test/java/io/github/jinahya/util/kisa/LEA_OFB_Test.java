@@ -23,7 +23,7 @@ class LEA_OFB_Test
         extends LEA__Test {
 
     private static Stream<Arguments> getArgumentsStream() {
-        return _OFB_TestUtils.getArgumentsStream(
+        return _OFB_TestUtils.getCipherAndParamsArgumentsStream(
                 () -> getKeySizeStream(),
                 LEAEngine::new
         );

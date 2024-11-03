@@ -1,6 +1,5 @@
 package io.github.jinahya.util;
 
-import _org.junit.jupiter.params.provider._Arguments_TestUtils;
 import io.github.jinahya.util.bouncycastle.crypto.params._ParametersWithIVTestUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.BlockCipher;
@@ -48,19 +47,22 @@ public final class _CFB_TestUtils {
             final Supplier<? extends IntStream> keySizeStreamSupplier,
             final Supplier<? extends BlockCipher> cipherSupplier) {
         return getBitWidthStream()
-                .mapToObj(bs -> {
+                .mapToObj(bw -> {
                     final var engine = cipherSupplier.get();
                     try {
-                        return CFBBlockCipher.newInstance(engine, bs);
+                        return CFBBlockCipher.newInstance(engine, bw);
                     } catch (final Exception e) {
-                        log.error("failed to create CFBBlockCipher with cipher({}) and bit width: {}", engine, bs, e);
+                        log.error("failed to create cipher for bitWidth: {}", bw, e);
                         return null;
                     }
                 })
                 .filter(Objects::nonNull)
                 .flatMap(c -> keySizeStreamSupplier.get().mapToObj(ks -> {
                     final var params = _ParametersWithIVTestUtils.newRandomInstanceOfParametersWithIV(null, ks, c);
-                    return _Arguments_TestUtils.argumentsOf(c, params);
+                    return Arguments.of(
+                            Named.of(_TestUtils.cipherName(c), c),
+                            Named.of("params: " + params, params)
+                    );
                 }));
     }
 

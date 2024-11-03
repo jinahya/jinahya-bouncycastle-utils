@@ -6,7 +6,11 @@ import org.bouncycastle.crypto.paddings.ISO7816d4Padding;
 import org.bouncycastle.crypto.paddings.PKCS7Padding;
 import org.bouncycastle.crypto.paddings.TBCPadding;
 import org.bouncycastle.crypto.paddings.X923Padding;
+import org.junit.jupiter.api.Named;
+import org.junit.jupiter.params.provider.Arguments;
 
+import java.util.function.Supplier;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public final class _BlockCipherPaddingTestUtils {
@@ -28,6 +32,15 @@ public final class _BlockCipherPaddingTestUtils {
 //                ,
 //                new ZeroBytePadding() // https://github.com/bcgit/bc-java/issues/1871
         );
+    }
+
+    public static Stream<Arguments> getPaddingAndKeySizeArgumentsStream(
+            final Supplier<? extends IntStream> keySizeStreamSupplier) {
+        return getBlockCipherPaddingStream()
+                .flatMap(p -> keySizeStreamSupplier.get().mapToObj(ks -> Arguments.of(
+                        Named.of("padding: " + p.getPaddingName(), p),
+                        Named.of("keySize: " + ks, ks)
+                )));
     }
 
     private _BlockCipherPaddingTestUtils() {

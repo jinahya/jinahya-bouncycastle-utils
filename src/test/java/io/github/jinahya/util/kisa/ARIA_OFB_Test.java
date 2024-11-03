@@ -37,7 +37,7 @@ class ARIA_OFB_Test
         extends ARIA__Test {
 
     private static Stream<Arguments> getArgumentsStream() {
-        return _OFB_TestUtils.getArgumentsStream(
+        return _OFB_TestUtils.getCipherAndParamsArgumentsStream(
                 ARIA__Test::getKeySizeStream,
                 ARIAEngine::new
         );
@@ -79,7 +79,7 @@ class ARIA_OFB_Test
                     ALGORITHM
             );
             final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
-            _Cipher_TestUtils.__(cipher, key, params);
+            _Cipher_TestUtils.__(cipher, key, params, (byte[]) null);
             return null;
         });
     }
@@ -102,7 +102,7 @@ class ARIA_OFB_Test
                     ALGORITHM
             );
             final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
-            _Cipher_TestUtils.__(cipher, key, params, dir);
+            _Cipher_TestUtils.__(cipher, key, params, (byte[]) null, dir);
             return null;
         });
     }
@@ -139,7 +139,7 @@ class ARIA_OFB_Test
                     ALGORITHM
             );
             final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
-            _Cipher_TestUtils.__(cipher, key, params);
+            _Cipher_TestUtils.__(cipher, key, params, (byte[]) null);
             return null;
         });
     }
@@ -165,7 +165,7 @@ class ARIA_OFB_Test
                     ALGORITHM
             );
             final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
-            _Cipher_TestUtils.__(cipher, key, params, dir);
+            _Cipher_TestUtils.__(cipher, key, params, (byte[]) null, dir);
             return null;
         });
     }

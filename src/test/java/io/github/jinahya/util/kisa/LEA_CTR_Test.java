@@ -1,8 +1,8 @@
 package io.github.jinahya.util.kisa;
 
-import io.github.jinahya.util.bouncycastle.crypto._CipherParameters_TestUtils;
 import io.github.jinahya.util.bouncycastle.crypto._StreamCipher_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto.params._ParametersWithIVTestUtils;
+import io.github.jinahya.util.bouncycastle.crypto.params.JinahyaKeyParametersUtils;
+import io.github.jinahya.util.bouncycastle.crypto.params.JinahyaParametersWithIvUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +10,6 @@ import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.StreamCipher;
 import org.bouncycastle.crypto.engines.LEAEngine;
 import org.bouncycastle.crypto.modes.SICBlockCipher;
-import org.junit.jupiter.api.Named;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -28,10 +27,14 @@ class LEA_CTR_Test
         return getKeySizeStream().mapToObj(ks -> {
             final var engine = new LEAEngine();
             final var cipher = SICBlockCipher.newInstance(engine);
-            final var params = _ParametersWithIVTestUtils.newRandomInstanceOfParametersWithIV(null, ks, cipher);
+            final var params = JinahyaParametersWithIvUtils.newRandomInstanceFor(
+                    JinahyaKeyParametersUtils.newRandomInstance(null, ks >> 3),
+                    null,
+                    cipher.getUnderlyingCipher()
+            );
             return Arguments.of(
-                    Named.of(_StreamCipher_TestUtils.cipherName(cipher), cipher),
-                    Named.of(_CipherParameters_TestUtils.paramsName(params), params)
+                    cipher,
+                    params
             );
         });
     }

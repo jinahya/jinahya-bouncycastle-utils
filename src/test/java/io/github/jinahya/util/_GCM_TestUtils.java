@@ -1,7 +1,7 @@
 package io.github.jinahya.util;
 
 import _javax.security._Random_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto.params._KeyParametersTestUtils;
+import io.github.jinahya.util.bouncycastle.crypto.params.JinahyaKeyParametersUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.BlockCipher;
 import org.bouncycastle.crypto.modes.GCMBlockCipher;
@@ -18,22 +18,14 @@ import java.util.stream.Stream;
 @Slf4j
 public final class _GCM_TestUtils {
 
-    public static final String MODE = "GCM";
-
-    public static IntStream getTLenStream() {
-        return IntStream.of(
-                128, 120, 112, 104, 96,
-                64, 32 // for certain applications
-        );
-    }
-
-    public static Stream<Arguments> getArgumentsStream(final Supplier<? extends IntStream> keySizeStreamSupplier,
-                                                       final Supplier<? extends BlockCipher> cipherSupplier) {
+    public static Stream<Arguments> getCipherAndParamsArgumentsStream(
+            final Supplier<? extends IntStream> keySizeStreamSupplier,
+            final Supplier<? extends BlockCipher> cipherSupplier) {
         Objects.requireNonNull(keySizeStreamSupplier, "keySizeStreamSupplier is null");
         Objects.requireNonNull(cipherSupplier, "cipherSupplier is null");
         return keySizeStreamSupplier.get().mapToObj(ks -> {
             final var cipher = GCMBlockCipher.newInstance(cipherSupplier.get());
-            final var key = _KeyParametersTestUtils.newRandomKey(null, ks);
+            final var key = JinahyaKeyParametersUtils.newRandomKey(null, ks >> 3);
             final var macSize = ThreadLocalRandom.current().nextInt(12, 17) << 3; // [96...128]
             final var nonce = _Random_TestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(1024) + 1);
             final var associatedText = ThreadLocalRandom.current().nextBoolean()
@@ -52,6 +44,16 @@ public final class _GCM_TestUtils {
                     params
             );
         });
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    public static final String MODE = "GCM";
+
+    public static IntStream getTLenStream() {
+        return IntStream.of(
+                128, 120, 112, 104, 96,
+                64, 32 // for certain applications
+        );
     }
 
     // -----------------------------------------------------------------------------------------------------------------

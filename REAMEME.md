@@ -23,8 +23,7 @@ Utilities for [Bouncy Castle for Java](https://www.bouncycastle.org/documentatio
         * [[QUESTION] ZeroBytePadding with Zero-Ending Input? #1871](https://github.com/bcgit/bc-java/issues/1871)
 * [StackExchange](https://stackexchange.com)
   * [Is it possible to combine true streaming with AEAD?](https://crypto.stackexchange.com/questions/24876/is-it-possible-to-combine-true-streaming-with-aead)
-
-[//]: # ( end::tagname[]
+  * [AES-GCM recommended IV size: Why 12 bytes?](https://crypto.stackexchange.com/q/41601/39160)
 * https://data-make.tistory.com/
     * [[JAVA] KISA SEED CBC 암/복호화](https://data-make.tistory.com/759)
 * [RetroTV's Dev Blog](https://blog.retrotv.dev/)

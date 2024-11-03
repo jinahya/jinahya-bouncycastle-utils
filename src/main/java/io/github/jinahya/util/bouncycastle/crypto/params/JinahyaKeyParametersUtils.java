@@ -20,7 +20,7 @@ public class JinahyaKeyParametersUtils {
                 throw new RuntimeException("failed to get a " + SecureRandom.class.getSimpleName() + " object", e);
             }
         }
-        return random();
+        return random;
     }
 
     public static byte[] newRandomKey(Random random, final int length) {

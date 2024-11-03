@@ -2,8 +2,8 @@ package io.github.jinahya.util.nist;
 
 import _javax.crypto._Cipher_TestUtils;
 import _javax.security._Random_TestUtils;
-import _org.bouncycastle.jce.provider._BouncyCastleProvider_TestUtils;
 import io.github.jinahya.util._CFB_TestUtils;
+import io.github.jinahya.util._JCEProviderTest;
 import io.github.jinahya.util.bouncycastle.crypto._StreamCipher_TestUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -17,6 +17,7 @@ import org.bouncycastle.crypto.modes.CFBBlockCipher;
 import org.bouncycastle.crypto.modes.CFBModeCipher;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.jupiter.api.Named;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.io.TempDir;
@@ -36,7 +37,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -160,103 +160,93 @@ class AES_CFB_Test
     }
 
     @Nested
-    class JCEProviderTest {
+    class JCEProviderTest
+            extends _JCEProviderTest {
 
-        private static Stream<Arguments> getKeySizeAndTransformationArgumentsStream() {
-            return getKeySizeStream().mapToObj(ks -> {
-                return Stream.of("NoPadding")
-                        .map(p -> ALGORITHM + '/' + _CFB_TestUtils.MODE + '/' + p)
-                        .map(t -> Arguments.of(
-                                Named.of("keySize: " + ks, ks),
-                                Named.of("transformation: " + t, t)
-                        ));
-            }).flatMap(Function.identity());
+        private static Stream<Arguments> getTransformationAndKeySizeArgumentsStream() {
+            return Stream.of("NoPadding")
+                    .map(p -> ALGORITHM + '/' + _CFB_TestUtils.MODE + '/' + p)
+                    .flatMap(t -> getKeySizeStream().mapToObj(ks -> {
+                        return Arguments.of(
+                                Named.of("transformation: " + t, t),
+                                Named.of("keySize: " + ks, ks)
+                        );
+                    }));
         }
 
-        @MethodSource({"getKeySizeAndTransformationArgumentsStream"})
+        @MethodSource({"getTransformationAndKeySizeArgumentsStream"})
         @ParameterizedTest
-        void __(final int keySize, final String transformation) throws Throwable {
-            _BouncyCastleProvider_TestUtils.callForBouncyCastleProvider(() -> {
-                final Cipher cipher;
-                try {
-                    cipher = Cipher.getInstance(transformation);
-                } catch (final NoSuchAlgorithmException nsae) {
-                    log.error("failed to get cipher for '{}'", transformation, nsae);
-                    return null;
-                }
-                final var key = new SecretKeySpec(_Random_TestUtils.newRandomBytes(keySize >> 3), ALGORITHM);
-                final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
-                _Cipher_TestUtils.__(cipher, key, params);
-                return null;
-            });
+        void __(final String transformation, final int keySize) throws Throwable {
+            final Cipher cipher;
+            try {
+                cipher = Cipher.getInstance(transformation, BouncyCastleProvider.PROVIDER_NAME);
+            } catch (final NoSuchAlgorithmException nsae) {
+                log.error("failed to get cipher for '{}'", transformation, nsae);
+                return;
+            }
+            final var key = new SecretKeySpec(_Random_TestUtils.newRandomBytes(keySize >> 3), ALGORITHM);
+            final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
+            _Cipher_TestUtils.__(cipher, key, params, (byte[]) null);
         }
 
-        @MethodSource({"getKeySizeAndTransformationArgumentsStream"})
+        @MethodSource({"getTransformationAndKeySizeArgumentsStream"})
         @ParameterizedTest
-        void __(final int keySize, final String transformation, @TempDir final Path dir) throws Throwable {
-            _BouncyCastleProvider_TestUtils.callForBouncyCastleProvider(() -> {
-                final Cipher cipher;
-                try {
-                    cipher = Cipher.getInstance(transformation);
-                } catch (final NoSuchAlgorithmException nsae) {
-                    log.error("failed to get cipher for '{}'", transformation, nsae);
-                    return null;
-                }
-                final var key = new SecretKeySpec(_Random_TestUtils.newRandomBytes(keySize >> 3), ALGORITHM);
-                final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
-                _Cipher_TestUtils.__(cipher, key, params, dir);
-                return null;
-            });
+        void __(final String transformation, final int keySize, @TempDir final Path dir) throws Throwable {
+            final Cipher cipher;
+            try {
+                cipher = Cipher.getInstance(transformation, BouncyCastleProvider.PROVIDER_NAME);
+            } catch (final NoSuchAlgorithmException nsae) {
+                log.error("failed to get cipher for '{}'", transformation, nsae);
+                return;
+            }
+            final var key = new SecretKeySpec(_Random_TestUtils.newRandomBytes(keySize >> 3), ALGORITHM);
+            final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
+            _Cipher_TestUtils.__(cipher, key, params, (byte[]) null, dir);
         }
 
-        // -------------------------------------------------------------------------------------------------------------
-        private static Stream<Arguments> getKeySizeAndTransformationWithBitWidthArgumentsStream() {
-            return getKeySizeStream().mapToObj(ks -> {
-                return _CFB_TestUtils.getBitWidthStream().mapToObj(bw -> {
-                    return Stream.of("NoPadding")
-                            .map(p -> ALGORITHM + '/' + _CFB_TestUtils.MODE + bw + '/' + p)
-                            .map(t -> Arguments.of(
-                                    Named.of("keySize: " + ks, ks),
-                                    Named.of("transformation: " + t, t)
-                            ));
-                }).flatMap(Function.identity());
-            }).flatMap(Function.identity());
+        private static Stream<Arguments> getTransformationWithBitWidthAndKeySizeArgumentsStream() {
+            return _CFB_TestUtils.getBitWidthStream()
+                    .mapToObj(_CFB_TestUtils::mode)
+                    .flatMap(m -> {
+                        return Stream.of("NoPadding")
+                                .map(p -> ALGORITHM + '/' + m + '/' + p);
+                    })
+                    .flatMap(t -> getKeySizeStream().mapToObj(ks -> {
+                        return Arguments.of(
+                                Named.of("transformation: " + t, t),
+                                Named.of("keySize: " + ks, ks)
+                        );
+                    }));
         }
 
-        @MethodSource({"getKeySizeAndTransformationWithBitWidthArgumentsStream"})
+        @MethodSource({"getTransformationWithBitWidthAndKeySizeArgumentsStream"})
         @ParameterizedTest
-        void __bitWidth(final int keySize, final String transformation) throws Throwable {
-            _BouncyCastleProvider_TestUtils.callForBouncyCastleProvider(() -> {
-                final Cipher cipher;
-                try {
-                    cipher = Cipher.getInstance(transformation);
-                } catch (final NoSuchAlgorithmException naae) {
-                    log.error("failed to get cipher for '{}'", transformation);
-                    return null;
-                }
-                final var key = new SecretKeySpec(_Random_TestUtils.newRandomBytes(keySize >> 3), ALGORITHM);
-                final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
-                _Cipher_TestUtils.__(cipher, key, params);
-                return null;
-            });
+        void __bitWidth(final String transformation, final int keySize) throws Throwable {
+            final Cipher cipher;
+            try {
+                cipher = Cipher.getInstance(transformation, BouncyCastleProvider.PROVIDER_NAME);
+            } catch (final NoSuchAlgorithmException naae) {
+                log.error("failed to get cipher for '{}'", transformation, naae);
+                return;
+            }
+            final var key = new SecretKeySpec(_Random_TestUtils.newRandomBytes(keySize >> 3), ALGORITHM);
+            final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
+            _Cipher_TestUtils.__(cipher, key, params, (byte[]) null);
         }
 
-        @MethodSource({"getKeySizeAndTransformationWithBitWidthArgumentsStream"})
+        @MethodSource({"getTransformationWithBitWidthAndKeySizeArgumentsStream"})
         @ParameterizedTest
-        void __bitWidth(final int keySize, final String transformation, @TempDir final Path dir) throws Throwable {
-            _BouncyCastleProvider_TestUtils.callForBouncyCastleProvider(() -> {
-                final Cipher cipher;
-                try {
-                    cipher = Cipher.getInstance(transformation);
-                } catch (final NoSuchAlgorithmException naae) {
-                    log.error("failed to get cipher for '{}'", transformation);
-                    return null;
-                }
-                final var key = new SecretKeySpec(_Random_TestUtils.newRandomBytes(keySize >> 3), ALGORITHM);
-                final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
-                _Cipher_TestUtils.__(cipher, key, params, dir);
-                return null;
-            });
+        void __bitWidth(final String transformation, final int keySize, @TempDir final Path dir) throws Throwable {
+            final Cipher cipher;
+            try {
+                cipher = Cipher.getInstance(transformation, BouncyCastleProvider.PROVIDER_NAME);
+            } catch (final NoSuchAlgorithmException naae) {
+                log.error("failed to get cipher for '{}'", transformation, naae);
+                return;
+            }
+            final var key = new SecretKeySpec(_Random_TestUtils.newRandomBytes(keySize >> 3), ALGORITHM);
+            final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
+            _Cipher_TestUtils.__(cipher, key, params, (byte[]) null, dir);
         }
     }
 }

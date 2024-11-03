@@ -2,8 +2,8 @@ package io.github.jinahya.util.nist;
 
 import _javax.crypto._Cipher_TestUtils;
 import _javax.security._Random_TestUtils;
-import _org.bouncycastle.jce.provider._BouncyCastleProvider_TestUtils;
 import io.github.jinahya.util._CTR_TestUtils;
+import io.github.jinahya.util._JCEProviderTest;
 import io.github.jinahya.util.bouncycastle.crypto._StreamCipher_TestUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -16,6 +16,7 @@ import org.bouncycastle.crypto.io.CipherOutputStream;
 import org.bouncycastle.crypto.modes.SICBlockCipher;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.jupiter.api.Named;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.io.TempDir;
@@ -131,7 +132,8 @@ class AES_CTR_Test
     }
 
     @Nested
-    class ProviderTest {
+    class JCEProviderTest
+            extends _JCEProviderTest {
 
         private static Stream<Arguments> getKeySizeAndTransformationArgumentsStream() {
             return getKeySizeStream().mapToObj(ks -> {
@@ -147,25 +149,19 @@ class AES_CTR_Test
         @MethodSource({"getKeySizeAndTransformationArgumentsStream"})
         @ParameterizedTest
         void __(final int keySize, final String transformation) throws Throwable {
-            _BouncyCastleProvider_TestUtils.callForBouncyCastleProvider(() -> {
-                final var cipher = Cipher.getInstance(transformation);
-                final var key = new SecretKeySpec(_Random_TestUtils.newRandomBytes(keySize >> 3), ALGORITHM);
-                final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
-                _Cipher_TestUtils.__(cipher, key, params);
-                return null;
-            });
+            final var cipher = Cipher.getInstance(transformation, BouncyCastleProvider.PROVIDER_NAME);
+            final var key = new SecretKeySpec(_Random_TestUtils.newRandomBytes(keySize >> 3), ALGORITHM);
+            final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
+            _Cipher_TestUtils.__(cipher, key, params, (byte[]) null);
         }
 
         @MethodSource({"getKeySizeAndTransformationArgumentsStream"})
         @ParameterizedTest
         void __(final int keySize, final String transformation, @TempDir final Path dir) throws Throwable {
-            _BouncyCastleProvider_TestUtils.callForBouncyCastleProvider(() -> {
-                final var cipher = Cipher.getInstance(transformation);
-                final var key = new SecretKeySpec(_Random_TestUtils.newRandomBytes(keySize >> 3), ALGORITHM);
-                final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
-                _Cipher_TestUtils.__(cipher, key, params, dir);
-                return null;
-            });
+            final var cipher = Cipher.getInstance(transformation, BouncyCastleProvider.PROVIDER_NAME);
+            final var key = new SecretKeySpec(_Random_TestUtils.newRandomBytes(keySize >> 3), ALGORITHM);
+            final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
+            _Cipher_TestUtils.__(cipher, key, params, (byte[]) null, dir);
         }
     }
 }

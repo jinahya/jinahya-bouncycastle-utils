@@ -1,7 +1,8 @@
 package io.github.jinahya.util;
 
 import _org.junit.jupiter.params.provider._Arguments_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto.params._ParametersWithIVTestUtils;
+import io.github.jinahya.util.bouncycastle.crypto.params.JinahyaKeyParametersUtils;
+import io.github.jinahya.util.bouncycastle.crypto.params.JinahyaParametersWithIvUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.BlockCipher;
 import org.bouncycastle.crypto.modes.OFBBlockCipher;
@@ -32,19 +33,42 @@ public final class _OFB_TestUtils {
         return MODE + bitWidth;
     }
 
-    public static Stream<Arguments> getBitWidthAndKeySizeStream(final Supplier<? extends IntStream> keyStreamSupplier) {
-        return getBitWidthStream().mapToObj(bw -> {
-            return keyStreamSupplier.get().mapToObj(ks -> {
+    public static Stream<Arguments> getKeySizeAndBitWidthArgumentsStream(
+            final Supplier<? extends IntStream> keySizeStreamSupplier) {
+        return keySizeStreamSupplier.get().mapToObj(ks -> {
+            return getBitWidthStream().mapToObj(bw -> {
                 return Arguments.of(
-                        Named.of("bitWidth: " + bw, bw),
-                        Named.of("keySize: " + ks, ks)
+                        Named.named("keySize: " + ks, ks),
+                        Named.named("bitWidth: " + bw, bw)
                 );
             });
         }).flatMap(Function.identity());
     }
 
-    public static Stream<Arguments> getArgumentsStream(final Supplier<? extends IntStream> keyStreamSupplier,
-                                                       final Supplier<? extends BlockCipher> cipherSupplier) {
+//    public static Stream<Arguments> getBitWidthAndKeySizeArgumentsStream(
+//            final Supplier<? extends IntStream> keySizeStreamSupplier) {
+//        return keySizeStreamSupplier.get().mapToObj(ks -> {
+//            return getBitWidthStream().mapToObj(bw -> {
+//                return Arguments.of(
+//                        Named.named("keySize: " + ks, ks),
+//                        Named.named("bitWidth: " + bw, bw)
+//                );
+//            });
+//        }).flatMap(Function.identity());
+//    }
+
+    public static Stream<Arguments> getBitWidthAndKeySizeArgumentsStream(
+            final Supplier<? extends IntStream> keyStreamSupplier) {
+        return getBitWidthStream().mapToObj(bw -> {
+            return keyStreamSupplier.get().mapToObj(ks -> {
+                return Arguments.of(bw, ks);
+            });
+        }).flatMap(Function.identity());
+    }
+
+    public static Stream<Arguments> getCipherAndParamsArgumentsStream(
+            final Supplier<? extends IntStream> keyStreamSupplier,
+            final Supplier<? extends BlockCipher> cipherSupplier) {
         return getBitWidthStream().mapToObj(bs -> {
                     final var engine = cipherSupplier.get();
                     try {
@@ -56,7 +80,11 @@ public final class _OFB_TestUtils {
                 })
                 .filter(Objects::nonNull)
                 .flatMap(c -> keyStreamSupplier.get().mapToObj(ks -> {
-                    final var params = _ParametersWithIVTestUtils.newRandomInstanceOfParametersWithIV(null, ks, c);
+                    final var params = JinahyaParametersWithIvUtils.newRandomInstanceFor(
+                            JinahyaKeyParametersUtils.newRandomInstance(null, ks >> 3),
+                            null,
+                            c.getUnderlyingCipher()
+                    );
                     return _Arguments_TestUtils.argumentsOf(c, params);
                 }));
     }

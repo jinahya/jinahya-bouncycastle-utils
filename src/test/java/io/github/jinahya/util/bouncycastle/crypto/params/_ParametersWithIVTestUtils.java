@@ -15,14 +15,14 @@ import java.util.Random;
 public final class _ParametersWithIVTestUtils {
 
     // -----------------------------------------------------------------------------------------------------------------
-    public static byte[] newRandomIv(Random random, final int blockSizeInBits) {
+    public static byte[] newRandomIv(Random random, final int length) {
         if (random == null) {
             random = _KeyParametersTestUtils.random();
         }
-        if (blockSizeInBits <= 0) {
-            throw new IllegalArgumentException("non-positive blockSizeInBits: " + blockSizeInBits);
+        if (length < 0) {
+            throw new IllegalArgumentException("negative length: " + length);
         }
-        final var iv = new byte[blockSizeInBits >> 3];
+        final var iv = new byte[length >> 3];
         random.nextBytes(iv);
         return iv;
     }
@@ -34,17 +34,17 @@ public final class _ParametersWithIVTestUtils {
     /**
      * Returns a new instance of {@link ParametersWithIV} with specified arguments.
      *
-     * @param random          a random.
-     * @param keySizeInBits   a key size in bits.
-     * @param blockSizeInBits a block size in bits.
+     * @param random        a random.
+     * @param keySizeInBits a key size in bits.
+     * @param ivSizeInBits  a block size in bits.
      * @return a new instance of {@link ParametersWithIV}.
      * @see _ParametersWithIVTestUtils#newRandomIv(Random, int)
      */
     public static CipherParameters newRandomInstanceOfParametersWithIV(final Random random, final int keySizeInBits,
-                                                                       final int blockSizeInBits) {
+                                                                       final int ivSizeInBits) {
         return new ParametersWithIV(
                 _KeyParametersTestUtils.newRandomInstanceOfKeyParameter(random, keySizeInBits),
-                newRandomIv(random, blockSizeInBits)
+                newRandomIv(random, ivSizeInBits)
         );
     }
 
@@ -81,5 +81,4 @@ public final class _ParametersWithIVTestUtils {
     private _ParametersWithIVTestUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
-
 }

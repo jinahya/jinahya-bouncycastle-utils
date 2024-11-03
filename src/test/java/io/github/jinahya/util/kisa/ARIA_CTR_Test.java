@@ -1,16 +1,13 @@
 package io.github.jinahya.util.kisa;
 
-import io.github.jinahya.util.bouncycastle.crypto._CipherParameters_TestUtils;
+import io.github.jinahya.util._CTR_TestUtils;
 import io.github.jinahya.util.bouncycastle.crypto._StreamCipher_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto.params._ParametersWithIVTestUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.StreamCipher;
 import org.bouncycastle.crypto.engines.ARIAEngine;
-import org.bouncycastle.crypto.modes.SICBlockCipher;
-import org.junit.jupiter.api.Named;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -24,26 +21,21 @@ import java.util.stream.Stream;
 class ARIA_CTR_Test
         extends ARIA__Test {
 
-    private static Stream<Arguments> getArgumentsStream() {
-        return getKeySizeStream().mapToObj(ks -> {
-            final var engine = new ARIAEngine();
-            final var cipher = SICBlockCipher.newInstance(engine);
-            final var params = _ParametersWithIVTestUtils.newRandomInstanceOfParametersWithIV(null, ks, cipher);
-            return Arguments.of(
-                    Named.of(_StreamCipher_TestUtils.cipherName(cipher), cipher),
-                    Named.of(_CipherParameters_TestUtils.paramsName(params), params)
-            );
-        });
+    private static Stream<Arguments> getCipherAndParamsArgumentsStream_() {
+        return _CTR_TestUtils.getCipherAndParamsArgumentsStream(
+                ARIA__Test::getKeySizeStream,
+                ARIAEngine::new
+        );
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @MethodSource({"getArgumentsStream"})
+    @MethodSource({"getCipherAndParamsArgumentsStream_"})
     @ParameterizedTest
     void __(final StreamCipher cipher, final CipherParameters params) throws Exception {
         _StreamCipher_TestUtils.__(cipher, params);
     }
 
-    @MethodSource({"getArgumentsStream"})
+    @MethodSource({"getCipherAndParamsArgumentsStream_"})
     @ParameterizedTest
     void __(final StreamCipher cipher, final CipherParameters params, @TempDir final File dir)
             throws Exception {

@@ -66,7 +66,7 @@ class SEED_ECB_Test
                     _KeyParametersTestUtils.newRandomKey(null, keySize),
                     ALGORITHM
             );
-            _Cipher_TestUtils.__(cipher, key);
+            _Cipher_TestUtils.__(cipher, key, null, (byte[]) null);
             return null;
         });
     }
@@ -82,7 +82,7 @@ class SEED_ECB_Test
                     _KeyParametersTestUtils.newRandomKey(null, keySize),
                     ALGORITHM
             );
-            _Cipher_TestUtils.__(cipher, key, dir);
+            _Cipher_TestUtils.__(cipher, key, null, (byte[]) null, dir);
             return null;
         });
     }

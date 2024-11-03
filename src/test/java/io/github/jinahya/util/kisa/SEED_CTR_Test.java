@@ -76,7 +76,7 @@ class SEED_CTR_Test
                     ALGORITHM
             );
             final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
-            _Cipher_TestUtils.__(cipher, key, params);
+            _Cipher_TestUtils.__(cipher, key, params, (byte[]) null);
             return null;
         });
     }
@@ -98,7 +98,7 @@ class SEED_CTR_Test
                     ALGORITHM
             );
             final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
-            _Cipher_TestUtils.__(cipher, key, params, dir);
+            _Cipher_TestUtils.__(cipher, key, params, (byte[]) null, dir);
             return null;
         });
     }
