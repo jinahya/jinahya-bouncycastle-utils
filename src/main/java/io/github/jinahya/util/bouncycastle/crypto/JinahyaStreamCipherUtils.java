@@ -20,6 +20,14 @@ import java.util.Objects;
  */
 public final class JinahyaStreamCipherUtils {
 
+    private static <T extends StreamCipher> T initFor(final T cipher, final boolean encryption,
+                                                      final CipherParameters params) {
+        Objects.requireNonNull(cipher, "cipher is null");
+        Objects.requireNonNull(params, "params is null");
+        cipher.init(encryption, params);
+        return cipher;
+    }
+
     /**
      * Initializes specified cipher, with specified cipher parameters, for encryption, and returns the cipher.
      *
@@ -30,10 +38,7 @@ public final class JinahyaStreamCipherUtils {
      * @see StreamCipher#init(boolean, CipherParameters)
      */
     public static <T extends StreamCipher> T initForEncryption(final T cipher, final CipherParameters params) {
-        Objects.requireNonNull(cipher, "cipher is null");
-        Objects.requireNonNull(params, "params is null");
-        cipher.init(true, params);
-        return cipher;
+        return initFor(cipher, true, params);
     }
 
     /**
@@ -46,10 +51,7 @@ public final class JinahyaStreamCipherUtils {
      * @see StreamCipher#init(boolean, CipherParameters)
      */
     public static <T extends StreamCipher> T initForDecryption(final T cipher, final CipherParameters params) {
-        Objects.requireNonNull(cipher, "cipher is null");
-        Objects.requireNonNull(params, "params is null");
-        cipher.init(false, params);
-        return cipher;
+        return initFor(cipher, false, params);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

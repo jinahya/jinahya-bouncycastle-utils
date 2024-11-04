@@ -17,10 +17,20 @@ import java.util.Objects;
  */
 public final class JinahyaAEADCipherUtils {
 
-    public <T extends AEADCipher> T init(final T cipher, final boolean forEncryption, final CipherParameters params) {
+    private static <T extends AEADCipher> T initFor(final T cipher, final boolean encryption,
+                                                    final CipherParameters params) {
         Objects.requireNonNull(cipher, "cipher is null");
-        cipher.init(forEncryption, params);
+        Objects.requireNonNull(params, "params is null");
+        cipher.init(encryption, params);
         return cipher;
+    }
+
+    public static <T extends AEADCipher> T initForEncryption(final T cipher, final CipherParameters params) {
+        return initFor(cipher, true, params);
+    }
+
+    public static <T extends AEADCipher> T initForDecryption(final T cipher, final CipherParameters params) {
+        return initFor(cipher, false, params);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -46,6 +56,26 @@ public final class JinahyaAEADCipherUtils {
         return length;
     }
 
+    public static int encrypt(final AEADCipher cipher, final CipherParameters params, final byte[] input,
+                              final byte[] output)
+            throws InvalidCipherTextException {
+        return processBytesAndDoFinal(
+                initForEncryption(cipher, params),
+                input,
+                output
+        );
+    }
+
+    public static int decrypt(final AEADCipher cipher, final CipherParameters params, final byte[] input,
+                              final byte[] output)
+            throws InvalidCipherTextException {
+        return processBytesAndDoFinal(
+                initForDecryption(cipher, params),
+                input,
+                output
+        );
+    }
+
     /**
      * Processes and finalizes, using specified cipher, specified input bytes, and returns the result.
      *
@@ -63,13 +93,29 @@ public final class JinahyaAEADCipherUtils {
         return Arrays.copyOf(output, length);
     }
 
+    public static byte[] encrypt(final AEADCipher cipher, final CipherParameters params, final byte[] input)
+            throws InvalidCipherTextException {
+        return processBytesAndDoFinal(
+                initForEncryption(cipher, params),
+                input
+        );
+    }
+
+    public static byte[] decrypt(final AEADCipher cipher, final CipherParameters params, final byte[] input)
+            throws InvalidCipherTextException {
+        return processBytesAndDoFinal(
+                initForDecryption(cipher, params),
+                input
+        );
+    }
+
     // -----------------------------------------------------------------------------------------------------------------
-    public static long processAllBytesAndDoFinal(final AEADCipher cipher, final InputStream input,
-                                                 final OutputStream output, final byte[] inbuf, byte[] outbuf)
+    public static long processAllBytesAndDoFinal(final AEADCipher cipher, final InputStream in, final OutputStream out,
+                                                 final byte[] inbuf, byte[] outbuf)
             throws IOException, InvalidCipherTextException {
         Objects.requireNonNull(cipher, "cipher is null");
-        Objects.requireNonNull(input, "input is null");
-        Objects.requireNonNull(output, "output is null");
+        Objects.requireNonNull(in, "in is null");
+        Objects.requireNonNull(out, "out is null");
         if (Objects.requireNonNull(inbuf, "inbuf is null").length == 0) {
             throw new IllegalArgumentException("inbuf.length is zero");
         }
@@ -78,14 +124,14 @@ public final class JinahyaAEADCipherUtils {
         }
         var read = 0L;
         var written = 0L;
-        for (int r; (r = input.read(inbuf)) != -1; read += r) {
+        for (int r; (r = in.read(inbuf)) != -1; read += r) {
             for (final var l = cipher.getUpdateOutputSize(r); outbuf.length < l; ) {
                 System.err.println("doubling up outbuf.length from " + outbuf.length);
                 Arrays.fill(outbuf, (byte) 0);
                 outbuf = new byte[outbuf.length << 1];
             }
             final var outlen = cipher.processBytes(inbuf, 0, r, outbuf, 0); // DataLengthException
-            output.write(outbuf, 0, outlen);
+            out.write(outbuf, 0, outlen);
             written += outlen;
         }
         for (final var l = cipher.getOutputSize(Math.toIntExact(read)); outbuf.length < l; ) {
@@ -94,22 +140,68 @@ public final class JinahyaAEADCipherUtils {
             outbuf = new byte[outbuf.length << 1];
         }
         final var outlen = cipher.doFinal(outbuf, 0);
-        output.write(outbuf, 0, outlen);
+        out.write(outbuf, 0, outlen);
         written += outlen;
         Arrays.fill(inbuf, (byte) 0);
         Arrays.fill(outbuf, (byte) 0);
         return written;
     }
 
-    public static long processAllBytesAndDoFinal(final AEADCipher cipher, final InputStream input,
-                                                 final OutputStream output, final byte[] inbuf)
+    public static long encrypt(final AEADCipher cipher, final CipherParameters params, final InputStream in,
+                               final OutputStream out, final byte[] inbuf, byte[] outbuf)
+            throws IOException, InvalidCipherTextException {
+        return processAllBytesAndDoFinal(
+                initForEncryption(cipher, params),
+                in,
+                out,
+                inbuf,
+                outbuf
+        );
+    }
+
+    public static long decrypt(final AEADCipher cipher, final CipherParameters params, final InputStream in,
+                               final OutputStream out, final byte[] inbuf, byte[] outbuf)
+            throws IOException, InvalidCipherTextException {
+        return processAllBytesAndDoFinal(
+                initForDecryption(cipher, params),
+                in,
+                out,
+                inbuf,
+                outbuf
+        );
+    }
+
+    public static long processAllBytesAndDoFinal(final AEADCipher cipher, final InputStream in, final OutputStream out,
+                                                 final byte[] inbuf)
             throws IOException, InvalidCipherTextException {
         Objects.requireNonNull(cipher, "cipher is null");
         if (Objects.requireNonNull(inbuf, "inbuf is null").length == 0) {
             throw new IllegalArgumentException("inbuf.length is zero");
         }
         final var outbuf = new byte[Math.max(cipher.getOutputSize(inbuf.length), 1)];
-        return processAllBytesAndDoFinal(cipher, input, output, inbuf, outbuf);
+        return processAllBytesAndDoFinal(cipher, in, out, inbuf, outbuf);
+    }
+
+    public static long encrypt(final AEADCipher cipher, final CipherParameters params, final InputStream in,
+                               final OutputStream out, final byte[] inbuf)
+            throws IOException, InvalidCipherTextException {
+        return processAllBytesAndDoFinal(
+                initForEncryption(cipher, params),
+                in,
+                out,
+                inbuf
+        );
+    }
+
+    public static long decrypt(final AEADCipher cipher, final CipherParameters params, final InputStream in,
+                               final OutputStream out, final byte[] inbuf)
+            throws IOException, InvalidCipherTextException {
+        return processAllBytesAndDoFinal(
+                initForDecryption(cipher, params),
+                in,
+                out,
+                inbuf
+        );
     }
 
     // -----------------------------------------------------------------------------------------------------------------

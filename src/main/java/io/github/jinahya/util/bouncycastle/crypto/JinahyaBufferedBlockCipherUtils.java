@@ -142,22 +142,6 @@ public final class JinahyaBufferedBlockCipherUtils {
         return written;
     }
 
-    public static long processAllBytesAndDoFinal(final BufferedBlockCipher cipher, final InputStream in,
-                                                 final OutputStream out, final byte[] inbuf)
-            throws IOException, InvalidCipherTextException {
-        Objects.requireNonNull(cipher, "cipher is null");
-        if (Objects.requireNonNull(inbuf, "inbuf is null").length == 0) {
-            throw new IllegalArgumentException("inbuf.length shouldn't be zero");
-        }
-        return processAllBytesAndDoFinal(
-                cipher,
-                in,
-                out,
-                inbuf,
-                new byte[cipher.getOutputSize(inbuf.length)]
-        );
-    }
-
     public static long encrypt(final BufferedBlockCipher cipher, final CipherParameters params, final InputStream in,
                                final OutputStream out, final byte[] inbuf, byte[] outbuf)
             throws IOException, InvalidCipherTextException {
@@ -172,6 +156,22 @@ public final class JinahyaBufferedBlockCipherUtils {
         Objects.requireNonNull(cipher, "cipher is null");
         cipher.init(false, params);
         return processAllBytesAndDoFinal(cipher, in, out, inbuf, outbuf);
+    }
+
+    public static long processAllBytesAndDoFinal(final BufferedBlockCipher cipher, final InputStream in,
+                                                 final OutputStream out, final byte[] inbuf)
+            throws IOException, InvalidCipherTextException {
+        Objects.requireNonNull(cipher, "cipher is null");
+        if (Objects.requireNonNull(inbuf, "inbuf is null").length == 0) {
+            throw new IllegalArgumentException("inbuf.length shouldn't be zero");
+        }
+        return processAllBytesAndDoFinal(
+                cipher,
+                in,
+                out,
+                inbuf,
+                new byte[cipher.getOutputSize(inbuf.length)]
+        );
     }
 
     public static long encrypt(final BufferedBlockCipher cipher, final CipherParameters params,
