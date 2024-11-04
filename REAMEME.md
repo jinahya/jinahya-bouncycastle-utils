@@ -1,5 +1,7 @@
 # jinahya-bouncycastle-utils
 
+[![Java CI with Maven](https://github.com/jinahya/jinahya-bouncycastle-utils/actions/workflows/maven.yml/badge.svg)](https://github.com/jinahya/jinahya-bouncycastle-utils/actions/workflows/maven.yml)
+
 Utilities for [Bouncy Castle for Java](https://www.bouncycastle.org/documentation/documentation-java/).
 
 ## Links
