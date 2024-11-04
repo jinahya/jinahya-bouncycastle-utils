@@ -76,6 +76,11 @@ public final class _AEADCipher_TestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    public static String cipherName(final AEADCipher cipher) {
+        return cipher.getAlgorithmName();
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
     private _AEADCipher_TestUtils() {
         throw new AssertionError("instantiation is not allowed");
     }

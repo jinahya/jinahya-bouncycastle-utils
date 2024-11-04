@@ -1,5 +1,6 @@
 package io.github.jinahya.util.bouncycastle.crypto;
 
+import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.DataLengthException;
 import org.bouncycastle.crypto.StreamCipher;
 
@@ -20,7 +21,41 @@ import java.util.Objects;
 public final class JinahyaStreamCipherUtils {
 
     /**
-     * Processes, using specified cipher, specified input bytes.
+     * Initializes specified cipher, with specified cipher parameters, for encryption, and returns the cipher.
+     *
+     * @param cipher the cipher to be initialized for encryption.
+     * @param params the cipher parameters.
+     * @param <T>    cipher type parameter
+     * @return given {@code cipher}.
+     * @see StreamCipher#init(boolean, CipherParameters)
+     */
+    public static <T extends StreamCipher> T initForEncryption(final T cipher, final CipherParameters params) {
+        Objects.requireNonNull(cipher, "cipher is null");
+        Objects.requireNonNull(params, "params is null");
+        cipher.init(true, params);
+        return cipher;
+    }
+
+    /**
+     * Initializes specified cipher, with specified cipher parameters, for decryption, and returns the cipher.
+     *
+     * @param cipher the cipher to be initialized for decryption.
+     * @param params the cipher parameters.
+     * @param <T>    cipher type parameter
+     * @return given {@code cipher}.
+     * @see StreamCipher#init(boolean, CipherParameters)
+     */
+    public static <T extends StreamCipher> T initForDecryption(final T cipher, final CipherParameters params) {
+        Objects.requireNonNull(cipher, "cipher is null");
+        Objects.requireNonNull(params, "params is null");
+        cipher.init(false, params);
+        return cipher;
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Processes, using specified cipher, specified input bytes, and returns the result.
      *
      * @param cipher the cipher.
      * @param input  the input bytes to process.
@@ -44,25 +79,43 @@ public final class JinahyaStreamCipherUtils {
         }
     }
 
+    public static byte[] encrypt(final StreamCipher cipher, final CipherParameters params, final byte[] input) {
+        Objects.requireNonNull(cipher, "cipher is null");
+        Objects.requireNonNull(params, "params is null");
+        return processBytes(
+                initForEncryption(cipher, params),
+                input
+        );
+    }
+
+    public static byte[] decrypt(final StreamCipher cipher, final CipherParameters params, final byte[] input) {
+        Objects.requireNonNull(cipher, "cipher is null");
+        Objects.requireNonNull(params, "params is null");
+        return processBytes(
+                initForDecryption(cipher, params),
+                input
+        );
+    }
+
     // -----------------------------------------------------------------------------------------------------------------
-    public static long processAllBytes(final StreamCipher cipher, final InputStream input, final OutputStream output,
+    public static long processAllBytes(final StreamCipher cipher, final InputStream in, final OutputStream out,
                                        final byte[] inbuf, byte[] outbuf)
             throws IOException {
         Objects.requireNonNull(cipher, "cipher is null");
-        Objects.requireNonNull(input, "input is null");
-        Objects.requireNonNull(output, "output is null");
+        Objects.requireNonNull(in, "input is null");
+        Objects.requireNonNull(out, "output is null");
         if (Objects.requireNonNull(inbuf, "inbuf is null").length == 0) {
-            throw new IllegalArgumentException("inbuf.length shouldn't be zero");
+            throw new IllegalArgumentException("inbuf.length is zero");
         }
         if (Objects.requireNonNull(outbuf, "outbuf is null").length == 0) {
-            throw new IllegalArgumentException("outbuf.length shouldn't be zero");
+            throw new IllegalArgumentException("outbuf.length is zero");
         }
         var written = 0L;
-        for (int r; (r = input.read(inbuf)) != -1; ) {
+        for (int r; (r = in.read(inbuf)) != -1; ) {
             while (true) {
                 try {
                     final var processed = cipher.processBytes(inbuf, 0, r, outbuf, 0);
-                    output.write(outbuf, 0, processed);
+                    out.write(outbuf, 0, processed);
                     written += processed;
                     break;
                 } catch (final DataLengthException dle) {
@@ -72,8 +125,6 @@ public final class JinahyaStreamCipherUtils {
                 }
             }
         }
-        Arrays.fill(inbuf, (byte) 0);
-        Arrays.fill(outbuf, (byte) 0);
         return written;
     }
 
@@ -82,20 +133,65 @@ public final class JinahyaStreamCipherUtils {
      * output.
      *
      * @param cipher the cipher.
-     * @param input  the input stream from which bytes are read.
-     * @param output the output stream to which processed bytes are written.
+     * @param in     the input stream from which bytes are read.
+     * @param out    the output stream to which processed bytes are written.
      * @param inbuf  a buffer for reading bytes from {@code input}.
      * @return the number of bytes written to the {@code output}.
      * @throws IOException if an I/O error occurs.
      */
-    public static long processAllBytes(final StreamCipher cipher, final InputStream input, final OutputStream output,
+    public static long processAllBytes(final StreamCipher cipher, final InputStream in, final OutputStream out,
                                        final byte[] inbuf)
             throws IOException {
         if (Objects.requireNonNull(inbuf, "inbuf is null").length == 0) {
-            throw new IllegalArgumentException("inbuf.length shouldn't be zero");
+            throw new IllegalArgumentException("inbuf.length is zero");
         }
-        final var outbuf = new byte[inbuf.length];
-        return processAllBytes(cipher, input, output, inbuf, outbuf);
+        return processAllBytes(cipher, in, out, inbuf, new byte[inbuf.length]);
+    }
+
+    public static long encrypt(final StreamCipher cipher, final CipherParameters params, final InputStream in,
+                               final OutputStream out, final byte[] inbuf, byte[] outbuf)
+            throws IOException {
+        return processAllBytes(
+                initForEncryption(cipher, params),
+                in,
+                out,
+                inbuf,
+                outbuf
+        );
+    }
+
+    public static long decrypt(final StreamCipher cipher, final CipherParameters params, final InputStream in,
+                               final OutputStream out, final byte[] inbuf, byte[] outbuf)
+            throws IOException {
+        return processAllBytes(
+                initForDecryption(cipher, params),
+                in,
+                out,
+                inbuf,
+                outbuf
+        );
+    }
+
+    public static long encrypt(final StreamCipher cipher, final CipherParameters params, final InputStream in,
+                               final OutputStream out, final byte[] inbuf)
+            throws IOException {
+        return processAllBytes(
+                initForEncryption(cipher, params),
+                in,
+                out,
+                inbuf
+        );
+    }
+
+    public static long decrypt(final StreamCipher cipher, final CipherParameters params, final InputStream in,
+                               final OutputStream out, final byte[] inbuf)
+            throws IOException {
+        return processAllBytes(
+                initForDecryption(cipher, params),
+                in,
+                out,
+                inbuf
+        );
     }
 
     // -----------------------------------------------------------------------------------------------------------------

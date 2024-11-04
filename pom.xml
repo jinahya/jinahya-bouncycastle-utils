@@ -61,8 +61,8 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <maven.compiler.source>11</maven.compiler.source>
-<!--    <maven.compiler.source>17</maven.compiler.source>-->
+    <maven.compiler.source>11</maven.compiler.source>
+    <!--    <maven.compiler.source>17</maven.compiler.source>-->
     <maven.compiler.target>${maven.compiler.source}</maven.compiler.target>
     <maven.compiler.release>${maven.compiler.target}</maven.compiler.release>
     <maven.compiler.testSource>21</maven.compiler.testSource>
@@ -202,6 +202,9 @@
               <additionalOption>-Xdoclint:none</additionalOption>
               <!--            <additionalOptions>-package</additionalOptions>-->
             </additionalOptions>
+            <links>
+              <link>https://downloads.bouncycastle.org/java/docs/bcprov-jdk18on-javadoc/</link>
+            </links>
             <tags>
               <tag>
                 <name>apiNote</name>

@@ -181,7 +181,7 @@ class AES_OFB_Test
             }
             final var key = new SecretKeySpec(_Random_TestUtils.newRandomBytes(keySize >> 3), ALGORITHM);
             final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
-            _Cipher_TestUtils.__(cipher, key, params, (byte[]) null);
+            _Cipher_TestUtils.__(cipher, key, params, null);
         }
 
         @DisplayName("encrypt/decrypt file")
@@ -197,7 +197,7 @@ class AES_OFB_Test
             }
             final var key = new SecretKeySpec(_Random_TestUtils.newRandomBytes(keySize >> 3), ALGORITHM);
             final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
-            _Cipher_TestUtils.__(cipher, key, params, (byte[]) null, dir);
+            _Cipher_TestUtils.__(cipher, key, params, null, dir);
         }
 
         private static Stream<Arguments> getTransformationWithBitWidthAndKeySizeArgumentsStream() {
@@ -214,34 +214,34 @@ class AES_OFB_Test
 
         @DisplayName("encrypt/decrypt bytes")
         @MethodSource({"getTransformationWithBitWidthAndKeySizeArgumentsStream"})
-        @ParameterizedTest(name = "[{index}] transformation: {0}, keySize: {1}, ")
+        @ParameterizedTest(name = "[{index}] {0} with {1}-bit key")
         void __bitWidth(final String transformation, final int keySize) throws Throwable {
             final Cipher cipher;
             try {
                 cipher = Cipher.getInstance(transformation, BouncyCastleProvider.PROVIDER_NAME);
-            } catch (final NoSuchAlgorithmException naae) {
-                log.error("failed to get cipher for '{}'", transformation, naae);
+            } catch (final NoSuchAlgorithmException nsae) {
+                log.error("failed to get cipher for '{}'", transformation, nsae);
                 return;
             }
             final var key = new SecretKeySpec(_Random_TestUtils.newRandomBytes(keySize >> 3), ALGORITHM);
             final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
-            _Cipher_TestUtils.__(cipher, key, params, (byte[]) null);
+            _Cipher_TestUtils.__(cipher, key, params, null);
         }
 
         @DisplayName("encrypt/decrypt file")
         @MethodSource({"getTransformationWithBitWidthAndKeySizeArgumentsStream"})
-        @ParameterizedTest(name = "[{index}] transformation: {0}, keySize: {1}, ")
+        @ParameterizedTest(name = "[{index}] {0} with {1}-bit key")
         void __bitWidth(final String transformation, final int keySize, @TempDir final Path dir) throws Throwable {
             final Cipher cipher;
             try {
                 cipher = Cipher.getInstance(transformation, BouncyCastleProvider.PROVIDER_NAME);
-            } catch (final NoSuchAlgorithmException naae) {
-                log.error("failed to get cipher for '{}'", transformation, naae);
+            } catch (final NoSuchAlgorithmException nsae) {
+                log.error("failed to get cipher for '{}'", transformation, nsae);
                 return;
             }
             final var key = new SecretKeySpec(_Random_TestUtils.newRandomBytes(keySize >> 3), ALGORITHM);
             final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
-            _Cipher_TestUtils.__(cipher, key, params, (byte[]) null, dir);
+            _Cipher_TestUtils.__(cipher, key, params, null, dir);
         }
     }
 }

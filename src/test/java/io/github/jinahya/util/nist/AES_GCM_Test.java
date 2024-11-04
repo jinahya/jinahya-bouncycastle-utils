@@ -18,6 +18,7 @@ import org.bouncycastle.crypto.modes.AEADCipher;
 import org.bouncycastle.crypto.modes.GCMBlockCipher;
 import org.bouncycastle.crypto.params.AEADParameters;
 import org.bouncycastle.crypto.params.KeyParameter;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Named;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.io.TempDir;
@@ -137,12 +138,14 @@ class AES_GCM_Test
             );
         }
 
+        @DisplayName("encrypt/decrypt bytes")
         @MethodSource({"getCipherAndParamsArgumentsStream_"})
         @ParameterizedTest
         void __(final AEADCipher cipher, final CipherParameters params) throws Exception {
             _AEADCipher_TestUtils.__(cipher, params);
         }
 
+        @DisplayName("encrypt/decrypt file")
         @MethodSource({"getCipherAndParamsArgumentsStream_"})
         @ParameterizedTest
         void __(final AEADCipher cipher, final CipherParameters params, @TempDir final File dir) throws Exception {
@@ -159,17 +162,14 @@ class AES_GCM_Test
                     .map(p -> ALGORITHM + '/' + _GCM_TestUtils.MODE + '/' + p)
                     .flatMap(t -> getKeySizeStream().mapToObj(ks -> {
                         return _GCM_TestUtils.getTLenStream().mapToObj(tl -> {
-                            return Arguments.of(
-                                    t,
-                                    Named.of("keySize: " + ks, ks),
-                                    Named.of("TLen: " + tl, tl)
-                            );
+                            return Arguments.of(t, ks, tl);
                         });
                     })).flatMap(Function.identity());
         }
 
+        @DisplayName("encrypt/decrypt bytes")
         @MethodSource({"getTransformationKeySizeAndTLenArgumentsStream"})
-        @ParameterizedTest
+        @ParameterizedTest(name = "[{index}] {0} with {1}-bit key and {2}-bit tag length")
         void __(final String transformation, final int keySize, final int tLen) throws Throwable {
             final var cipher = Cipher.getInstance(transformation);
             final var key = new SecretKeySpec(
@@ -189,8 +189,9 @@ class AES_GCM_Test
             });
         }
 
+        @DisplayName("encrypt/decrypt file")
         @MethodSource({"getTransformationKeySizeAndTLenArgumentsStream"})
-        @ParameterizedTest
+        @ParameterizedTest(name = "[{index}] {0} with {1}-bit key and {2}-bit tag length")
         void __(final String transformation, final int keySize, final int tLen, @TempDir final Path dir)
                 throws Exception {
             final var cipher = Cipher.getInstance(transformation);

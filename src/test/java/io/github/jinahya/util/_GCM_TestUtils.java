@@ -1,12 +1,15 @@
 package io.github.jinahya.util;
 
 import _javax.security._Random_TestUtils;
+import _org.bouncycastle.crypto.modes._AEADBlockCipher_TestUtils;
+import _org.bouncycastle.crypto.params._AEADParameters_TestUtils;
 import io.github.jinahya.util.bouncycastle.crypto.params.JinahyaKeyParametersUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.BlockCipher;
 import org.bouncycastle.crypto.modes.GCMBlockCipher;
 import org.bouncycastle.crypto.params.AEADParameters;
 import org.bouncycastle.crypto.params.KeyParameter;
+import org.junit.jupiter.api.Named;
 import org.junit.jupiter.params.provider.Arguments;
 
 import java.util.Objects;
@@ -38,10 +41,8 @@ public final class _GCM_TestUtils {
                     associatedText
             );
             return Arguments.of(
-//                    Named.of(_TestUtils.cipherName(cipher), cipher),
-//                    Named.of(_TestUtils.paramsName(params), params)
-                    cipher,
-                    params
+                    Named.of(_AEADBlockCipher_TestUtils.cipherName(cipher), cipher),
+                    Named.of(_AEADParameters_TestUtils.paramsName(params), params)
             );
         });
     }
