@@ -102,8 +102,8 @@ public final class JinahyaStreamCipherUtils {
                                        final byte[] inbuf, byte[] outbuf)
             throws IOException {
         Objects.requireNonNull(cipher, "cipher is null");
-        Objects.requireNonNull(in, "input is null");
-        Objects.requireNonNull(out, "output is null");
+        Objects.requireNonNull(in, "in is null");
+        Objects.requireNonNull(out, "out is null");
         if (Objects.requireNonNull(inbuf, "inbuf is null").length == 0) {
             throw new IllegalArgumentException("inbuf.length is zero");
         }
