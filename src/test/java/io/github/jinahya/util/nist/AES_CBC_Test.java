@@ -33,7 +33,6 @@ import javax.crypto.spec.SecretKeySpec;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -105,7 +104,7 @@ class AES_CBC_Test
         @DisplayName("encrypt/decrypt file")
         @MethodSource({"getPaddingAndKeySizeArgumentsStream"})
         @ParameterizedTest(name = "[{index}] {0} with {1}-bit key")
-        void __(final BlockCipherPadding padding, final int keySize, @TempDir final File dir) throws IOException {
+        void __(final BlockCipherPadding padding, final int keySize, @TempDir final File dir) throws Exception {
             // --------------------------------------------------------------------------------------------------- given
             final var cipher = new PaddedBufferedBlockCipher(
                     CBCBlockCipher.newInstance(AESEngine.newInstance()),
@@ -143,8 +142,7 @@ class AES_CBC_Test
 
         private static Stream<Arguments> getCipherAndParamsArgumentsStream() {
             return _CBC_TestUtils.getCipherAndParamsArgumentsStream(
-                    AES__Test::getKeySizeStream,
-                    AESEngine::newInstance
+                    AESEngine::newInstance, AES__Test::getKeySizeStream
             );
         }
 

@@ -24,8 +24,8 @@ import static _org.bouncycastle.crypto.paddings._BlockCipherPadding_TestUtils.ge
 public final class _CBC_TestUtils {
 
     public static Stream<Arguments> getCipherAndParamsArgumentsStream(
-            final Supplier<? extends IntStream> keySizeStreamSupplier,
-            final Supplier<? extends BlockCipher> cipherSupplier) {
+            final Supplier<? extends BlockCipher> cipherSupplier,
+            final Supplier<? extends IntStream> keySizeStreamSupplier) {
         Objects.requireNonNull(keySizeStreamSupplier, "keySizeStreamSupplier is null");
         Objects.requireNonNull(cipherSupplier, "cipherSupplier is null");
         return getBlockCipherPaddingStream()
