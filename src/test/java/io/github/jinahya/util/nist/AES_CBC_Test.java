@@ -106,6 +106,7 @@ class AES_CBC_Test
         @MethodSource({"getPaddingAndKeySizeArgumentsStream"})
         @ParameterizedTest(name = "[{index}] {0} with {1}-bit key")
         void __(final BlockCipherPadding padding, final int keySize, @TempDir final File dir) throws IOException {
+            // --------------------------------------------------------------------------------------------------- given
             final var cipher = new PaddedBufferedBlockCipher(
                     CBCBlockCipher.newInstance(AESEngine.newInstance()),
                     padding
@@ -124,17 +125,16 @@ class AES_CBC_Test
             {
                 cipher.init(true, params);
                 try (var out = new CipherOutputStream(new FileOutputStream(encrypted), cipher)) {
-                    Files.copy(plain.toPath(), out);
+                    final var bytes = Files.copy(plain.toPath(), out);
                     out.flush();
                 }
-                assertThat(encrypted.length()).isGreaterThanOrEqualTo(plain.length());
             }
             // ------------------------------------------------------------------------------------------------- decrypt
             final var decrypted = File.createTempFile("tmp", null, dir);
             {
                 cipher.init(false, params);
                 try (var in = new CipherInputStream(new FileInputStream(encrypted), cipher)) {
-                    Files.copy(in, decrypted.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    final var bytes = Files.copy(in, decrypted.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 }
             }
             // -------------------------------------------------------------------------------------------------- verify

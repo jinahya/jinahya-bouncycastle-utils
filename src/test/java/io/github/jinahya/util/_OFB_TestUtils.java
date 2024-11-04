@@ -45,18 +45,6 @@ public final class _OFB_TestUtils {
         }).flatMap(Function.identity());
     }
 
-//    public static Stream<Arguments> getBitWidthAndKeySizeArgumentsStream(
-//            final Supplier<? extends IntStream> keySizeStreamSupplier) {
-//        return keySizeStreamSupplier.get().mapToObj(ks -> {
-//            return getBitWidthStream().mapToObj(bw -> {
-//                return Arguments.of(
-//                        Named.named("keySize: " + ks, ks),
-//                        Named.named("bitWidth: " + bw, bw)
-//                );
-//            });
-//        }).flatMap(Function.identity());
-//    }
-
     public static Stream<Arguments> getBitWidthAndKeySizeArgumentsStream(
             final Supplier<? extends IntStream> keyStreamSupplier) {
         return getBitWidthStream().mapToObj(bw -> {
