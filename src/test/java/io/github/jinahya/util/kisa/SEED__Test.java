@@ -10,13 +10,19 @@ import java.util.stream.IntStream;
 @Slf4j
 abstract class SEED__Test {
 
+    static final String ALGORITHM = "SEED";
+
+    public static final int BLOCK_SIZE = 128;
+
+    public static final int BLOCK_BYTES = BLOCK_SIZE >> 3;
+
     static IntStream getKeySizeStream() {
         return IntStream.of(
                 128
-//                ,
-//                196,
-//                256
         );
     }
 
+    static IntStream getKeyBytestream() {
+        return getKeySizeStream().map(ks -> ks >> 3);
+    }
 }

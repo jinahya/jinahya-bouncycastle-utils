@@ -1,5 +1,7 @@
 package io.github.jinahya.util.bouncycastle.crypto;
 
+import _org.bouncycastle.crypto.params._KeyParameters_TestUtils;
+import _org.bouncycastle.crypto.params._ParametersWithIV_TestUtils;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -38,7 +40,7 @@ class JinahyaCipherParametersUtilsTest {
     })
     @ParameterizedTest
     void newKey__(final int keySize) {
-        final var key = JinahyaCipherParametersUtils.newRandomKey(null, keySize);
+        final var key = _KeyParameters_TestUtils.newRandomKey(null, keySize);
         assertThat(key).isNotNull().hasSize(keySize >> 3);
     }
 
@@ -47,7 +49,7 @@ class JinahyaCipherParametersUtilsTest {
     })
     @ParameterizedTest
     void newIv__(final int blockSize) {
-        final var iv = JinahyaCipherParametersUtils.newRandomIv(null, blockSize);
+        final var iv = _ParametersWithIV_TestUtils.newRandomIv(null, blockSize);
         assertThat(iv).isNotNull().hasSize(blockSize >> 3);
     }
 
@@ -57,7 +59,7 @@ class JinahyaCipherParametersUtilsTest {
     })
     @ParameterizedTest
     void newKeyParameter__(final int keySize) {
-        final var params = JinahyaCipherParametersUtils.newRandomKeyParameter(null, keySize);
+        final var params = _KeyParameters_TestUtils.newRandomInstanceOfKeyParameter(null, keySize);
         final var key = JinahyaCipherParametersUtils.getKey(params);
         assertThat(key).isNotNull().hasSize(keySize >> 3);
     }
@@ -67,9 +69,9 @@ class JinahyaCipherParametersUtilsTest {
     })
     @ParameterizedTest
     void newParametersWithIV__(final int keySize, final int blockSize) {
-        final var params = JinahyaCipherParametersUtils.newRandomParametersWithIV(null, keySize, blockSize);
+        final var params = _ParametersWithIV_TestUtils.newRandomInstanceOfParametersWithIV(null, keySize, blockSize);
         final var key = JinahyaCipherParametersUtils.getKey(params);
-        final var iv = JinahyaCipherParametersUtils.getIV(params);
+        final var iv = JinahyaCipherParametersUtils.getIv(params);
         assertThat(key).isNotNull().hasSize(keySize >> 3);
         assertThat(iv).isNotNull().hasSize(128 >> 3);
     }

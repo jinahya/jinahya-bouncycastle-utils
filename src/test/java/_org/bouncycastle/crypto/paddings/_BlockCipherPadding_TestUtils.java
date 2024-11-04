@@ -1,4 +1,4 @@
-package io.github.jinahya.util.bouncycastle.crypto.padding;
+package _org.bouncycastle.crypto.paddings;
 
 import org.bouncycastle.crypto.paddings.BlockCipherPadding;
 import org.bouncycastle.crypto.paddings.ISO10126d2Padding;
@@ -6,10 +6,15 @@ import org.bouncycastle.crypto.paddings.ISO7816d4Padding;
 import org.bouncycastle.crypto.paddings.PKCS7Padding;
 import org.bouncycastle.crypto.paddings.TBCPadding;
 import org.bouncycastle.crypto.paddings.X923Padding;
+import org.junit.jupiter.api.Named;
+import org.junit.jupiter.params.provider.Arguments;
 
+import java.util.Objects;
+import java.util.function.Supplier;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-public final class _BlockCipherPaddingTestUtils {
+public final class _BlockCipherPadding_TestUtils {
 
     /**
      * .
@@ -30,7 +35,21 @@ public final class _BlockCipherPaddingTestUtils {
         );
     }
 
-    private _BlockCipherPaddingTestUtils() {
+    public static Stream<Arguments> getPaddingAndKeySizeArgumentsStream(
+            final Supplier<? extends IntStream> keySizeStreamSupplier) {
+        return getBlockCipherPaddingStream()
+                .flatMap(p -> keySizeStreamSupplier.get().mapToObj(ks -> Arguments.of(
+                        Named.of(p.getPaddingName(), p),
+                        ks
+                )));
+    }
+
+    public static String paddingName(final BlockCipherPadding padding) {
+        Objects.requireNonNull(padding, "padding is null");
+        return padding.getPaddingName();
+    }
+
+    private _BlockCipherPadding_TestUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

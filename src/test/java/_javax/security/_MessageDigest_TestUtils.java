@@ -10,7 +10,7 @@ import java.security.Security;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public final class _MessageDigestTestUtils {
+public final class _MessageDigest_TestUtils {
 
     public static void __(final File plain, final File decrypted) throws NoSuchAlgorithmException, IOException {
         for (var algorithm : Security.getAlgorithms("MessageDigest")) {
@@ -20,7 +20,7 @@ public final class _MessageDigestTestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private _MessageDigestTestUtils() {
+    private _MessageDigest_TestUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

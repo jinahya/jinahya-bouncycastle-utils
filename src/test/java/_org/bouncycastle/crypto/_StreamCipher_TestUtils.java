@@ -1,7 +1,7 @@
-package io.github.jinahya.util.bouncycastle.crypto;
+package _org.bouncycastle.crypto;
 
-import io.github.jinahya.util._LogUtils;
-import io.github.jinahya.util._RandomTestUtils;
+import _javax.security._Random_TestUtils;
+import io.github.jinahya.util.bouncycastle.crypto.JinahyaStreamCipherUtils;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.StreamCipher;
@@ -11,11 +11,18 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public final class _StreamCipherTestUtils {
+public final class _StreamCipher_TestUtils {
 
+    public static String cipherName(final StreamCipher cipher) {
+        Objects.requireNonNull(cipher, "cipher is null");
+        return String.format("%1$s", cipher.getAlgorithmName());
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
     private static void __(final StreamCipher cipher, final CipherParameters params, final byte[] plain) {
         // ----------------------------------------------------------------------------------------------------- encrypt
         cipher.init(true, params);
@@ -23,13 +30,12 @@ public final class _StreamCipherTestUtils {
         // ----------------------------------------------------------------------------------------------------- decrypt
         cipher.init(false, params);
         final var decrypted = JinahyaStreamCipherUtils.processBytes(cipher, encrypted);
-        // -------------------------------------------------------------------------------------------------------- then
-        _LogUtils.log(plain, encrypted, decrypted);
+        // ------------------------------------------------------------------------------------------------------ verify
         assertThat(decrypted).isEqualTo(plain);
     }
 
-    public static void __(final StreamCipher cipher, final CipherParameters params) throws Exception {
-        _RandomTestUtils.getRandomBytesStream().forEach(b -> {
+    public static void __(final StreamCipher cipher, final CipherParameters params) {
+        _Random_TestUtils.getRandomBytesStream().forEach(b -> {
             __(cipher, params, b);
         });
     }
@@ -43,7 +49,7 @@ public final class _StreamCipherTestUtils {
         final var encrypted = File.createTempFile("tmp", null, dir);
         try (var source = new FileInputStream(plain);
              var target = new FileOutputStream(encrypted)) {
-            JinahyaStreamCipherUtils.processAllBytes(cipher, source, target, 1);
+            final var bytes = JinahyaStreamCipherUtils.processAllBytes(cipher, source, target, new byte[1]);
             target.flush();
         }
         // ----------------------------------------------------------------------------------------------------- decrypt
@@ -51,11 +57,10 @@ public final class _StreamCipherTestUtils {
         final var decrypted = File.createTempFile("tmp", null, dir);
         try (var source = new FileInputStream(encrypted);
              var target = new FileOutputStream(decrypted)) {
-            JinahyaStreamCipherUtils.processAllBytes(cipher, source, target, 1);
+            final var bytes = JinahyaStreamCipherUtils.processAllBytes(cipher, source, target, new byte[1]);
             target.flush();
         }
-        // -------------------------------------------------------------------------------------------------------- then
-        _LogUtils.log(plain, encrypted, decrypted);
+        // ------------------------------------------------------------------------------------------------------ verify
         assertThat(decrypted).hasSize(plain.length());
         for (var algorithm : new String[]{"SHA-1", "SHA-256"}) {
             final var digest = MessageDigest.getInstance(algorithm);
@@ -64,7 +69,7 @@ public final class _StreamCipherTestUtils {
     }
 
     public static void __(final StreamCipher cipher, final CipherParameters params, final File dir) throws IOException {
-        _RandomTestUtils.getRandomFileStream(dir).forEach(f -> {
+        _Random_TestUtils.getRandomFileStream(dir).forEach(f -> {
             try {
                 __(cipher, params, dir, f);
             } catch (final Exception e) {
@@ -74,7 +79,7 @@ public final class _StreamCipherTestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private _StreamCipherTestUtils() {
+    private _StreamCipher_TestUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

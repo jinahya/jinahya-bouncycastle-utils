@@ -62,6 +62,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.compiler.source>11</maven.compiler.source>
+    <!--    <maven.compiler.source>17</maven.compiler.source>-->
     <maven.compiler.target>${maven.compiler.source}</maven.compiler.target>
     <maven.compiler.release>${maven.compiler.target}</maven.compiler.release>
     <maven.compiler.testSource>21</maven.compiler.testSource>
@@ -78,6 +79,11 @@
 
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>jakarta.platform</groupId>
+        <artifactId>jakarta.jakartaee-bom</artifactId>
+        <version>11.0.0-M4</version>
+      </dependency>
       <dependency>
         <groupId>org.junit</groupId>
         <artifactId>junit-bom</artifactId>
@@ -107,6 +113,18 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>io.vavr</groupId>
+      <artifactId>vavr</artifactId>
+      <version>0.10.4</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.annotation</groupId>
+      <artifactId>jakarta.annotation-api</artifactId>
+      <version>3.0.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>nl.jqno.equalsverifier</groupId>
       <artifactId>equalsverifier-nodep</artifactId>
       <version>3.17.1</version>
@@ -126,6 +144,16 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-engine</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.platform</groupId>
+      <artifactId>junit-platform-suite-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.platform</groupId>
+      <artifactId>junit-platform-suite-engine</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -174,6 +202,9 @@
               <additionalOption>-Xdoclint:none</additionalOption>
               <!--            <additionalOptions>-package</additionalOptions>-->
             </additionalOptions>
+            <links>
+              <link>https://downloads.bouncycastle.org/java/docs/bcprov-jdk18on-javadoc/</link>
+            </links>
             <tags>
               <tag>
                 <name>apiNote</name>
@@ -443,7 +474,7 @@
       <dependencies>
         <dependency>
           <groupId>org.bouncycastle</groupId>
-          <artifactId>bcprov-jdk18on</artifactId>
+          <artifactId>bcprov-debug-jdk18on</artifactId>
           <version>${version.org.bouncycastle}</version>
           <scope>provided</scope>
         </dependency>
