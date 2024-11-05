@@ -40,21 +40,21 @@ public final class _BufferedBlockCipher_TestUtils {
     public static void __(final BufferedBlockCipher cipher, final CipherParameters params, final ByteBuffer plain)
             throws Exception {
         // ----------------------------------------------------------------------------------------------------- encrypt
-        cipher.init(true, params);
-        final var encrypted = ByteBuffer.allocate(cipher.getOutputSize(plain.remaining()));
-        {
-            plain.mark();
-            final var bytes = JinahyaBufferedBlockCipherUtils.processBytesAndDoFinal(cipher, plain, encrypted);
-            assert !plain.hasRemaining();
-        }
+        final var encrypted = JinahyaBufferedBlockCipherUtils.encrypt(
+                cipher, params,
+                plain,
+                ByteBuffer::allocate
+        );
         // ----------------------------------------------------------------------------------------------------- decrypt
         cipher.init(false, params);
-        final var decrypted = ByteBuffer.allocate(cipher.getOutputSize(encrypted.flip().remaining()));
-        {
-            final var bytes = JinahyaBufferedBlockCipherUtils.processBytesAndDoFinal(cipher, encrypted, decrypted);
-        }
+        final var decrypted = JinahyaBufferedBlockCipherUtils.decrypt(
+                cipher,
+                params,
+                encrypted.flip(),
+                ByteBuffer::allocate
+        );
         // -------------------------------------------------------------------------------------------------------- then
-        assertThat(decrypted.flip()).isEqualTo(plain.reset());
+        assertThat(decrypted.flip()).isEqualTo(plain.clear());
     }
 
     public static void __(final BufferedBlockCipher cipher, final CipherParameters params, final byte[] plain)

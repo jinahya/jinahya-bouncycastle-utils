@@ -11,6 +11,7 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.function.IntFunction;
 
 /**
  * A utility class for {@link BufferedBlockCipher}.
@@ -232,8 +233,8 @@ public final class JinahyaBufferedBlockCipherUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    public static int processBytesAndDoFinal(final BufferedBlockCipher cipher, final ByteBuffer input,
-                                             final ByteBuffer output)
+    public static <T extends ByteBuffer> T processBytesAndDoFinal(final BufferedBlockCipher cipher,
+                                                                  final ByteBuffer input, final T output)
             throws InvalidCipherTextException {
         final byte[] in;
         final int inoff;
@@ -262,28 +263,85 @@ public final class JinahyaBufferedBlockCipherUtils {
         } else {
             output.put(out, outoff, outlen);
         }
-        return outlen;
+        return output;
     }
 
-//    public static int encrypt(final BufferedBlockCipher cipher, final CipherParameters params, final ByteBuffer input,
-//                              final ByteBuffer output)
-//            throws InvalidCipherTextException {
-//        return processBytesAndDoFinal(
-//                initForEncryption(cipher, params),
-//                input,
-//                output
-//        );
-//    }
-//
-//    public static int decrypt(final BufferedBlockCipher cipher, final CipherParameters params, final ByteBuffer input,
-//                              final ByteBuffer output)
-//            throws InvalidCipherTextException {
-//        return processBytesAndDoFinal(
-//                initForEncryption(cipher, params),
-//                input,
-//                output
-//        );
-//    }
+    /**
+     * Processes and finalizes, using specified cipher, all remaining bytes of specified input buffer, returns a byte
+     * buffer of processed bytes.
+     *
+     * @param cipher   the cipher.
+     * @param input    the input buffer whose remaining bytes are processed.
+     * @param function a function for allocating an output buffer of specific capacity.
+     * @param <T>      byte buffer type parameter
+     * @return a byte buffer of processed bytes.
+     * @throws InvalidCipherTextException if padding is expected and not found.
+     * @see #processBytesAndDoFinal(BufferedBlockCipher, ByteBuffer, ByteBuffer)
+     * @see #encrypt(BufferedBlockCipher, CipherParameters, ByteBuffer, IntFunction)
+     * @see #decrypt(BufferedBlockCipher, CipherParameters, ByteBuffer, IntFunction)
+     */
+    public static <T extends ByteBuffer> T processBytesAndDoFinal(final BufferedBlockCipher cipher,
+                                                                  final ByteBuffer input,
+                                                                  final IntFunction<? extends T> function)
+            throws InvalidCipherTextException {
+        Objects.requireNonNull(input, "input is null");
+        Objects.requireNonNull(function, "function is null");
+        final var capacity = cipher.getOutputSize(input.remaining());
+        final var output = function.apply(capacity);
+        return processBytesAndDoFinal(
+                cipher,
+                input,
+                output
+        );
+    }
+
+    /**
+     * Initializes specified cipher for encryption, encrypts all remaining bytes of specified input buffer, returns a
+     * bytes buffer of encrypted bytes.
+     *
+     * @param cipher   the cipher to be initialized for encryption.
+     * @param params   a cipher parameter for the initialization.
+     * @param input    the byte buffer whose remaining bytes are encrypted.
+     * @param function a function for allocating an output buffer of specific capacity.
+     * @param <T>      byte buffer type parameter
+     * @return a byte buffer of encrypted bytes.
+     * @throws InvalidCipherTextException if padding is expected and not found.
+     * @see #processBytesAndDoFinal(BufferedBlockCipher, ByteBuffer, IntFunction)
+     * @see #decrypt(BufferedBlockCipher, CipherParameters, ByteBuffer, IntFunction)
+     */
+    public static <T extends ByteBuffer> T encrypt(final BufferedBlockCipher cipher, final CipherParameters params,
+                                                   final ByteBuffer input, final IntFunction<? extends T> function)
+            throws InvalidCipherTextException {
+        return processBytesAndDoFinal(
+                initForEncryption(cipher, params),
+                input,
+                function
+        );
+    }
+
+    /**
+     * Initializes specified cipher for decryption, decrypts all remaining bytes of specified input buffer, returns a
+     * bytes buffer of decrypted bytes.
+     *
+     * @param cipher   the cipher to be initialized for decryption.
+     * @param params   a cipher parameter for the initialization.
+     * @param input    the byte buffer whose remaining bytes are decrypted.
+     * @param function a function for allocating an output buffer of specific capacity.
+     * @param <T>      byte buffer type parameter
+     * @return a byte buffer of decrypted bytes.
+     * @throws InvalidCipherTextException if padding is expected and not found.
+     * @see #processBytesAndDoFinal(BufferedBlockCipher, ByteBuffer, IntFunction)
+     * @see #encrypt(BufferedBlockCipher, CipherParameters, ByteBuffer, IntFunction)
+     */
+    public static <T extends ByteBuffer> T decrypt(final BufferedBlockCipher cipher, final CipherParameters params,
+                                                   final ByteBuffer input, final IntFunction<? extends T> function)
+            throws InvalidCipherTextException {
+        return processBytesAndDoFinal(
+                initForDecryption(cipher, params),
+                input,
+                function
+        );
+    }
 
     // -----------------------------------------------------------------------------------------------------------------
     private JinahyaBufferedBlockCipherUtils() {
