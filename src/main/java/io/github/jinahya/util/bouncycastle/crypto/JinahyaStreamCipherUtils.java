@@ -7,6 +7,7 @@ import org.bouncycastle.crypto.StreamCipher;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -55,6 +56,17 @@ public final class JinahyaStreamCipherUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    private static byte[] processBytes(final StreamCipher cipher, final byte[] in, final int inoff, final int inlen) {
+        for (var output = new byte[Math.max(in.length, 1)]; ; ) {
+            try {
+                final var processed = cipher.processBytes(in, inoff, inlen, output, 0);
+                return Arrays.copyOf(output, processed);
+            } catch (final DataLengthException dle) {
+                System.err.println("doubling up output.length from " + output.length);
+                output = new byte[output.length << 1];
+            }
+        }
+    }
 
     /**
      * Processes, using specified cipher, specified input bytes, and returns the result.
@@ -69,21 +81,21 @@ public final class JinahyaStreamCipherUtils {
     public static byte[] processBytes(final StreamCipher cipher, final byte[] input) {
         Objects.requireNonNull(cipher, "cipher is null");
         Objects.requireNonNull(input, "input is null");
+//        if (true) {
+//            return processBytes(cipher, input, 0, input.length);
+//        }
         for (var output = new byte[Math.max(input.length, 1)]; ; ) {
             try {
                 final var processed = cipher.processBytes(input, 0, input.length, output, 0);
                 return Arrays.copyOf(output, processed);
             } catch (final DataLengthException dle) {
                 System.err.println("doubling up output.length from " + output.length);
-                Arrays.fill(output, (byte) 0);
                 output = new byte[output.length << 1];
             }
         }
     }
 
     public static byte[] encrypt(final StreamCipher cipher, final CipherParameters params, final byte[] input) {
-        Objects.requireNonNull(cipher, "cipher is null");
-        Objects.requireNonNull(params, "params is null");
         return processBytes(
                 initForEncryption(cipher, params),
                 input
@@ -91,12 +103,36 @@ public final class JinahyaStreamCipherUtils {
     }
 
     public static byte[] decrypt(final StreamCipher cipher, final CipherParameters params, final byte[] input) {
-        Objects.requireNonNull(cipher, "cipher is null");
-        Objects.requireNonNull(params, "params is null");
         return processBytes(
                 initForDecryption(cipher, params),
                 input
         );
+    }
+
+    public static ByteBuffer processBytes(final StreamCipher cipher, final ByteBuffer input) {
+        Objects.requireNonNull(cipher, "cipher is null");
+        Objects.requireNonNull(input, "input is null");
+        final byte[] in;
+        final int inoff;
+        final int inlen = input.remaining();
+        if (input.hasArray()) {
+            in = input.array();
+            inoff = input.arrayOffset() + input.position();
+        } else {
+            in = new byte[inlen];
+            input.get(input.position(), in);
+            inoff = 0;
+        }
+        for (var out = new byte[Math.max(in.length, 1)]; ; ) {
+            try {
+                final var processed = cipher.processBytes(in, inoff, inlen, out, 0);
+                input.position(input.limit());
+                return ByteBuffer.wrap(out).slice(0, processed);
+            } catch (final DataLengthException dle) {
+                System.err.println("doubling up out.length from " + out.length);
+                out = new byte[out.length << 1];
+            }
+        }
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -114,11 +150,11 @@ public final class JinahyaStreamCipherUtils {
         }
         var written = 0L;
         for (int r; (r = in.read(inbuf)) != -1; ) {
-            while (true) {
+            for (int outlen; ; ) {
                 try {
-                    final var processed = cipher.processBytes(inbuf, 0, r, outbuf, 0);
-                    out.write(outbuf, 0, processed);
-                    written += processed;
+                    outlen = cipher.processBytes(inbuf, 0, r, outbuf, 0);
+                    out.write(outbuf, 0, outlen);
+                    written += outlen;
                     break;
                 } catch (final DataLengthException dle) {
                     System.err.println("doubling up outbuf.length from " + outbuf.length);

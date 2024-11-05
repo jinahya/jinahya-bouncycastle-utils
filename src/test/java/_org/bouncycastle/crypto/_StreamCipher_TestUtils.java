@@ -25,11 +25,13 @@ public final class _StreamCipher_TestUtils {
     // -----------------------------------------------------------------------------------------------------------------
     private static void __(final StreamCipher cipher, final CipherParameters params, final byte[] plain) {
         // ----------------------------------------------------------------------------------------------------- encrypt
-        cipher.init(true, params);
-        final var encrypted = JinahyaStreamCipherUtils.processBytes(cipher, plain);
+//        cipher.init(true, params);
+//        final var encrypted = JinahyaStreamCipherUtils.processBytes(cipher, plain);
+        final var encrypted = JinahyaStreamCipherUtils.encrypt(cipher, params, plain);
         // ----------------------------------------------------------------------------------------------------- decrypt
-        cipher.init(false, params);
-        final var decrypted = JinahyaStreamCipherUtils.processBytes(cipher, encrypted);
+//        cipher.init(false, params);
+//        final var decrypted = JinahyaStreamCipherUtils.processBytes(cipher, encrypted);
+        final var decrypted = JinahyaStreamCipherUtils.decrypt(cipher, params, encrypted);
         // ------------------------------------------------------------------------------------------------------ verify
         assertThat(decrypted).isEqualTo(plain);
     }
