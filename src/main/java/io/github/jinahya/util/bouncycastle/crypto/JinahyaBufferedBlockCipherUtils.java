@@ -64,61 +64,61 @@ public final class JinahyaBufferedBlockCipherUtils {
         return processed + finalized;
     }
 
-    /**
-     * Processes and finalizes, using specified cipher, specified input bytes, and set those processed bytes to
-     * specified output array.
-     *
-     * @param cipher the cipher.
-     * @param input  the input bytes to process and finalize.
-     * @param output the array to which processed bytes are set.
-     * @return the number of bytes set on the {@code output}.
-     * @throws DataLengthException        when the {@code output} is too short.
-     * @throws InvalidCipherTextException if padding is expected and not found.
-     * @see BufferedBlockCipher#getOutputSize(int)
-     * @see BufferedBlockCipher#processBytes(byte[], int, int, byte[], int)
-     * @see BufferedBlockCipher#doFinal(byte[], int)
-     */
-    public static int processBytesAndDoFinal(final BufferedBlockCipher cipher, final byte[] input,
-                                             final byte[] output)
-            throws InvalidCipherTextException {
-        final var processed = cipher.processBytes(input, 0, input.length, output, 0);
-        final var finalized = cipher.doFinal(output, processed);
-        return processed + finalized;
-    }
+//    /**
+//     * Processes and finalizes, using specified cipher, specified input bytes, and set those processed bytes to
+//     * specified output array.
+//     *
+//     * @param cipher the cipher.
+//     * @param input  the input bytes to process and finalize.
+//     * @param output the array to which processed bytes are set.
+//     * @return the number of bytes set on the {@code output}.
+//     * @throws DataLengthException        when the {@code output} is too short.
+//     * @throws InvalidCipherTextException if padding is expected and not found.
+//     * @see BufferedBlockCipher#getOutputSize(int)
+//     * @see BufferedBlockCipher#processBytes(byte[], int, int, byte[], int)
+//     * @see BufferedBlockCipher#doFinal(byte[], int)
+//     */
+//    public static int processBytesAndDoFinal(final BufferedBlockCipher cipher, final byte[] input,
+//                                             final byte[] output)
+//            throws InvalidCipherTextException {
+//        final var processed = cipher.processBytes(input, 0, input.length, output, 0);
+//        final var finalized = cipher.doFinal(output, processed);
+//        return processed + finalized;
+//    }
 
-    public static byte[] processBytesAndDoFinal(final BufferedBlockCipher cipher, final byte[] input, final int inoff,
-                                                final int inlen)
-            throws InvalidCipherTextException {
-        final var output = new byte[cipher.getOutputSize(input.length)];
-        final var outlen = processBytesAndDoFinal(cipher, input, inoff, inlen, output, 0);
-        return Arrays.copyOf(output, outlen);
-    }
+//    public static byte[] processBytesAndDoFinal(final BufferedBlockCipher cipher, final byte[] input, final int inoff,
+//                                                final int inlen)
+//            throws InvalidCipherTextException {
+//        final var output = new byte[cipher.getOutputSize(input.length)];
+//        final var outlen = processBytesAndDoFinal(cipher, input, inoff, inlen, output, 0);
+//        return Arrays.copyOf(output, outlen);
+//    }
 
-    public static byte[] encrypt(final BufferedBlockCipher cipher, final CipherParameters params, final byte[] input,
-                                 final int inoff, final int inlen)
-            throws InvalidCipherTextException {
-        Objects.requireNonNull(cipher, "cipher is null");
-        Objects.requireNonNull(params, "params is null");
-        return processBytesAndDoFinal(
-                initForEncryption(cipher, params),
-                input,
-                inoff,
-                inlen
-        );
-    }
+//    public static byte[] encrypt(final BufferedBlockCipher cipher, final CipherParameters params, final byte[] input,
+//                                 final int inoff, final int inlen)
+//            throws InvalidCipherTextException {
+//        Objects.requireNonNull(cipher, "cipher is null");
+//        Objects.requireNonNull(params, "params is null");
+//        return processBytesAndDoFinal(
+//                initForEncryption(cipher, params),
+//                input,
+//                inoff,
+//                inlen
+//        );
+//    }
 
-    public static byte[] decrypt(final BufferedBlockCipher cipher, final CipherParameters params, final byte[] input,
-                                 final int inoff, final int inlen)
-            throws InvalidCipherTextException {
-        Objects.requireNonNull(cipher, "cipher is null");
-        Objects.requireNonNull(params, "params is null");
-        return processBytesAndDoFinal(
-                initForDecryption(cipher, params),
-                input,
-                inoff,
-                inlen
-        );
-    }
+//    public static byte[] decrypt(final BufferedBlockCipher cipher, final CipherParameters params, final byte[] input,
+//                                 final int inoff, final int inlen)
+//            throws InvalidCipherTextException {
+//        Objects.requireNonNull(cipher, "cipher is null");
+//        Objects.requireNonNull(params, "params is null");
+//        return processBytesAndDoFinal(
+//                initForDecryption(cipher, params),
+//                input,
+//                inoff,
+//                inlen
+//        );
+//    }
 
     // -----------------------------------------------------------------------------------------------------------------
 
@@ -170,67 +170,67 @@ public final class JinahyaBufferedBlockCipherUtils {
         return written;
     }
 
-    public static long encrypt(final BufferedBlockCipher cipher, final CipherParameters params, final InputStream in,
-                               final OutputStream out, final byte[] inbuf, byte[] outbuf)
-            throws IOException, InvalidCipherTextException {
-        return processAllBytesAndDoFinal(
-                initForDecryption(cipher, params),
-                in,
-                out,
-                inbuf,
-                outbuf
-        );
-    }
+//    public static long encrypt(final BufferedBlockCipher cipher, final CipherParameters params, final InputStream in,
+//                               final OutputStream out, final byte[] inbuf, byte[] outbuf)
+//            throws IOException, InvalidCipherTextException {
+//        return processAllBytesAndDoFinal(
+//                initForDecryption(cipher, params),
+//                in,
+//                out,
+//                inbuf,
+//                outbuf
+//        );
+//    }
 
-    public static long decrypt(final BufferedBlockCipher cipher, final CipherParameters params, final InputStream in,
-                               final OutputStream out, final byte[] inbuf, byte[] outbuf)
-            throws IOException, InvalidCipherTextException {
-        return processAllBytesAndDoFinal(
-                initForDecryption(cipher, params),
-                in,
-                out,
-                inbuf,
-                outbuf
-        );
-    }
+//    public static long decrypt(final BufferedBlockCipher cipher, final CipherParameters params, final InputStream in,
+//                               final OutputStream out, final byte[] inbuf, byte[] outbuf)
+//            throws IOException, InvalidCipherTextException {
+//        return processAllBytesAndDoFinal(
+//                initForDecryption(cipher, params),
+//                in,
+//                out,
+//                inbuf,
+//                outbuf
+//        );
+//    }
 
-    public static long processAllBytesAndDoFinal(final BufferedBlockCipher cipher, final InputStream in,
-                                                 final OutputStream out, final byte[] inbuf)
-            throws IOException, InvalidCipherTextException {
-        Objects.requireNonNull(cipher, "cipher is null");
-        if (Objects.requireNonNull(inbuf, "inbuf is null").length == 0) {
-            throw new IllegalArgumentException("inbuf.length shouldn't be zero");
-        }
-        return processAllBytesAndDoFinal(
-                cipher,
-                in,
-                out,
-                inbuf,
-                new byte[cipher.getOutputSize(inbuf.length)]
-        );
-    }
+//    public static long processAllBytesAndDoFinal(final BufferedBlockCipher cipher, final InputStream in,
+//                                                 final OutputStream out, final byte[] inbuf)
+//            throws IOException, InvalidCipherTextException {
+//        Objects.requireNonNull(cipher, "cipher is null");
+//        if (Objects.requireNonNull(inbuf, "inbuf is null").length == 0) {
+//            throw new IllegalArgumentException("inbuf.length shouldn't be zero");
+//        }
+//        return processAllBytesAndDoFinal(
+//                cipher,
+//                in,
+//                out,
+//                inbuf,
+//                new byte[cipher.getOutputSize(inbuf.length)]
+//        );
+//    }
 
-    public static long encrypt(final BufferedBlockCipher cipher, final CipherParameters params,
-                               final InputStream in, final OutputStream out, final byte[] inbuf)
-            throws IOException, InvalidCipherTextException {
-        return processAllBytesAndDoFinal(
-                initForEncryption(cipher, params),
-                in,
-                out,
-                inbuf
-        );
-    }
-
-    public static long decrypt(final BufferedBlockCipher cipher, final CipherParameters params,
-                               final InputStream in, final OutputStream out, final byte[] inbuf)
-            throws IOException, InvalidCipherTextException {
-        return processAllBytesAndDoFinal(
-                initForDecryption(cipher, params),
-                in,
-                out,
-                inbuf
-        );
-    }
+//    public static long encrypt(final BufferedBlockCipher cipher, final CipherParameters params,
+//                               final InputStream in, final OutputStream out, final byte[] inbuf)
+//            throws IOException, InvalidCipherTextException {
+//        return processAllBytesAndDoFinal(
+//                initForEncryption(cipher, params),
+//                in,
+//                out,
+//                inbuf
+//        );
+//    }
+//
+//    public static long decrypt(final BufferedBlockCipher cipher, final CipherParameters params,
+//                               final InputStream in, final OutputStream out, final byte[] inbuf)
+//            throws IOException, InvalidCipherTextException {
+//        return processAllBytesAndDoFinal(
+//                initForDecryption(cipher, params),
+//                in,
+//                out,
+//                inbuf
+//        );
+//    }
 
     // -----------------------------------------------------------------------------------------------------------------
     public static <T extends ByteBuffer> T processBytesAndDoFinal(final BufferedBlockCipher cipher,
