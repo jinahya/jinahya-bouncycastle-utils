@@ -2,11 +2,13 @@ package io.github.jinahya.util.bouncycastle.crypto;
 
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
+import org.bouncycastle.crypto.DataLengthException;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -17,8 +19,16 @@ import java.util.Objects;
  */
 public final class JinahyaBufferedBlockCipherUtils {
 
+    private static <T extends BufferedBlockCipher> T initFor(final T cipher, final boolean encryption,
+                                                             final CipherParameters params) {
+        Objects.requireNonNull(cipher, "cipher is null");
+        Objects.requireNonNull(params, "params is null");
+        cipher.init(encryption, params);
+        return cipher;
+    }
+
     /**
-     * Initializes specified cipher, with specified cipher parameters, for encryption, and returns the cipher.
+     * Initializes specified cipher with specified cipher parameters, for encryption, and returns the cipher.
      *
      * @param cipher the cipher to be initialized for encryption.
      * @param params the cipher parameters.
@@ -27,14 +37,11 @@ public final class JinahyaBufferedBlockCipherUtils {
      * @see BufferedBlockCipher#init(boolean, CipherParameters)
      */
     public static <T extends BufferedBlockCipher> T initForEncryption(final T cipher, final CipherParameters params) {
-        Objects.requireNonNull(cipher, "cipher is null");
-        Objects.requireNonNull(params, "params is null");
-        cipher.init(true, params);
-        return cipher;
+        return initFor(cipher, true, params);
     }
 
     /**
-     * Initializes specified cipher, with specified cipher parameters, for decryption, and returns the cipher.
+     * Initializes specified cipher with specified cipher parameters, for decryption, and returns the cipher.
      *
      * @param cipher the cipher to be initialized for decryption.
      * @param params the cipher parameters.
@@ -43,71 +50,90 @@ public final class JinahyaBufferedBlockCipherUtils {
      * @see BufferedBlockCipher#init(boolean, CipherParameters)
      */
     public static <T extends BufferedBlockCipher> T initForDecryption(final T cipher, final CipherParameters params) {
-        Objects.requireNonNull(cipher, "cipher is null");
-        Objects.requireNonNull(params, "params is null");
-        cipher.init(false, params);
-        return cipher;
+        return initFor(cipher, false, params);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
 
-    /**
-     * Processes and finalizes, using specified cipher, specified input bytes, and returns the result.
-     *
-     * @param cipher the cipher.
-     * @param input  the input bytes to process and finalize.
-     * @return an array of result bytes
-     * @throws InvalidCipherTextException if padding is expected and not found.
-     * @see BufferedBlockCipher#processBytes(byte[], int, int, byte[], int)
-     * @see BufferedBlockCipher#doFinal(byte[], int)
-     */
-    public static byte[] processBytesAndDoFinal(final BufferedBlockCipher cipher, final byte[] input)
+    public static int processBytesAndDoFinal(final BufferedBlockCipher cipher, final byte[] input, final int inoff,
+                                             final int inlen, final byte[] output, final int outoff)
             throws InvalidCipherTextException {
-        final var output = new byte[cipher.getOutputSize(input.length)];
-        final var processed = cipher.processBytes(input, 0, input.length, output, 0);
+        final var processed = cipher.processBytes(input, inoff, inlen, output, outoff);
         final var finalized = cipher.doFinal(output, processed);
-        return Arrays.copyOf(output, processed + finalized);
+        return processed + finalized;
     }
 
     /**
-     * Initializes specified cipher, using specified cipher parameters, for encryption, and encrypts specified input.
+     * Processes and finalizes, using specified cipher, specified input bytes, and set those processed bytes to
+     * specified output array.
      *
-     * @param cipher the cipher to be initialized for encryption.
-     * @param params the cipher parameters.
-     * @param input  the input data to encrypt.
-     * @return an array of encrypted bytes.
+     * @param cipher the cipher.
+     * @param input  the input bytes to process and finalize.
+     * @param output the array to which processed bytes are set.
+     * @return the number of bytes set on the {@code output}.
+     * @throws DataLengthException        when the {@code output} is too short.
      * @throws InvalidCipherTextException if padding is expected and not found.
+     * @see BufferedBlockCipher#getOutputSize(int)
+     * @see BufferedBlockCipher#processBytes(byte[], int, int, byte[], int)
+     * @see BufferedBlockCipher#doFinal(byte[], int)
      */
-    public static byte[] encrypt(final BufferedBlockCipher cipher, final CipherParameters params, final byte[] input)
+    public static int processBytesAndDoFinal(final BufferedBlockCipher cipher, final byte[] input,
+                                             final byte[] output)
+            throws InvalidCipherTextException {
+        final var processed = cipher.processBytes(input, 0, input.length, output, 0);
+        final var finalized = cipher.doFinal(output, processed);
+        return processed + finalized;
+    }
+
+    public static byte[] processBytesAndDoFinal(final BufferedBlockCipher cipher, final byte[] input, final int inoff,
+                                                final int inlen)
+            throws InvalidCipherTextException {
+        final var output = new byte[cipher.getOutputSize(input.length)];
+        final var outlen = processBytesAndDoFinal(cipher, input, inoff, inlen, output, 0);
+        return Arrays.copyOf(output, outlen);
+    }
+
+    public static byte[] encrypt(final BufferedBlockCipher cipher, final CipherParameters params, final byte[] input,
+                                 final int inoff, final int inlen)
             throws InvalidCipherTextException {
         Objects.requireNonNull(cipher, "cipher is null");
         Objects.requireNonNull(params, "params is null");
         return processBytesAndDoFinal(
                 initForEncryption(cipher, params),
-                input
+                input,
+                inoff,
+                inlen
         );
     }
 
-    /**
-     * Initializes specified cipher, using specified cipher parameters, for decryption, and decrypts specified input.
-     *
-     * @param cipher the cipher to be initialized for decryption.
-     * @param params the cipher parameters.
-     * @param input  the input data to encrypt.
-     * @return an array of decrypted bytes.
-     * @throws InvalidCipherTextException if padding is expected and not found.
-     */
-    public static byte[] decrypt(final BufferedBlockCipher cipher, final CipherParameters params, final byte[] input)
+    public static byte[] decrypt(final BufferedBlockCipher cipher, final CipherParameters params, final byte[] input,
+                                 final int inoff, final int inlen)
             throws InvalidCipherTextException {
         Objects.requireNonNull(cipher, "cipher is null");
         Objects.requireNonNull(params, "params is null");
         return processBytesAndDoFinal(
                 initForDecryption(cipher, params),
-                input
+                input,
+                inoff,
+                inlen
         );
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Processes and finalizes, using specified cipher, all bytes from specified input stream, and writes all processed
+     * bytes to specified output stream.
+     *
+     * @param cipher the cipher.
+     * @param in     the input stream from which unprocessed bytes are read.
+     * @param out    the output stream to which processed bytes are written.
+     * @param inbuf  a buffer for reading unprocessed bytes from the {@code in}.
+     * @param outbuf a buffer for processing bytes, and writing those bytes to the {@code out}.
+     * @return the number of bytes written to the {@code out}.
+     * @throws IOException                if an I/O error occurs.
+     * @throws InvalidCipherTextException if padding is expected and not found.
+     */
     public static long processAllBytesAndDoFinal(final BufferedBlockCipher cipher, final InputStream in,
                                                  final OutputStream out, final byte[] inbuf, byte[] outbuf)
             throws IOException, InvalidCipherTextException {
@@ -121,41 +147,50 @@ public final class JinahyaBufferedBlockCipherUtils {
             throw new IllegalArgumentException("outbuf.length is zero");
         }
         var written = 0L;
+        int outlen;
         for (int r; (r = in.read(inbuf)) != -1; ) {
             final var updateOutputSize = cipher.getUpdateOutputSize(r);
             if (outbuf.length < updateOutputSize) {
-                System.err.println("recreating outbuf for an updateOutputSize(" + updateOutputSize + ")");
+                System.err.println("extending outbuf for an updateOutputSize(" + updateOutputSize + ")");
                 outbuf = new byte[updateOutputSize];
             }
-            final var processed = cipher.processBytes(inbuf, 0, r, outbuf, 0);
-            out.write(outbuf, 0, processed);
-            written += processed;
+            outlen = cipher.processBytes(inbuf, 0, r, outbuf, 0);
+            out.write(outbuf, 0, outlen);
+            written += outlen;
         }
         final var outputSize = cipher.getOutputSize(0);
         if (outbuf.length < outputSize) {
-            System.err.println("recreating outbuf for the final outputSize(" + outputSize + ")");
+            System.err.println("extending outbuf for the final outputSize(" + outputSize + ")");
             outbuf = new byte[outputSize];
         }
-        final var finalized = cipher.doFinal(outbuf, 0);
-        out.write(outbuf, 0, finalized);
-        written += finalized;
+        outlen = cipher.doFinal(outbuf, 0);
+        out.write(outbuf, 0, outlen);
+        written += outlen;
         return written;
     }
 
     public static long encrypt(final BufferedBlockCipher cipher, final CipherParameters params, final InputStream in,
                                final OutputStream out, final byte[] inbuf, byte[] outbuf)
             throws IOException, InvalidCipherTextException {
-        Objects.requireNonNull(cipher, "cipher is null");
-        cipher.init(true, params);
-        return processAllBytesAndDoFinal(cipher, in, out, inbuf, outbuf);
+        return processAllBytesAndDoFinal(
+                initForDecryption(cipher, params),
+                in,
+                out,
+                inbuf,
+                outbuf
+        );
     }
 
     public static long decrypt(final BufferedBlockCipher cipher, final CipherParameters params, final InputStream in,
                                final OutputStream out, final byte[] inbuf, byte[] outbuf)
             throws IOException, InvalidCipherTextException {
-        Objects.requireNonNull(cipher, "cipher is null");
-        cipher.init(false, params);
-        return processAllBytesAndDoFinal(cipher, in, out, inbuf, outbuf);
+        return processAllBytesAndDoFinal(
+                initForDecryption(cipher, params),
+                in,
+                out,
+                inbuf,
+                outbuf
+        );
     }
 
     public static long processAllBytesAndDoFinal(final BufferedBlockCipher cipher, final InputStream in,
@@ -177,8 +212,6 @@ public final class JinahyaBufferedBlockCipherUtils {
     public static long encrypt(final BufferedBlockCipher cipher, final CipherParameters params,
                                final InputStream in, final OutputStream out, final byte[] inbuf)
             throws IOException, InvalidCipherTextException {
-        Objects.requireNonNull(cipher, "cipher is null");
-        cipher.init(true, params);
         return processAllBytesAndDoFinal(
                 initForEncryption(cipher, params),
                 in,
@@ -190,13 +223,46 @@ public final class JinahyaBufferedBlockCipherUtils {
     public static long decrypt(final BufferedBlockCipher cipher, final CipherParameters params,
                                final InputStream in, final OutputStream out, final byte[] inbuf)
             throws IOException, InvalidCipherTextException {
-        Objects.requireNonNull(cipher, "cipher is null");
         return processAllBytesAndDoFinal(
                 initForDecryption(cipher, params),
                 in,
                 out,
                 inbuf
         );
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    public static int processBytesAndDoFinal(final BufferedBlockCipher cipher, final ByteBuffer input,
+                                             final ByteBuffer output)
+            throws InvalidCipherTextException {
+        final byte[] in;
+        final int inoff;
+        final int inlen = input.remaining();
+        if (input.hasArray()) {
+            in = input.array();
+            inoff = input.arrayOffset() + input.position();
+        } else {
+            in = new byte[inlen];
+            input.get(0, in);
+            inoff = 0;
+        }
+        final byte[] out;
+        final int outoff;
+        if (output.hasArray()) {
+            out = output.array();
+            outoff = output.arrayOffset() + output.position();
+        } else {
+            out = new byte[output.remaining()];
+            outoff = 0;
+        }
+        final var outlen = processBytesAndDoFinal(cipher, in, inoff, inlen, out, outoff);
+        input.position(input.position() + inlen);
+        if (output.hasArray()) {
+            output.position(output.position() + outlen);
+        } else {
+            output.put(out, outoff, outlen);
+        }
+        return outlen;
     }
 
     // -----------------------------------------------------------------------------------------------------------------
