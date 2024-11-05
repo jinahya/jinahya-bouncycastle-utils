@@ -37,15 +37,25 @@ public final class _BufferedBlockCipher_TestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-//    public static void __(final BufferedBlockCipher cipher, final CipherParameters params, final ByteBuffer plain)
-//            throws Exception {
-//        // ----------------------------------------------------------------------------------------------------- encrypt
-//        final var encrypted = JinahyaBufferedBlockCipherUtils.encrypt(cipher, params, plain, 0, plain.length);
-//        // ----------------------------------------------------------------------------------------------------- decrypt
-//        final var decrypted = JinahyaBufferedBlockCipherUtils.decrypt(cipher, params, encrypted, 0, encrypted.length);
-//        // -------------------------------------------------------------------------------------------------------- then
-//        assertThat(decrypted).isEqualTo(plain);
-//    }
+    public static void __(final BufferedBlockCipher cipher, final CipherParameters params, final ByteBuffer plain)
+            throws Exception {
+        // ----------------------------------------------------------------------------------------------------- encrypt
+        cipher.init(true, params);
+        final var encrypted = ByteBuffer.allocate(cipher.getOutputSize(plain.remaining()));
+        {
+            plain.mark();
+            final var bytes = JinahyaBufferedBlockCipherUtils.processBytesAndDoFinal(cipher, plain, encrypted);
+            assert !plain.hasRemaining();
+        }
+        // ----------------------------------------------------------------------------------------------------- decrypt
+        cipher.init(false, params);
+        final var decrypted = ByteBuffer.allocate(cipher.getOutputSize(encrypted.flip().remaining()));
+        {
+            final var bytes = JinahyaBufferedBlockCipherUtils.processBytesAndDoFinal(cipher, encrypted, decrypted);
+        }
+        // -------------------------------------------------------------------------------------------------------- then
+        assertThat(decrypted.flip()).isEqualTo(plain.reset());
+    }
 
     public static void __(final BufferedBlockCipher cipher, final CipherParameters params, final byte[] plain)
             throws Exception {
@@ -55,6 +65,7 @@ public final class _BufferedBlockCipher_TestUtils {
         final var decrypted = JinahyaBufferedBlockCipherUtils.decrypt(cipher, params, encrypted, 0, encrypted.length);
         // -------------------------------------------------------------------------------------------------------- then
         assertThat(decrypted).isEqualTo(plain);
+        __(cipher, params, ByteBuffer.wrap(plain));
     }
 
     public static void __(final BufferedBlockCipher cipher, final CipherParameters params) throws Exception {

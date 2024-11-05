@@ -265,6 +265,26 @@ public final class JinahyaBufferedBlockCipherUtils {
         return outlen;
     }
 
+//    public static int encrypt(final BufferedBlockCipher cipher, final CipherParameters params, final ByteBuffer input,
+//                              final ByteBuffer output)
+//            throws InvalidCipherTextException {
+//        return processBytesAndDoFinal(
+//                initForEncryption(cipher, params),
+//                input,
+//                output
+//        );
+//    }
+//
+//    public static int decrypt(final BufferedBlockCipher cipher, final CipherParameters params, final ByteBuffer input,
+//                              final ByteBuffer output)
+//            throws InvalidCipherTextException {
+//        return processBytesAndDoFinal(
+//                initForEncryption(cipher, params),
+//                input,
+//                output
+//        );
+//    }
+
     // -----------------------------------------------------------------------------------------------------------------
     private JinahyaBufferedBlockCipherUtils() {
         throw new AssertionError("instantiation is not allowed");
