@@ -1,7 +1,7 @@
 package _org.bouncycastle.crypto;
 
 import _javax.security._Random_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto.JinahyaStreamCipherUtils;
+import io.github.jinahya.bouncycastle.crypto.StreamCipherUtils;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.StreamCipher;
@@ -27,11 +27,11 @@ public final class _StreamCipher_TestUtils {
         // ----------------------------------------------------------------------------------------------------- encrypt
 //        cipher.init(true, params);
 //        final var encrypted = JinahyaStreamCipherUtils.processBytes(cipher, plain);
-        final var encrypted = JinahyaStreamCipherUtils.encrypt(cipher, params, plain);
+        final var encrypted = StreamCipherUtils.encrypt(cipher, params, plain);
         // ----------------------------------------------------------------------------------------------------- decrypt
 //        cipher.init(false, params);
 //        final var decrypted = JinahyaStreamCipherUtils.processBytes(cipher, encrypted);
-        final var decrypted = JinahyaStreamCipherUtils.decrypt(cipher, params, encrypted);
+        final var decrypted = StreamCipherUtils.decrypt(cipher, params, encrypted);
         // ------------------------------------------------------------------------------------------------------ verify
         assertThat(decrypted).isEqualTo(plain);
     }
@@ -51,7 +51,7 @@ public final class _StreamCipher_TestUtils {
         final var encrypted = File.createTempFile("tmp", null, dir);
         try (var source = new FileInputStream(plain);
              var target = new FileOutputStream(encrypted)) {
-            final var bytes = JinahyaStreamCipherUtils.processAllBytes(cipher, source, target, new byte[1]);
+            final var bytes = StreamCipherUtils.processAllBytes(cipher, source, target, new byte[1]);
             target.flush();
         }
         // ----------------------------------------------------------------------------------------------------- decrypt
@@ -59,7 +59,7 @@ public final class _StreamCipher_TestUtils {
         final var decrypted = File.createTempFile("tmp", null, dir);
         try (var source = new FileInputStream(encrypted);
              var target = new FileOutputStream(decrypted)) {
-            final var bytes = JinahyaStreamCipherUtils.processAllBytes(cipher, source, target, new byte[1]);
+            final var bytes = StreamCipherUtils.processAllBytes(cipher, source, target, new byte[1]);
             target.flush();
         }
         // ------------------------------------------------------------------------------------------------------ verify

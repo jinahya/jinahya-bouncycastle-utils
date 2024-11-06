@@ -1,9 +1,9 @@
-package io.github.jinahya.util.bouncycastle.crypto;
+package io.github.jinahya.bouncycastle.crypto;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-class JinahyaBufferedBlockCipherUtilsTest {
+class BufferedBlockCipherUtilsTest {
 
     @Nested
     class aTest {

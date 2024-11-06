@@ -1,14 +1,14 @@
-package io.github.jinahya.util.bouncycastle.jce.provider;
+package io.github.jinahya.bouncycastle.jce.provider;
 
 import java.security.Provider;
 import java.security.Security;
 
 /**
- * Utilities related to the {@value JinahyaBouncyCastleProviderUtils#BOUNCY_CASTLE_PROVIDER_CLASS_NAME} class.
+ * Utilities related to the {@value BouncyCastleProviderUtils#BOUNCY_CASTLE_PROVIDER_CLASS_NAME} class.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
-public final class JinahyaBouncyCastleProviderUtils {
+public final class BouncyCastleProviderUtils {
 
     // ----------------------------------------------------------------------------------------------------------- class
     private static final String BOUNCY_CASTLE_PROVIDER_CLASS_NAME =
@@ -60,7 +60,7 @@ public final class JinahyaBouncyCastleProviderUtils {
      * @see #removeBouncyCastleProvider()
      */
     public static void addBouncyCastleProvider() {
-        synchronized (JinahyaBouncyCastleProviderUtils.class) {
+        synchronized (BouncyCastleProviderUtils.class) {
             if (added) {
                 return;
             }
@@ -76,14 +76,14 @@ public final class JinahyaBouncyCastleProviderUtils {
      * @see #addBouncyCastleProvider()
      */
     public static void removeBouncyCastleProvider() {
-        synchronized (JinahyaBouncyCastleProviderUtils.class) {
+        synchronized (BouncyCastleProviderUtils.class) {
             Security.removeProvider(BOUNCY_CASTLE_PROVIDER_NAME);
             added = false;
         }
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private JinahyaBouncyCastleProviderUtils() {
+    private BouncyCastleProviderUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

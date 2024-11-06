@@ -5,7 +5,7 @@ import _org.bouncycastle.crypto._BufferedBlockCipher_TestUtils;
 import _org.bouncycastle.crypto.params._KeyParameters_TestUtils;
 import _org.bouncycastle.jce.provider._BouncyCastleProvider_TestUtils;
 import io.github.jinahya.util._ECB_TestUtils;
-import io.github.jinahya.util.bouncycastle.jce.provider.JinahyaBouncyCastleProviderUtils;
+import io.github.jinahya.bouncycastle.jce.provider.BouncyCastleProviderUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -92,7 +92,7 @@ class ARIA_ECB_Test
         @ParameterizedTest
         void __(final int keySize, final String transformation, @TempDir final Path dir) throws Throwable {
             _BouncyCastleProvider_TestUtils.callForBouncyCastleProvider(() -> {
-                JinahyaBouncyCastleProviderUtils.addBouncyCastleProvider();
+                BouncyCastleProviderUtils.addBouncyCastleProvider();
                 final var cipher = Cipher.getInstance(transformation);
                 final var key = new SecretKeySpec(
                         _KeyParameters_TestUtils.newRandomKey(null, keySize),

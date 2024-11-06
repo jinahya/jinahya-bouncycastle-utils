@@ -1,6 +1,6 @@
 package io.github.jinahya.util;
 
-import io.github.jinahya.util.bouncycastle.jce.provider.JinahyaBouncyCastleProviderUtils;
+import io.github.jinahya.bouncycastle.jce.provider.BouncyCastleProviderUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.AfterAll;
@@ -11,11 +11,11 @@ public abstract class _JCEProviderTest {
 
     @BeforeAll
     static void beforeAll() {
-        JinahyaBouncyCastleProviderUtils.addBouncyCastleProvider();
+        BouncyCastleProviderUtils.addBouncyCastleProvider();
     }
 
     @AfterAll
     static void afterAll() {
-        JinahyaBouncyCastleProviderUtils.removeBouncyCastleProvider();
+        BouncyCastleProviderUtils.removeBouncyCastleProvider();
     }
 }

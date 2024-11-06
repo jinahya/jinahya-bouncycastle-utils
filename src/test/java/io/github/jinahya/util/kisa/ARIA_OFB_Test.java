@@ -6,7 +6,7 @@ import _org.bouncycastle.crypto._StreamCipher_TestUtils;
 import _org.bouncycastle.crypto.params._KeyParameters_TestUtils;
 import _org.bouncycastle.jce.provider._BouncyCastleProvider_TestUtils;
 import io.github.jinahya.util._OFB_TestUtils;
-import io.github.jinahya.util.bouncycastle.jce.provider.JinahyaBouncyCastleProviderUtils;
+import io.github.jinahya.bouncycastle.jce.provider.BouncyCastleProviderUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -128,7 +128,7 @@ class ARIA_OFB_Test
             try {
                 cipher = Cipher.getInstance(
                         transformation,
-                        JinahyaBouncyCastleProviderUtils.BOUNCY_CASTLE_PROVIDER_NAME
+                        BouncyCastleProviderUtils.BOUNCY_CASTLE_PROVIDER_NAME
                 );
             } catch (final NoSuchAlgorithmException naae) {
                 log.error("failed to get cipher for '{}'", transformation);
@@ -154,7 +154,7 @@ class ARIA_OFB_Test
             try {
                 cipher = Cipher.getInstance(
                         transformation,
-                        JinahyaBouncyCastleProviderUtils.BOUNCY_CASTLE_PROVIDER_NAME
+                        BouncyCastleProviderUtils.BOUNCY_CASTLE_PROVIDER_NAME
                 );
             } catch (final NoSuchAlgorithmException naae) {
                 log.error("failed to get cipher for '{}'", transformation);

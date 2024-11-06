@@ -1,4 +1,4 @@
-package io.github.jinahya.util.bouncycastle.crypto;
+package io.github.jinahya.bouncycastle.crypto;
 
 import org.bouncycastle.crypto.InvalidCipherTextException;
 
@@ -7,11 +7,28 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Objects;
 
-public interface JinahyaCipherAdapter {
+public interface CipherAdapter {
 
     // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * @param in
+     * @param inoff
+     * @param inlen
+     * @param out
+     * @param outoff
+     * @return the number of bytes set on the {@code out}.
+     * @throws InvalidCipherTextException
+     */
     int encrypt(byte[] in, int inoff, int inlen, byte[] out, int outoff) throws InvalidCipherTextException;
 
+    /**
+     * @param in
+     * @param inoff
+     * @param inlen
+     * @return an array of encrypted bytes.
+     * @throws InvalidCipherTextException
+     */
     byte[] encrypt(byte[] in, int inoff, int inlen) throws InvalidCipherTextException;
 
     /**
@@ -21,7 +38,7 @@ public interface JinahyaCipherAdapter {
      * @return an array of encrypted bytes.
      * @throws InvalidCipherTextException if padding is expected and not found.
      */
-    default byte[] encrypt(byte[] in) throws InvalidCipherTextException {
+    default byte[] encrypt(final byte[] in) throws InvalidCipherTextException {
         return encrypt(in, 0, in.length);
     }
 
@@ -43,9 +60,30 @@ public interface JinahyaCipherAdapter {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * .
+     *
+     * @param in     .
+     * @param out
+     * @param inbuf
+     * @param outbuf
+     * @return the number of bytes written to the {@code out}.
+     * @throws IOException                if an I/O error occurs.
+     * @throws InvalidCipherTextException
+     */
     long encrypt(InputStream in, OutputStream out, byte[] inbuf, byte[] outbuf)
             throws IOException, InvalidCipherTextException;
 
+    /**
+     *
+     * @param in
+     * @param out
+     * @param inbuf
+     * @return the number of bytes written to the {@code out}.
+     * @throws IOException
+     * @throws InvalidCipherTextException
+     */
     long encrypt(InputStream in, OutputStream out, byte[] inbuf) throws IOException, InvalidCipherTextException;
 
     // -----------------------------------------------------------------------------------------------------------------

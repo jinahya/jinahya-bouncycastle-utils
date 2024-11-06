@@ -1,4 +1,4 @@
-package io.github.jinahya.util.bouncycastle.crypto;
+package io.github.jinahya.bouncycastle.crypto;
 
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.DataLengthException;
@@ -21,7 +21,7 @@ import java.util.function.IntFunction;
  * href="https://downloads.bouncycastle.org/java/docs/bcprov-jdk18on-javadoc/index.html?org/bouncycastle/crypto/StreamCipher.html">org.bouncycastle.crypto.StreamCipher</a>
  * (bcprov-jdk18on-javadoc)
  */
-public final class JinahyaStreamCipherUtils {
+public final class StreamCipherUtils {
 
     private static <T extends StreamCipher> T initFor(final T cipher, final boolean encryption,
                                                       final CipherParameters params) {
@@ -256,7 +256,7 @@ public final class JinahyaStreamCipherUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private JinahyaStreamCipherUtils() {
+    private StreamCipherUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

@@ -1,15 +1,13 @@
-package io.github.jinahya.util.bouncycastle.crypto;
+package io.github.jinahya.bouncycastle.crypto;
 
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
-import org.bouncycastle.crypto.DataLengthException;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.IntFunction;
 
@@ -18,7 +16,7 @@ import java.util.function.IntFunction;
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
-public final class JinahyaBufferedBlockCipherUtils {
+public final class BufferedBlockCipherUtils {
 
     private static <T extends BufferedBlockCipher> T initFor(final T cipher, final boolean encryption,
                                                              final CipherParameters params) {
@@ -344,7 +342,7 @@ public final class JinahyaBufferedBlockCipherUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private JinahyaBufferedBlockCipherUtils() {
+    private BufferedBlockCipherUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

@@ -1,8 +1,8 @@
 package _org.bouncycastle.crypto;
 
 import _javax.security._Random_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto.JinahyaBufferedBlockCipherAdapter;
-import io.github.jinahya.util.bouncycastle.crypto.JinahyaBufferedBlockCipherUtils;
+import io.github.jinahya.bouncycastle.crypto.BufferedBlockCipherAdapter;
+import io.github.jinahya.bouncycastle.crypto.BufferedBlockCipherUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
@@ -36,14 +36,14 @@ public final class _BufferedBlockCipher_TestUtils {
     public static void __(final BufferedBlockCipher cipher, final CipherParameters params, final ByteBuffer plain)
             throws Exception {
         // ----------------------------------------------------------------------------------------------------- encrypt
-        final var encrypted = JinahyaBufferedBlockCipherUtils.encrypt(
+        final var encrypted = BufferedBlockCipherUtils.encrypt(
                 cipher, params,
                 plain,
                 ByteBuffer::allocate
         );
         // ----------------------------------------------------------------------------------------------------- decrypt
         cipher.init(false, params);
-        final var decrypted = JinahyaBufferedBlockCipherUtils.decrypt(
+        final var decrypted = BufferedBlockCipherUtils.decrypt(
                 cipher,
                 params,
                 encrypted.flip(),
@@ -55,7 +55,7 @@ public final class _BufferedBlockCipher_TestUtils {
 
     public static void __(final BufferedBlockCipher cipher, final CipherParameters params, final byte[] plain)
             throws Exception {
-        final var adapter = new JinahyaBufferedBlockCipherAdapter(cipher, params);
+        final var adapter = new BufferedBlockCipherAdapter(cipher, params);
         // ----------------------------------------------------------------------------------------------------- encrypt
 //        final var encrypted = JinahyaBufferedBlockCipherUtils.encrypt(cipher, params, plain, 0, plain.length);
         final var encrypted = adapter.encrypt(plain);
@@ -99,7 +99,7 @@ public final class _BufferedBlockCipher_TestUtils {
     public static void __(final BufferedBlockCipher cipher, final CipherParameters params, final File dir,
                           final File plain)
             throws Exception {
-        final var adapter = new JinahyaBufferedBlockCipherAdapter(cipher, params);
+        final var adapter = new BufferedBlockCipherAdapter(cipher, params);
         // ----------------------------------------------------------------------------------------------------- encrypt
         final var encrypted = File.createTempFile("tmp", null, dir);
         try (var in = new FileInputStream(plain);
