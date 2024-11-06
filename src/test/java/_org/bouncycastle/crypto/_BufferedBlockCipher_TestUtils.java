@@ -1,8 +1,7 @@
 package _org.bouncycastle.crypto;
 
 import _javax.security._Random_TestUtils;
-import io.github.jinahya.bouncycastle.crypto.BufferedBlockCipherUtils;
-import io.github.jinahya.bouncycastle.crypto.BufferedBlockCrypto;
+import io.github.jinahya.bouncycastle.crypto.JinahyaBufferedBlockCipherCrypto;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
@@ -11,7 +10,6 @@ import org.bouncycastle.crypto.paddings.BlockCipherPadding;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.nio.ByteBuffer;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -32,30 +30,30 @@ public final class _BufferedBlockCipher_TestUtils {
         );
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
-    public static void __(final BufferedBlockCipher cipher, final CipherParameters params, final ByteBuffer plain)
-            throws Exception {
-        // ----------------------------------------------------------------------------------------------------- encrypt
-        final var encrypted = BufferedBlockCipherUtils.encrypt(
-                cipher, params,
-                plain,
-                ByteBuffer::allocate
-        );
-        // ----------------------------------------------------------------------------------------------------- decrypt
-        cipher.init(false, params);
-        final var decrypted = BufferedBlockCipherUtils.decrypt(
-                cipher,
-                params,
-                encrypted.flip(),
-                ByteBuffer::allocate
-        );
-        // -------------------------------------------------------------------------------------------------------- then
-        assertThat(decrypted.flip()).isEqualTo(plain.clear());
-    }
+//    // -----------------------------------------------------------------------------------------------------------------
+//    public static void __(final BufferedBlockCipher cipher, final CipherParameters params, final ByteBuffer plain)
+//            throws Exception {
+//        // ----------------------------------------------------------------------------------------------------- encrypt
+//        final var encrypted = BufferedBlockCipherUtils.encrypt(
+//                cipher, params,
+//                plain,
+//                ByteBuffer::allocate
+//        );
+//        // ----------------------------------------------------------------------------------------------------- decrypt
+//        cipher.init(false, params);
+//        final var decrypted = BufferedBlockCipherUtils.decrypt(
+//                cipher,
+//                params,
+//                encrypted.flip(),
+//                ByteBuffer::allocate
+//        );
+//        // -------------------------------------------------------------------------------------------------------- then
+//        assertThat(decrypted.flip()).isEqualTo(plain.clear());
+//    }
 
     public static void __(final BufferedBlockCipher cipher, final CipherParameters params, final byte[] plain)
             throws Exception {
-        final var adapter = new BufferedBlockCrypto(cipher, params);
+        final var adapter = new JinahyaBufferedBlockCipherCrypto(cipher, params);
         // ----------------------------------------------------------------------------------------------------- encrypt
 //        final var encrypted = JinahyaBufferedBlockCipherUtils.encrypt(cipher, params, plain, 0, plain.length);
         final var encrypted = adapter.encrypt(plain);
@@ -64,7 +62,7 @@ public final class _BufferedBlockCipher_TestUtils {
         final var decrypted = adapter.decrypt(encrypted);
         // -------------------------------------------------------------------------------------------------------- then
         assertThat(decrypted).isEqualTo(plain);
-        __(cipher, params, ByteBuffer.wrap(plain));
+//        __(cipher, params, ByteBuffer.wrap(plain));
     }
 
     public static void __(final BufferedBlockCipher cipher, final CipherParameters params) throws Exception {
@@ -99,7 +97,7 @@ public final class _BufferedBlockCipher_TestUtils {
     public static void __(final BufferedBlockCipher cipher, final CipherParameters params, final File dir,
                           final File plain)
             throws Exception {
-        final var adapter = new BufferedBlockCrypto(cipher, params);
+        final var adapter = new JinahyaBufferedBlockCipherCrypto(cipher, params);
         // ----------------------------------------------------------------------------------------------------- encrypt
         final var encrypted = File.createTempFile("tmp", null, dir);
         try (var in = new FileInputStream(plain);

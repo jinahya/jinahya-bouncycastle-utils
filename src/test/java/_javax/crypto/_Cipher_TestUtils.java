@@ -105,7 +105,7 @@ public final class _Cipher_TestUtils {
                         break;
                     } catch (final ShortBufferException sbe) {
                         assert inbuf.position() == p; // TODO: remove!
-                        System.err.printf("doubling up outbuf.capacity from %1$d%n", outbuf.capacity());
+                        System.err.printf("doubling up outbuf.capacity(%1$d)%n", outbuf.capacity());
                         outbuf = ByteBuffer.allocate(outbuf.capacity() << 1);
                     }
                 }
@@ -122,7 +122,7 @@ public final class _Cipher_TestUtils {
                     assert stored >= 0;
                     break;
                 } catch (final ShortBufferException sbe) {
-                    System.err.printf("doubling up outbuf.capacity from %1$d%n", outbuf.capacity());
+                    System.err.printf("doubling up outbuf.capacity(%1$d)%n", outbuf.capacity());
                     outbuf = ByteBuffer.allocate(outbuf.capacity() << 1);
                 }
             }
