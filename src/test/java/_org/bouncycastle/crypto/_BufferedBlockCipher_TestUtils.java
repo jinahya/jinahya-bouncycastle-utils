@@ -1,8 +1,8 @@
 package _org.bouncycastle.crypto;
 
 import _javax.security._Random_TestUtils;
-import io.github.jinahya.bouncycastle.crypto.BufferedBlockCipherAdapter;
 import io.github.jinahya.bouncycastle.crypto.BufferedBlockCipherUtils;
+import io.github.jinahya.bouncycastle.crypto.BufferedBlockCrypto;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
@@ -55,7 +55,7 @@ public final class _BufferedBlockCipher_TestUtils {
 
     public static void __(final BufferedBlockCipher cipher, final CipherParameters params, final byte[] plain)
             throws Exception {
-        final var adapter = new BufferedBlockCipherAdapter(cipher, params);
+        final var adapter = new BufferedBlockCrypto(cipher, params);
         // ----------------------------------------------------------------------------------------------------- encrypt
 //        final var encrypted = JinahyaBufferedBlockCipherUtils.encrypt(cipher, params, plain, 0, plain.length);
         final var encrypted = adapter.encrypt(plain);
@@ -99,7 +99,7 @@ public final class _BufferedBlockCipher_TestUtils {
     public static void __(final BufferedBlockCipher cipher, final CipherParameters params, final File dir,
                           final File plain)
             throws Exception {
-        final var adapter = new BufferedBlockCipherAdapter(cipher, params);
+        final var adapter = new BufferedBlockCrypto(cipher, params);
         // ----------------------------------------------------------------------------------------------------- encrypt
         final var encrypted = File.createTempFile("tmp", null, dir);
         try (var in = new FileInputStream(plain);

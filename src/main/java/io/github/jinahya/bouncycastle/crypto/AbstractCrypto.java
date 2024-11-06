@@ -7,10 +7,10 @@ import java.util.Objects;
 @SuppressWarnings({
         "java:S119" // <CIPHER>
 })
-public abstract class AbstractCipherAdapter<CIPHER>
-        implements CipherAdapter {
+public abstract class AbstractCrypto<CIPHER>
+        implements Crypto {
 
-    protected AbstractCipherAdapter(final CIPHER cipher, final CipherParameters params) {
+    protected AbstractCrypto(final CIPHER cipher, final CipherParameters params) {
         super();
         this.cipher = Objects.requireNonNull(cipher, "cipher is null");
         this.params = Objects.requireNonNull(params, "params is null");

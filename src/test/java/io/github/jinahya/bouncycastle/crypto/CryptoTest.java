@@ -5,9 +5,9 @@ import java.util.Objects;
 @SuppressWarnings({
         "java:S119" // <ADAPTER>
 })
-public abstract class CipherAdapterTest<ADAPTER extends CipherAdapter> {
+public abstract class CryptoTest<ADAPTER extends Crypto> {
 
-    protected CipherAdapterTest(final Class<ADAPTER> adapterClass) {
+    protected CryptoTest(final Class<ADAPTER> adapterClass) {
         super();
         this.adapterClass = Objects.requireNonNull(adapterClass, "adapterClass is null");
     }

@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.IntFunction;
 
@@ -142,25 +143,30 @@ public final class BufferedBlockCipherUtils {
         if (Objects.requireNonNull(inbuf, "inbuf is null").length == 0) {
             throw new IllegalArgumentException("inbuf.length is zero");
         }
-        if (Objects.requireNonNull(outbuf, "outbuf is null").length == 0) {
-            throw new IllegalArgumentException("outbuf.length is zero");
+        if (outbuf == null || outbuf.length == 0) {
+            outbuf = new byte[cipher.getOutputSize(inbuf.length)];
         }
+//        if (Objects.requireNonNull(outbuf, "outbuf is null").length == 0) {
+//            throw new IllegalArgumentException("outbuf.length is zero");
+//        }
         var written = 0L;
         int outlen;
-        for (int r; (r = in.read(inbuf)) != -1; ) {
-            final var updateOutputSize = cipher.getUpdateOutputSize(r);
-            if (outbuf.length < updateOutputSize) {
-                System.err.println("extending outbuf for an updateOutputSize(" + updateOutputSize + ")");
-                outbuf = new byte[updateOutputSize];
+        for (int uos, r; (r = in.read(inbuf)) != -1; ) {
+            if (outbuf.length < (uos = cipher.getUpdateOutputSize(r))) {
+                System.err.println(
+                        "re-allocating outbuf(" + outbuf.length + ") for an intermediate updateOutputSize(" + uos + ")"
+                );
+                Arrays.fill(outbuf, (byte) 0);
+                outbuf = new byte[uos];
             }
             outlen = cipher.processBytes(inbuf, 0, r, outbuf, 0);
             out.write(outbuf, 0, outlen);
             written += outlen;
         }
-        final var outputSize = cipher.getOutputSize(0);
-        if (outbuf.length < outputSize) {
-            System.err.println("extending outbuf for the final outputSize(" + outputSize + ")");
-            outbuf = new byte[outputSize];
+        for (final var os = cipher.getOutputSize(0); outbuf.length < os; ) {
+            System.err.println("re-allocating outbuf(" + outbuf.length + ") for the final outputSize(" + os + ")");
+            Arrays.fill(outbuf, (byte) 0);
+            outbuf = new byte[os];
         }
         outlen = cipher.doFinal(outbuf, 0);
         out.write(outbuf, 0, outlen);
