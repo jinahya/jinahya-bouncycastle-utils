@@ -265,6 +265,25 @@
     </pluginManagement>
     <plugins>
       <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>3.1.0</version>
+        <executions>
+          <execution>
+            <phase>generate-test-resources</phase>
+            <configuration>
+              <target>
+                <unzip src="${project.basedir}/src/test/resources/symmetric/aes/KAT_AES.zip"
+                       dest="${project.basedir}/src/test/resources/symmetric/aes/KAT_AES">
+                </unzip>
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
