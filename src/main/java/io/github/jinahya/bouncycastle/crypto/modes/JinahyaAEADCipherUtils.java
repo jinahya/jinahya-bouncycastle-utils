@@ -97,7 +97,7 @@ public final class JinahyaAEADCipherUtils {
         if (outbuf == null || outbuf.length == 0) {
             outbuf = new byte[cipher.getOutputSize(inbuf.length)];
         }
-        var written = 0L;
+        var bytes = 0L;
         for (int r; (r = in.read(inbuf)) != -1; ) {
             for (final var uos = cipher.getUpdateOutputSize(r); outbuf.length < uos; ) {
                 System.err.println("re-allocating outbuf(" + outbuf.length +
@@ -107,7 +107,7 @@ public final class JinahyaAEADCipherUtils {
             }
             final var outlen = cipher.processBytes(inbuf, 0, r, outbuf, 0); // DataLengthException
             out.write(outbuf, 0, outlen);
-            written += outlen;
+            bytes += outlen;
         }
         for (final var os = cipher.getOutputSize(0); outbuf.length < os; ) {
             System.err.println("re-allocating outbuf(" + outbuf.length + ") for the final output size: " + os);
@@ -116,9 +116,9 @@ public final class JinahyaAEADCipherUtils {
         }
         final var outlen = cipher.doFinal(outbuf, 0); // InvalidCipherTextException
         out.write(outbuf, 0, outlen);
-        written += outlen;
+        bytes += outlen;
         Arrays.fill(outbuf, (byte) 0);
-        return written;
+        return bytes;
     }
 
     // -----------------------------------------------------------------------------------------------------------------

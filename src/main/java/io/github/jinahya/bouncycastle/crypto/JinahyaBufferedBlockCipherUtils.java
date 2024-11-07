@@ -111,7 +111,7 @@ public final class JinahyaBufferedBlockCipherUtils {
         if (outbuf == null || outbuf.length == 0) {
             outbuf = new byte[cipher.getOutputSize(inbuf.length)];
         }
-        var written = 0L;
+        var bytes = 0L;
         int outlen;
         for (int r; (r = in.read(inbuf)) != -1; ) {
             for (final var uos = cipher.getUpdateOutputSize(r); outbuf.length < uos; ) {
@@ -124,7 +124,7 @@ public final class JinahyaBufferedBlockCipherUtils {
             }
             outlen = cipher.processBytes(inbuf, 0, r, outbuf, 0);
             out.write(outbuf, 0, outlen);
-            written += outlen;
+            bytes += outlen;
         }
         for (final var os = cipher.getOutputSize(0); outbuf.length < os; ) {
             System.err.println("re-allocating outbuf(" + outbuf.length + ") for the final output-size(" + os + ")");
@@ -133,8 +133,8 @@ public final class JinahyaBufferedBlockCipherUtils {
         }
         outlen = cipher.doFinal(outbuf, 0);
         out.write(outbuf, 0, outlen);
-        written += outlen;
-        return written;
+        bytes += outlen;
+        return bytes;
     }
 
     // -----------------------------------------------------------------------------------------------------------------
