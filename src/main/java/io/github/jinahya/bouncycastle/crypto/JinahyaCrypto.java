@@ -7,17 +7,6 @@ import java.nio.ByteBuffer;
 
 public interface JinahyaCrypto {
 
-//    /**
-//     * Encrypts a portion of specified input bytes, and returns an array of encrypted bytes.
-//     *
-//     * @param in    the input bytes to encrypt.
-//     * @param inoff starting position in {@code in}.
-//     * @param inlen number of bytes to encrypt.
-//     * @return an array of encrypted bytes.
-//     * @throws InvalidCipherTextException if padding is expected and not found.
-//     */
-//    byte[] encrypt(byte[] in, int inoff, int inlen) throws InvalidCipherTextException;
-
     /**
      * Encrypts specified input bytes, and returns the result.
      *
@@ -26,20 +15,16 @@ public interface JinahyaCrypto {
      */
     byte[] encrypt(final byte[] in);
 
+    /**
+     * Encrypts all remaining bytes of specified input buffer, and put encrypted bytes to specified output buffer.
+     *
+     * @param input  the input buffer whose remaining bytes are encrypted.
+     * @param output the output buffer onto which encrypted bytes are put.
+     * @return the number of bytes put on the {@code output}.
+     */
     int encrypt(final ByteBuffer input, final ByteBuffer output);
 
     // -----------------------------------------------------------------------------------------------------------------
-
-//    /**
-//     * Decrypts a portion of specified input bytes, and returns an array of decrypted bytes.
-//     *
-//     * @param in    the input bytes to decrypt.
-//     * @param inoff starting position in {@code in}.
-//     * @param inlen number of bytes to decrypt.
-//     * @return an array of decrypted bytes.
-//     * @throws InvalidCipherTextException if padding is expected and not found.
-//     */
-//    byte[] decrypt(byte[] in, int inoff, int inlen) throws InvalidCipherTextException;
 
     /**
      * Decrypts specified input bytes, and returns the result.
@@ -49,12 +34,19 @@ public interface JinahyaCrypto {
      */
     byte[] decrypt(final byte[] in);
 
+    /**
+     * Decrypts all remaining bytes of specified input buffer, and put decrypted bytes to specified output buffer.
+     *
+     * @param input  the input buffer whose remaining bytes are decrypted.
+     * @param output the output buffer onto which decrypted bytes are put.
+     * @return the number of bytes put on the {@code output}.
+     */
     int decrypt(final ByteBuffer input, final ByteBuffer output);
 
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Encrypts all bytes from specified input stream, and writes all encrypted bytes to specified output stream.
+     * Encrypts all bytes from specified input stream, and writes encrypted bytes to specified output stream.
      *
      * @param in    the input stream from which plain bytes are read.
      * @param out   the output stream to which encrypted bytes are written.
@@ -67,7 +59,7 @@ public interface JinahyaCrypto {
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Decrypts all bytes from specified input stream, and writes all decrypted bytes to specified output stream.
+     * Decrypts all bytes from specified input stream, and writes decrypted bytes to specified output stream.
      *
      * @param in    the input stream from which plain bytes are read.
      * @param out   the output stream to which decrypted bytes are written.
@@ -75,6 +67,5 @@ public interface JinahyaCrypto {
      * @return the number of bytes written to the {@code out}.
      * @throws IOException if an I/O error occurs.
      */
-    long decrypt(InputStream in, OutputStream out, byte[] inbuf)
-            throws IOException;
+    long decrypt(InputStream in, OutputStream out, byte[] inbuf) throws IOException;
 }

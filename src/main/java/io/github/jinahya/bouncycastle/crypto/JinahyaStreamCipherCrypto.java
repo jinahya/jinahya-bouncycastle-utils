@@ -16,39 +16,62 @@ public class JinahyaStreamCipherCrypto
         super(cipher, params);
     }
 
+    // ---------------------------------------------------------------------------------------------------------- cipher
     @Override
-    public byte[] encrypt(final byte[] in) {
-        Objects.requireNonNull(in, "in is null");
-        cipher.init(true, params);
-        return JinahyaStreamCipherUtils.processBytes(cipher, in, 0, in.length);
-    }
-
-    @Override
-    public int encrypt(final ByteBuffer input, final ByteBuffer output) {
-        cipher.init(true, params);
-        JinahyaStreamCipherUtils.processBytes(cipher, input, output);
-        return 0;
+    protected void initFor(final boolean encryption) {
+        cipher.init(encryption, params);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
     @Override
-    public byte[] decrypt(byte[] in) {
+    public byte[] encrypt(final byte[] in) {
         Objects.requireNonNull(in, "in is null");
-        cipher.init(false, params);
-        return JinahyaStreamCipherUtils.processBytes(cipher, in, 0, in.length);
+        initForEncryption();
+        return JinahyaStreamCipherUtils.processBytes(
+                cipher,
+                in,
+                0,
+                in.length
+        );
+    }
+
+    @Override
+    public int encrypt(final ByteBuffer input, final ByteBuffer output) {
+        initForEncryption();
+        return JinahyaStreamCipherUtils.processBytes(
+                cipher,
+                input,
+                output
+        );
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @Override
+    public byte[] decrypt(final byte[] in) {
+        Objects.requireNonNull(in, "in is null");
+        initForDecryption();
+        return JinahyaStreamCipherUtils.processBytes(
+                cipher,
+                in,
+                0,
+                in.length
+        );
     }
 
     @Override
     public int decrypt(final ByteBuffer input, final ByteBuffer output) {
-        cipher.init(false, params);
-        JinahyaStreamCipherUtils.processBytes(cipher, input, output);
-        return 0;
+        initForDecryption();
+        return JinahyaStreamCipherUtils.processBytes(
+                cipher,
+                input,
+                output
+        );
     }
 
     // -----------------------------------------------------------------------------------------------------------------
     @Override
     public long encrypt(final InputStream in, final OutputStream out, final byte[] inbuf) throws IOException {
-        cipher.init(true, params);
+        initForEncryption();
         return JinahyaStreamCipherUtils.processAllBytes(
                 cipher,
                 in,
@@ -61,7 +84,7 @@ public class JinahyaStreamCipherCrypto
     // -----------------------------------------------------------------------------------------------------------------
     @Override
     public long decrypt(final InputStream in, final OutputStream out, final byte[] inbuf) throws IOException {
-        cipher.init(false, params);
+        initForDecryption();
         return JinahyaStreamCipherUtils.processAllBytes(
                 cipher,
                 in,

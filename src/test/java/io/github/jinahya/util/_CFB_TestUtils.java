@@ -1,13 +1,18 @@
 package io.github.jinahya.util;
 
+import _javax.security._Random_TestUtils;
 import _org.bouncycastle.crypto.params._ParametersWithIV_TestUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.BlockCipher;
+import org.bouncycastle.crypto.StreamBlockCipher;
 import org.bouncycastle.crypto.modes.CFBBlockCipher;
+import org.bouncycastle.crypto.params.KeyParameter;
+import org.bouncycastle.crypto.params.ParametersWithIV;
 import org.junit.jupiter.api.Named;
 import org.junit.jupiter.params.provider.Arguments;
 
 import java.util.Objects;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
@@ -58,7 +63,10 @@ public final class _CFB_TestUtils {
                 })
                 .filter(Objects::nonNull)
                 .flatMap(c -> keySizeStreamSupplier.get().mapToObj(ks -> {
-                    final var params = _ParametersWithIV_TestUtils.newRandomInstanceOfParametersWithIV(null, ks, c);
+                    final var key = _Random_TestUtils.newRandomBytes(ks >> 3);
+                    // initialisation vector must be between one and block size length
+                    final var iv = _Random_TestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(c.getBlockSize()) + 1);
+                    final var params = new ParametersWithIV(new KeyParameter(key), iv);
                     return Arguments.of(
                             Named.of(_TestUtils.cipherName(c), c),
                             Named.of("params: " + params, params)

@@ -13,6 +13,12 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Objects;
 
+/**
+ * A crypto for {@link AEADCipher}.
+ *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ * @see JinahyaAEADCipherUtils
+ */
 public class JinahyaAEADCipherCrypto
         extends JinahyaCipherCrypto<AEADCipher> {
 
@@ -20,60 +26,71 @@ public class JinahyaAEADCipherCrypto
         super(cipher, params);
     }
 
+    // ---------------------------------------------------------------------------------------------------------- cipher
+    @Override
+    protected void initFor(final boolean encryption) {
+        cipher.init(encryption, params);
+    }
+
     // -----------------------------------------------------------------------------------------------------------------
     @Override
     public byte[] encrypt(final byte[] in) {
         Objects.requireNonNull(in, "in is null");
-        cipher.init(true, params);
+        initForEncryption();
         final var out = new byte[Math.max(cipher.getOutputSize(in.length), 1)];
         try {
-            final var outlen = JinahyaAEADCipherUtils.processBytesAndDoFinal(cipher, in, 0, in.length, out, 0);
+            final var outlen = JinahyaAEADCipherUtils.processBytesAndDoFinal(
+                    cipher,
+                    in,
+                    0,
+                    in.length,
+                    out,
+                    0
+            );
             return Arrays.copyOf(out, outlen);
         } catch (final InvalidCipherTextException icte) {
-            throw new JinahyaCryptoException("failed to encrypt", icte);
+            throw JinahyaCryptoException.ofEncryptionFailure(icte);
         }
     }
 
     @Override
     public int encrypt(final ByteBuffer input, final ByteBuffer output) {
-        cipher.init(true, params);
+        initForEncryption();
         try {
-            JinahyaAEADCipherUtils.processBytesAndDoFinal_(cipher, input, output);
+            return JinahyaAEADCipherUtils.processBytesAndDoFinal(cipher, input, output);
         } catch (final InvalidCipherTextException icte) {
-            throw new JinahyaCryptoException("failed to encrypt", icte);
+            throw JinahyaCryptoException.ofEncryptionFailure(icte);
         }
-        return 0;
     }
 
     // -----------------------------------------------------------------------------------------------------------------
     @Override
     public byte[] decrypt(byte[] in) {
         Objects.requireNonNull(in, "in is null");
-        cipher.init(false, params);
+        initForDecryption();
         final var out = new byte[Math.max(cipher.getOutputSize(in.length), 1)];
         try {
             final var outlen = JinahyaAEADCipherUtils.processBytesAndDoFinal(cipher, in, 0, in.length, out, 0);
             return Arrays.copyOf(out, outlen);
         } catch (final InvalidCipherTextException icte) {
-            throw new JinahyaCryptoException("failed to decrypt", icte);
+            throw JinahyaCryptoException.ofDecryptionFailure(icte);
         }
     }
 
     @Override
     public int decrypt(final ByteBuffer input, final ByteBuffer output) {
-        cipher.init(false, params);
+        initForDecryption();
         try {
-            JinahyaAEADCipherUtils.processBytesAndDoFinal_(cipher, input, output);
+            return JinahyaAEADCipherUtils.processBytesAndDoFinal(cipher, input, output);
         } catch (final InvalidCipherTextException icte) {
-            throw new JinahyaCryptoException("failed to decrypt", icte);
+            throw JinahyaCryptoException.ofDecryptionFailure(icte);
         }
-        return 0;
     }
 
     // -----------------------------------------------------------------------------------------------------------------
     @Override
     public long encrypt(final InputStream in, final OutputStream out, final byte[] inbuf) throws IOException {
-        cipher.init(true, params);
+        initForEncryption();
         try {
             return JinahyaAEADCipherUtils.processAllBytesAndDoFinal(
                     cipher,
@@ -83,14 +100,14 @@ public class JinahyaAEADCipherCrypto
                     null
             );
         } catch (final InvalidCipherTextException icte) {
-            throw new JinahyaCryptoException("failed to encrypt", icte);
+            throw JinahyaCryptoException.ofEncryptionFailure(icte);
         }
     }
 
     // -----------------------------------------------------------------------------------------------------------------
     @Override
     public long decrypt(final InputStream in, final OutputStream out, final byte[] inbuf) throws IOException {
-        cipher.init(false, params);
+        initForDecryption();
         try {
             return JinahyaAEADCipherUtils.processAllBytesAndDoFinal(
                     cipher,
@@ -100,7 +117,7 @@ public class JinahyaAEADCipherCrypto
                     null
             );
         } catch (final InvalidCipherTextException icte) {
-            throw new JinahyaCryptoException("failed to decrypt", icte);
+            throw JinahyaCryptoException.ofDecryptionFailure(icte);
         }
     }
 }

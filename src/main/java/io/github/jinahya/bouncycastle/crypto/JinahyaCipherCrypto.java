@@ -16,6 +16,29 @@ public abstract class JinahyaCipherCrypto<CIPHER>
         this.params = Objects.requireNonNull(params, "params is null");
     }
 
+    // ---------------------------------------------------------------------------------------------------------- cipher
+
+    /**
+     * Initialize the {@link #cipher} for specified boolean flag of encryption.
+     *
+     * @param encryption {@code true} for encryption; {@code false} for decryption.
+     */
+    protected abstract void initFor(final boolean encryption);
+
+    /**
+     * Initialize the {@link #cipher} for encryption.
+     */
+    protected void initForEncryption() {
+        initFor(true);
+    }
+
+    /**
+     * Initialize the {@link #cipher} for decryption.
+     */
+    protected void initForDecryption() {
+        initFor(false);
+    }
+
     // -----------------------------------------------------------------------------------------------------------------
     protected final CIPHER cipher;
 
