@@ -1,4 +1,4 @@
-package io.github.jinahya.util.bouncycastle.crypto;
+package io.github.jinahya.bouncycastle.crypto;
 
 import _org.bouncycastle.crypto.params._KeyParameters_TestUtils;
 import _org.bouncycastle.crypto.params._ParametersWithIV_TestUtils;

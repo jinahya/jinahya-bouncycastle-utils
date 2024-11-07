@@ -1,11 +1,12 @@
 package io.github.jinahya.util;
 
+import _javax.security._Random_TestUtils;
 import _org.junit.jupiter.params.provider._Arguments_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto.params.JinahyaKeyParametersUtils;
-import io.github.jinahya.util.bouncycastle.crypto.params.JinahyaParametersWithIvUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.BlockCipher;
 import org.bouncycastle.crypto.modes.OFBBlockCipher;
+import org.bouncycastle.crypto.params.KeyParameter;
+import org.bouncycastle.crypto.params.ParametersWithIV;
 import org.junit.jupiter.api.Named;
 import org.junit.jupiter.params.provider.Arguments;
 
@@ -68,10 +69,11 @@ public final class _OFB_TestUtils {
                 })
                 .filter(Objects::nonNull)
                 .flatMap(c -> keyStreamSupplier.get().mapToObj(ks -> {
-                    final var params = JinahyaParametersWithIvUtils.newRandomInstanceFor(
-                            JinahyaKeyParametersUtils.newRandomInstance(null, ks >> 3),
-                            null,
-                            c.getUnderlyingCipher()
+                    final var key = _Random_TestUtils.newRandomBytes(ks >> 3);
+                    final var iv = _Random_TestUtils.newRandomBytes(c.getBlockSize());
+                    final var params = new ParametersWithIV(
+                            new KeyParameter(key),
+                            iv
                     );
                     return _Arguments_TestUtils.argumentsOf(c, params);
                 }));

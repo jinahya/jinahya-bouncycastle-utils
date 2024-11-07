@@ -1,10 +1,11 @@
 package io.github.jinahya.util;
 
-import io.github.jinahya.util.bouncycastle.crypto.params.JinahyaKeyParametersUtils;
-import io.github.jinahya.util.bouncycastle.crypto.params.JinahyaParametersWithIvUtils;
+import _javax.security._Random_TestUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.BlockCipher;
 import org.bouncycastle.crypto.modes.SICBlockCipher;
+import org.bouncycastle.crypto.params.KeyParameter;
+import org.bouncycastle.crypto.params.ParametersWithIV;
 import org.junit.jupiter.params.provider.Arguments;
 
 import java.util.function.Supplier;
@@ -22,10 +23,11 @@ public final class _CTR_TestUtils {
         return keyStreamSupplier.get().mapToObj(ks -> {
             final var engine = cipherSupplier.get();
             final var cipher = SICBlockCipher.newInstance(engine);
-            final var params = JinahyaParametersWithIvUtils.newRandomInstanceFor(
-                    JinahyaKeyParametersUtils.newRandomInstance(null, ks >> 3),
-                    null,
-                    cipher.getUnderlyingCipher()
+            final var key = _Random_TestUtils.newRandomBytes(ks >> 3);
+            final var iv = _Random_TestUtils.newRandomBytes(cipher.getBlockSize());
+            final var params = new ParametersWithIV(
+                    new KeyParameter(key),
+                    iv
             );
             return Arguments.of(
                     cipher,

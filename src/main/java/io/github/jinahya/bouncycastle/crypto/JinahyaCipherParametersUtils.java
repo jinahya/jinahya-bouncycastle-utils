@@ -1,5 +1,8 @@
-package io.github.jinahya.util.bouncycastle.crypto;
+package io.github.jinahya.bouncycastle.crypto;
 
+import io.github.jinahya.bouncycastle.crypto.params.JinahyaAEADParametersUtils;
+import io.github.jinahya.bouncycastle.crypto.params.JinahyaKeyParametersUtils;
+import io.github.jinahya.bouncycastle.crypto.params.JinahyaParametersWithIvUtils;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.params.AEADParameters;
 import org.bouncycastle.crypto.params.KeyParameter;
@@ -13,14 +16,13 @@ public class JinahyaCipherParametersUtils {
     public static byte[] getKey(final CipherParameters params) {
         Objects.requireNonNull(params, "params is null");
         if (params instanceof ParametersWithIV) {
-            final var parameters = ((ParametersWithIV) params).getParameters();
-            return getKey(parameters);
+            return JinahyaParametersWithIvUtils.getKey(params);
         }
         if (params instanceof KeyParameter) {
-            return ((KeyParameter) params).getKey();
+            return JinahyaKeyParametersUtils.getKey(params);
         }
         if (params instanceof AEADParameters) {
-            return getKey(((AEADParameters) params).getKey());
+            return JinahyaAEADParametersUtils.getKey(params);
         }
         throw new IllegalArgumentException("failed to get key from " + params);
     }
@@ -28,7 +30,7 @@ public class JinahyaCipherParametersUtils {
     public static byte[] getIv(final CipherParameters params) {
         Objects.requireNonNull(params, "params is null");
         if (params instanceof ParametersWithIV) {
-            return ((ParametersWithIV) params).getIV();
+            return JinahyaParametersWithIvUtils.getIv(params);
         }
         throw new IllegalArgumentException("failed to get iv from " + params);
     }

@@ -5,8 +5,6 @@ import _javax.security._Random_TestUtils;
 import _org.bouncycastle.crypto.modes._AEADCipher_TestUtils;
 import io.github.jinahya.util._GCM_TestUtils;
 import io.github.jinahya.util._JCEProviderTest;
-import io.github.jinahya.util.bouncycastle.crypto.params.JinahyaKeyParametersUtils;
-import io.github.jinahya.util.bouncycastle.crypto.params.JinahyaParametersWithIvUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,7 +55,7 @@ class AES_GCM_Test
         @MethodSource({"getKeySizeArgumentsStream"})
         @ParameterizedTest
         void __(final int keySize) throws Exception {
-            final var key = JinahyaKeyParametersUtils.newRandomKey(null, keySize >> 3);
+            final var key = _Random_TestUtils.newRandomBytes(keySize >> 3);
             // https://github.com/bcgit/bc-java/blob/99efbb53a33fbc4a159ac7ece4ec445198dd040b/core/src/main/java/org/bouncycastle/crypto/modes/GCMBlockCipher.java#L144
             final var macSize = ThreadLocalRandom.current().nextInt(32, 129) >> 3 << 3;
             // https://github.com/bcgit/bc-java/blob/99efbb53a33fbc4a159ac7ece4ec445198dd040b/core/src/main/java/org/bouncycastle/crypto/modes/GCMBlockCipher.java#L169
@@ -100,7 +98,7 @@ class AES_GCM_Test
         @ParameterizedTest
         void __(final int keySize, @TempDir final File dir) throws Exception {
             // ------------------------------------------------------------------------------------------------------- given
-            final var key = JinahyaKeyParametersUtils.newRandomKey(null, keySize >> 3);
+            final var key = _Random_TestUtils.newRandomBytes(keySize >> 3);
             // https://github.com/bcgit/bc-java/blob/99efbb53a33fbc4a159ac7ece4ec445198dd040b/core/src/main/java/org/bouncycastle/crypto/modes/GCMBlockCipher.java#L144
             final var macSize = ThreadLocalRandom.current().nextInt(32, 129) >> 3 << 3;
             // https://github.com/bcgit/bc-java/blob/99efbb53a33fbc4a159ac7ece4ec445198dd040b/core/src/main/java/org/bouncycastle/crypto/modes/GCMBlockCipher.java#L169
@@ -173,10 +171,10 @@ class AES_GCM_Test
         void __(final String transformation, final int keySize, final int tLen) throws Throwable {
             final var cipher = Cipher.getInstance(transformation);
             final var key = new SecretKeySpec(
-                    JinahyaKeyParametersUtils.newRandomKey(null, keySize >> 3), ALGORITHM
+                    _Random_TestUtils.newRandomBytes(keySize >> 3), ALGORITHM
             );
             _Random_TestUtils.getRandomBytesStream().forEach(p -> {
-                final var iv = JinahyaParametersWithIvUtils.newRandomIv(null, BLOCK_BYTES);
+                final var iv = _Random_TestUtils.newRandomBytes(BLOCK_BYTES);
                 final var params = new GCMParameterSpec(tLen, iv);
                 final var aad = ThreadLocalRandom.current().nextBoolean()
                         ? null
@@ -196,10 +194,10 @@ class AES_GCM_Test
                 throws Exception {
             final var cipher = Cipher.getInstance(transformation);
             final var key = new SecretKeySpec(
-                    JinahyaKeyParametersUtils.newRandomKey(null, keySize >> 3), ALGORITHM
+                    _Random_TestUtils.newRandomBytes(keySize >> 3), ALGORITHM
             );
             _Random_TestUtils.getRandomFileStream(dir).forEach(p -> {
-                final var iv = JinahyaParametersWithIvUtils.newRandomIv(null, BLOCK_BYTES);
+                final var iv = _Random_TestUtils.newRandomBytes(BLOCK_BYTES);
                 final var params = new GCMParameterSpec(tLen, iv);
                 final var aad = ThreadLocalRandom.current().nextBoolean()
                         ? null

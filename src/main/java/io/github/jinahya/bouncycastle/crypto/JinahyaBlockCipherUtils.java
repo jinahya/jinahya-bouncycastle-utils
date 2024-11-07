@@ -1,4 +1,4 @@
-package io.github.jinahya.util.bouncycastle.crypto;
+package io.github.jinahya.bouncycastle.crypto;
 
 import org.bouncycastle.crypto.BlockCipher;
 

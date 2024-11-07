@@ -1,4 +1,4 @@
-package io.github.jinahya.util.bouncycastle.crypto.paddings;
+package io.github.jinahya.bouncycastle.crypto.paddings;
 
 import org.bouncycastle.crypto.BlockCipher;
 import org.bouncycastle.crypto.BufferedBlockCipher;

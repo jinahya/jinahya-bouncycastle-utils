@@ -1,7 +1,7 @@
 package _org.bouncycastle.crypto.params;
 
 import _javax.security._Random_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto.params.JinahyaKeyParametersUtils;
+import io.github.jinahya.bouncycastle.crypto.params.JinahyaKeyParametersUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.params.KeyParameter;
 

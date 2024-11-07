@@ -24,6 +24,16 @@ public final class JinahyaStreamCipherUtils {
     public static byte[] processBytes(final StreamCipher cipher, final byte[] in, final int inoff, final int inlen) {
         Objects.requireNonNull(cipher, "cipher is null");
         Objects.requireNonNull(in, "in is null");
+        if (inoff < 0) {
+            throw new IllegalArgumentException("inoff(" + inoff + ") is negative");
+        }
+        if (inlen < 0) {
+            throw new IllegalArgumentException("inlen(" + inlen + ") is negative");
+        }
+        if (inoff + inlen > in.length) {
+            throw new IllegalArgumentException(
+                    "inoff(" + inoff + ") + inlen(" + inlen + ") > in.length(" + in.length + ")");
+        }
         for (var output = new byte[in.length == 0 ? 1 : in.length]; ; ) {
             try {
                 final var processed = cipher.processBytes(in, inoff, inlen, output, 0);
@@ -36,6 +46,7 @@ public final class JinahyaStreamCipherUtils {
     }
 
     public static int processBytes(final StreamCipher cipher, final ByteBuffer input, final ByteBuffer output) {
+        Objects.requireNonNull(cipher, "cipher is null");
         Objects.requireNonNull(input, "input is null");
         Objects.requireNonNull(output, "output is null");
         final byte[] in;

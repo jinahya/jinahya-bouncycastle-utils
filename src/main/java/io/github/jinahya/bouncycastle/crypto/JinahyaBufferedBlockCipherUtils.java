@@ -18,17 +18,39 @@ import java.util.Objects;
 public final class JinahyaBufferedBlockCipherUtils {
 
     // -----------------------------------------------------------------------------------------------------------------
-    public static int processBytesAndDoFinal(final BufferedBlockCipher cipher, final byte[] input, final int inoff,
-                                             final int inlen, final byte[] output, final int outoff)
+    public static int processBytesAndDoFinal(final BufferedBlockCipher cipher, final byte[] in, final int inoff,
+                                             final int inlen, final byte[] out, final int outoff)
             throws InvalidCipherTextException {
-        final var processed = cipher.processBytes(input, inoff, inlen, output, outoff);
-        final var finalized = cipher.doFinal(output, processed);
+        Objects.requireNonNull(cipher, "cipher is null");
+        Objects.requireNonNull(in, "in is null");
+        if (inoff < 0) {
+            throw new IllegalArgumentException("inoff(" + inoff + ") is negative");
+        }
+        if (inlen < 0) {
+            throw new IllegalArgumentException("inlen(" + inlen + ") is negative");
+        }
+        if (inoff + inlen > in.length) {
+            throw new IllegalArgumentException(
+                    "inoff(" + inoff + ") + inlen(" + inlen + ") > in.length(" + in.length + ")");
+        }
+        Objects.requireNonNull(out, "out is null");
+        if (outoff < 0) {
+            throw new IllegalArgumentException("outoff(" + outoff + ") is negative");
+        }
+        if (outoff > out.length) {
+            throw new IllegalArgumentException("outoff(" + outoff + ") > out.length(" + out.length + ")");
+        }
+        final var processed = cipher.processBytes(in, inoff, inlen, out, outoff);
+        final var finalized = cipher.doFinal(out, processed);
         return processed + finalized;
     }
 
     public static int processBytesAndDoFinal(final BufferedBlockCipher cipher, final ByteBuffer input,
                                              final ByteBuffer output)
             throws InvalidCipherTextException {
+        Objects.requireNonNull(cipher, "cipher is null");
+        Objects.requireNonNull(input, "input is null");
+        Objects.requireNonNull(output, "output is null");
         final byte[] in;
         final int inoff;
         final int inlen = input.remaining();

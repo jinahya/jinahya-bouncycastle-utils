@@ -23,6 +23,24 @@ public final class JinahyaAEADCipherUtils {
                                              final byte[] out, final int outoff)
             throws InvalidCipherTextException {
         Objects.requireNonNull(cipher, "cipher is null");
+        Objects.requireNonNull(in, "in is null");
+        if (inoff < 0) {
+            throw new IllegalArgumentException("inoff(" + inoff + ") is negative");
+        }
+        if (inlen < 0) {
+            throw new IllegalArgumentException("inlen(" + inlen + ") is negative");
+        }
+        if (inoff + inlen > in.length) {
+            throw new IllegalArgumentException(
+                    "inoff(" + inoff + ") + inlen(" + inlen + ") > in.length(" + in.length + ")");
+        }
+        Objects.requireNonNull(out, "out is null");
+        if (outoff < 0) {
+            throw new IllegalArgumentException("outoff(" + outoff + ") is negative");
+        }
+        if (outoff > out.length) {
+            throw new IllegalArgumentException("outoff(" + outoff + ") > out.length(" + out.length + ")");
+        }
         final var processed = cipher.processBytes(in, inoff, inlen, out, outoff); // DataLengthException
         final var finalized = cipher.doFinal(out, outoff + processed); // InvalidCipherTextException
         return processed + finalized;
@@ -30,6 +48,9 @@ public final class JinahyaAEADCipherUtils {
 
     public static int processBytesAndDoFinal(final AEADCipher cipher, final ByteBuffer input, final ByteBuffer output)
             throws InvalidCipherTextException {
+        Objects.requireNonNull(cipher, "cipher is null");
+        Objects.requireNonNull(input, "input is null");
+        Objects.requireNonNull(output, "output is null");
         final byte[] in;
         final int inoff;
         final int inlen = input.remaining();
@@ -76,12 +97,11 @@ public final class JinahyaAEADCipherUtils {
         if (outbuf == null || outbuf.length == 0) {
             outbuf = new byte[cipher.getOutputSize(inbuf.length)];
         }
-//        var read = 0L;
         var written = 0L;
         for (int r; (r = in.read(inbuf)) != -1; ) {
             for (final var uos = cipher.getUpdateOutputSize(r); outbuf.length < uos; ) {
                 System.err.println("re-allocating outbuf(" + outbuf.length +
-                                           ") for an intermediate update-output-size(" + uos + ")");
+                                           ") for an intermediate update output size: " + uos);
                 Arrays.fill(outbuf, (byte) 0);
                 outbuf = new byte[uos];
             }
@@ -89,16 +109,14 @@ public final class JinahyaAEADCipherUtils {
             out.write(outbuf, 0, outlen);
             written += outlen;
         }
-//        for (final var os = cipher.getOutputSize(Math.toIntExact(read)); outbuf.length < os; ) {
         for (final var os = cipher.getOutputSize(0); outbuf.length < os; ) {
-            System.err.println("re-allocating outbuf(" + outbuf.length + ") for the final output-size(" + os + ")");
+            System.err.println("re-allocating outbuf(" + outbuf.length + ") for the final output size: " + os);
             Arrays.fill(outbuf, (byte) 0);
             outbuf = new byte[os];
         }
         final var outlen = cipher.doFinal(outbuf, 0); // InvalidCipherTextException
         out.write(outbuf, 0, outlen);
         written += outlen;
-        Arrays.fill(inbuf, (byte) 0);
         Arrays.fill(outbuf, (byte) 0);
         return written;
     }

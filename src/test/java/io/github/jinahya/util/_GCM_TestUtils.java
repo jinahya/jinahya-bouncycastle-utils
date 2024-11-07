@@ -3,7 +3,6 @@ package io.github.jinahya.util;
 import _javax.security._Random_TestUtils;
 import _org.bouncycastle.crypto.modes._AEADBlockCipher_TestUtils;
 import _org.bouncycastle.crypto.params._AEADParameters_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto.params.JinahyaKeyParametersUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.BlockCipher;
 import org.bouncycastle.crypto.modes.GCMBlockCipher;
@@ -28,7 +27,7 @@ public final class _GCM_TestUtils {
         Objects.requireNonNull(cipherSupplier, "cipherSupplier is null");
         return keySizeStreamSupplier.get().mapToObj(ks -> {
             final var cipher = GCMBlockCipher.newInstance(cipherSupplier.get());
-            final var key = JinahyaKeyParametersUtils.newRandomKey(null, ks >> 3);
+            final var key = _Random_TestUtils.newRandomBytes(ks >> 3);
             final var macSize = ThreadLocalRandom.current().nextInt(12, 17) << 3; // [96...128]
             final var nonce = _Random_TestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(1024) + 1);
             final var associatedText = ThreadLocalRandom.current().nextBoolean()
