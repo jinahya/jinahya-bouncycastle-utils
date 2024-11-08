@@ -11,6 +11,12 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Objects;
 
+/**
+ * A crypto for a {@link BufferedBlockCipher}.
+ *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ * @see JinahyaBufferedBlockCipherUtils
+ */
 public class JinahyaBufferedBlockCipherCrypto
         extends JinahyaCipherCrypto<BufferedBlockCipher> {
 
