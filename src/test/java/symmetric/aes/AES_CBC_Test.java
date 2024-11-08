@@ -4,11 +4,10 @@ import _javax.crypto._Cipher_TestUtils;
 import _javax.security._Random_TestUtils;
 import _org.bouncycastle.crypto._BufferedBlockCipher_TestUtils;
 import _org.bouncycastle.crypto.paddings._BlockCipherPadding_TestUtils;
-import symmetric._CBC_TestUtils;
-import symmetric._JCEProviderTest;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.assertj.core.error.ShouldSatisfyOnlyOnce;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.engines.AESEngine;
@@ -26,16 +25,24 @@ import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import symmetric._CBC_TestUtils;
+import symmetric._JCEProviderTest;
 
 import javax.crypto.Cipher;
+import javax.crypto.ShortBufferException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
@@ -173,10 +180,137 @@ class AES_CBC_Test
                     .flatMap(t -> getKeySizeStream().mapToObj(ks -> Arguments.of(t, ks)));
         }
 
+        @DisplayName("encrypt/decrypt")
+        @MethodSource({"getTransformationAndKeySizeArgumentsStream"})
+        @ParameterizedTest(name = "[{index}] {0} with {1}-bit key")
+        void __(final String transformation, final int keySize, @TempDir final Path dir) throws Exception {
+            final var cipher = Cipher.getInstance(transformation, BouncyCastleProvider.PROVIDER_NAME);
+            final var key = new SecretKeySpec(_Random_TestUtils.newRandomBytes(keySize >> 3), ALGORITHM);
+            final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
+            // --------------------------------------------------------------------------------------------------- bytes
+            {
+                final var plain = _Random_TestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(8192));
+                // --------------------------------------------------------------------------------------------- encrypt
+                cipher.init(Cipher.ENCRYPT_MODE, key, params);
+                final var encrypted = cipher.doFinal(plain);
+                // --------------------------------------------------------------------------------------------- decrypt
+                cipher.init(Cipher.DECRYPT_MODE, key, params);
+                final var decrypted = cipher.doFinal(encrypted);
+                // ---------------------------------------------------------------------------------------------- verify
+                assertThat(decrypted).isEqualTo(plain);
+            }
+            // -------------------------------------------------------------------------------------------------- stream
+            {
+                final var plain = File.createTempFile("tmp", null, dir.toFile());
+                // --------------------------------------------------------------------------------------------- encrypt
+                final var encrypted = File.createTempFile("tmp", null, dir.toFile());
+                cipher.init(Cipher.ENCRYPT_MODE, key, params);
+                try (var in = new FileInputStream(plain);
+                     var out = new javax.crypto.CipherOutputStream(new FileOutputStream(encrypted), cipher)) {
+                    final var buf = new byte[ThreadLocalRandom.current().nextInt(8192) + 1];
+                    for (int r; (r = in.read(buf)) != -1; ) {
+                        out.write(buf, 0, r);
+                    }
+                    out.flush();
+                }
+                // ---------------------------------------------------------------------------------------------- decrypt
+                final var decrypted = File.createTempFile("tmp", null, dir.toFile());
+                cipher.init(Cipher.DECRYPT_MODE, key, params);
+                try (var in = new FileInputStream(encrypted);
+                     var out = new javax.crypto.CipherOutputStream(new FileOutputStream(decrypted), cipher)) {
+                    final var buf = new byte[ThreadLocalRandom.current().nextInt(8192) + 1];
+                    for (int r; (r = in.read(buf)) != -1; ) {
+                        out.write(buf, 0, r);
+                    }
+                    out.flush();
+                }
+                // ---------------------------------------------------------------------------------------------- verify
+                assertThat(decrypted)
+                        .hasSize(plain.length())
+                        .hasSameBinaryContentAs(plain);
+            }
+            // ------------------------------------------------------------------------------------------------- channel
+//            {
+//                final var plain = Files.createFile(dir, null, null);
+//                // --------------------------------------------------------------------------------------------- encrypt
+//                final var encrypted = Files.createFile(dir, null, null);
+//                cipher.init(Cipher.ENCRYPT_MODE, key, params);
+//                try (var in = FileChannel.open(plain, StandardOpenOption.READ);
+//                     var out = FileChannel.open(encrypted, StandardOpenOption.WRITE)) {
+//                    final var inbuf = ByteBuffer.allocate(ThreadLocalRandom.current().nextInt(8192) + 1);
+//                    var outbuf = ByteBuffer.allocate(ThreadLocalRandom.current().nextInt(8192) + 1);
+//                    while (in.read(inbuf) != -1) {
+//                        for (inbuf.flip(); ; ) {
+//                            try {
+//                                cipher.update(inbuf, outbuf);
+//                                break;
+//                            } catch (final ShortBufferException sbe) {
+//                                outbuf = ByteBuffer.allocate(outbuf.capacity() << 1);
+//                            }
+//                        }
+//                        inbuf.clear();
+//                        for (outbuf.flip(); outbuf.hasRemaining(); ) {
+//                            out.write(outbuf);
+//                        }
+//                        outbuf.clear();
+//                    }
+//                    for (inbuf.flip(); ; ) {
+//                        try {
+//                            cipher.doFinal(inbuf, outbuf);
+//                            break;
+//                        } catch (final ShortBufferException sbe) {
+//                            outbuf = ByteBuffer.allocate(outbuf.capacity() << 1);
+//                        }
+//                    }
+//                    for (outbuf.flip(); outbuf.hasRemaining(); ) {
+//                        out.write(outbuf);
+//                    }
+//                }
+//                final byte[] encrypted = baos.toByteArray();
+//                // --------------------------------------------------------------------------------------------- decrypt
+//                baos.reset();
+//                cipher.init(Cipher.DECRYPT_MODE, key, params);
+//                try (var in = Channels.newChannel(new ByteArrayInputStream(encrypted));
+//                     var out = Channels.newChannel(new javax.crypto.CipherOutputStream(baos, cipher))) {
+//                    final var inbuf = ByteBuffer.allocate(ThreadLocalRandom.current().nextInt(8192) + 1);
+//                    var outbuf = ByteBuffer.allocate(ThreadLocalRandom.current().nextInt(8192) + 1);
+//                    while (in.read(inbuf) != -1) {
+//                        for (inbuf.flip(); ; ) {
+//                            try {
+//                                cipher.update(inbuf, outbuf);
+//                                break;
+//                            } catch (final ShortBufferException sbe) {
+//                                outbuf = ByteBuffer.allocate(outbuf.capacity() << 1);
+//                            }
+//                        }
+//                        inbuf.clear();
+//                        for (outbuf.flip(); outbuf.hasRemaining(); ) {
+//                            out.write(outbuf);
+//                        }
+//                        outbuf.clear();
+//                    }
+//                    for (inbuf.flip(); ; ) {
+//                        try {
+//                            cipher.doFinal(inbuf, outbuf);
+//                            break;
+//                        } catch (final ShortBufferException sbe) {
+//                            outbuf = ByteBuffer.allocate(outbuf.capacity() << 1);
+//                        }
+//                    }
+//                    for (outbuf.flip(); outbuf.hasRemaining(); ) {
+//                        out.write(outbuf);
+//                    }
+//                }
+//                final var decrypted = baos.toByteArray();
+//                // ---------------------------------------------------------------------------------------------- verify
+//                assertThat(decrypted).isEqualTo(plain);
+//            }
+        }
+
         @DisplayName("encrypt/decrypt bytes")
         @MethodSource({"getTransformationAndKeySizeArgumentsStream"})
         @ParameterizedTest(name = "[{index}] {0} with {1}-bit key")
-        void __(final String transformation, final int keySize) throws Exception {
+        void __bytes(final String transformation, final int keySize) throws Exception {
             final var cipher = Cipher.getInstance(transformation, BouncyCastleProvider.PROVIDER_NAME);
             final var key = new SecretKeySpec(_Random_TestUtils.newRandomBytes(keySize >> 3), ALGORITHM);
             final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
@@ -186,7 +320,7 @@ class AES_CBC_Test
         @DisplayName("encrypt/decrypt file")
         @MethodSource({"getTransformationAndKeySizeArgumentsStream"})
         @ParameterizedTest(name = "[{index}] {0} with {1}-bit key")
-        void __(final String transformation, final int keySize, @TempDir final Path dir) throws Exception {
+        void __file(final String transformation, final int keySize, @TempDir final Path dir) throws Exception {
             final var cipher = Cipher.getInstance(transformation, BouncyCastleProvider.PROVIDER_NAME);
             final var key = new SecretKeySpec(_Random_TestUtils.newRandomBytes(keySize >> 3), ALGORITHM);
             final var params = new IvParameterSpec(_Random_TestUtils.newRandomBytes(BLOCK_BYTES));
