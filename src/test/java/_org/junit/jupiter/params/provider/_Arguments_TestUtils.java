@@ -1,7 +1,7 @@
 package _org.junit.jupiter.params.provider;
 
 import _org.junit.jupiter.api._Named_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto.JinahyaCipherParametersUtils;
+import io.github.jinahya.bouncycastle.crypto.JinahyaCipherParametersUtils;
 import org.bouncycastle.crypto.BlockCipher;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.CipherParameters;

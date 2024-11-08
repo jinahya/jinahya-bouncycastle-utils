@@ -27,3 +27,6 @@ buildNumber.properties
 
 .idea
 !.idea/codeStyles
+
+
+src/test/resources/symmetric/aes/KAT_AES

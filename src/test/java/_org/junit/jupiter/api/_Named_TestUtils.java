@@ -1,7 +1,7 @@
 package _org.junit.jupiter.api;
 
 import _org.bouncycastle.crypto._CipherParameters_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto.JinahyaCipherParametersUtils;
+import io.github.jinahya.bouncycastle.crypto.JinahyaCipherParametersUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.BlockCipher;
 import org.bouncycastle.crypto.BufferedBlockCipher;

@@ -9,12 +9,12 @@
     <version>0.9.6</version>
   </parent>
 
-  <artifactId>jinahya-bouncycastle-utils</artifactId>
-  <version>0.2.0.20240931-SNAPSHOT</version>
+  <artifactId>jinahya-bcprov</artifactId>
+  <version>0.1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>${project.artifactId}</name>
-  <description>Jinahya's Bouncy Castle Utils</description>
+  <description>A library for Bouncy Castle</description>
   <url>https://github.com/jinahya/$project.artifactId}</url>
   <inceptionYear>2024</inceptionYear>
   <organization>
@@ -32,9 +32,9 @@
 
   <developers>
     <developer>
-      <id>jinahya</id>
+      <id>onacit</id>
       <name>Jin Kwon</name>
-      <email>jinahya@gmail.com</email>
+      <email>onacit@gmail.com</email>
     </developer>
     <developer>
       <id>jinahya</id>
@@ -62,7 +62,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.compiler.source>11</maven.compiler.source>
-    <!--    <maven.compiler.source>17</maven.compiler.source>-->
+    <!--        <maven.compiler.source>17</maven.compiler.source>-->
     <maven.compiler.target>${maven.compiler.source}</maven.compiler.target>
     <maven.compiler.release>${maven.compiler.target}</maven.compiler.release>
     <maven.compiler.testSource>21</maven.compiler.testSource>
@@ -70,10 +70,10 @@
     <maven.compiler.testRelease>${maven.compiler.testTarget}</maven.compiler.testRelease>
     <version.lombok>1.18.34</version.lombok>
     <version.maven-failsafe>${version.maven-surefire}</version.maven-failsafe>
-    <version.maven-surefire>3.5.1</version.maven-surefire>
+    <version.maven-surefire>3.5.2</version.maven-surefire>
     <version.org.bouncycastle>1.78.1</version.org.bouncycastle>
     <!-- https://search.maven.org/artifact/org.junit/junit-bom -->
-    <version.org.junit>5.11.2</version.org.junit>
+    <version.org.junit>5.11.3</version.org.junit>
     <version.org.mockito>5.14.2</version.org.mockito>
   </properties>
 
@@ -97,25 +97,13 @@
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.5.11</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>commons-codec</groupId>
-      <artifactId>commons-codec</artifactId>
-      <version>1.17.1</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.itextpdf</groupId>
-      <artifactId>itextpdf</artifactId>
-      <version>5.5.13.4</version>
+      <version>1.5.12</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>io.vavr</groupId>
       <artifactId>vavr</artifactId>
-      <version>0.10.4</version>
+      <version>0.10.5</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -127,7 +115,7 @@
     <dependency>
       <groupId>nl.jqno.equalsverifier</groupId>
       <artifactId>equalsverifier-nodep</artifactId>
-      <version>3.17.1</version>
+      <version>3.17.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -166,7 +154,7 @@
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
       <version>${version.lombok}</version>
-      <scope>provided</scope>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -196,7 +184,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
-          <version>3.10.1</version>
+          <version>3.11.1</version>
           <configuration>
             <additionalOptions>
               <additionalOption>-Xdoclint:none</additionalOption>
@@ -205,6 +193,8 @@
             <links>
               <link>https://downloads.bouncycastle.org/java/docs/bcprov-jdk18on-javadoc/</link>
             </links>
+            <release>${maven.compiler.release}</release>
+            <!--            <source>${maven.compiler.target}</source>-->
             <tags>
               <tag>
                 <name>apiNote</name>
@@ -227,7 +217,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-project-info-reports-plugin</artifactId>
-          <version>3.7.0</version>
+          <version>3.8.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -249,7 +239,7 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>exec-maven-plugin</artifactId>
-          <version>3.4.1</version>
+          <version>3.5.0</version>
         </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
@@ -274,6 +264,25 @@
       </plugins>
     </pluginManagement>
     <plugins>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>3.1.0</version>
+        <executions>
+          <execution>
+            <phase>generate-test-resources</phase>
+            <configuration>
+              <target>
+                <unzip src="${project.basedir}/src/test/resources/symmetric/aes/KAT_AES.zip"
+                       dest="${project.basedir}/src/test/resources/symmetric/aes/KAT_AES">
+                </unzip>
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -421,11 +430,15 @@
       <plugin>
         <groupId>com.github.spotbugs</groupId>
         <artifactId>spotbugs-maven-plugin</artifactId>
-        <version>4.8.6.4</version>
+        <version>4.8.6.5</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <release>${maven.compiler.release}</release>
+          <source>${maven.compiler.release}</source>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -435,12 +448,12 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>3.5.0</version>
+        <version>3.6.0</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-pmd-plugin</artifactId>
-        <version>3.25.0</version>
+        <version>3.26.0</version>
         <configuration>
           <!-- Unsupported targetJdk value '21'. -->
           <!--          <skip>true</skip>-->
@@ -469,7 +482,7 @@
       </activation>
       <properties>
         <!-- https://central.sonatype.com/artifact/org.bouncycastle/bcprov-jdk18on -->
-        <version.org.bouncycastle>1.78.1</version.org.bouncycastle>
+        <version.org.bouncycastle>1.79</version.org.bouncycastle>
       </properties>
       <dependencies>
         <dependency>
@@ -488,6 +501,7 @@
       <!-- https://www.bouncycastle.org/download/bouncy-castle-java-lts/ -->
       <id>java-lts</id>
       <properties>
+        <!-- https://repo1.maven.org/maven2/org/bouncycastle/ -->
         <!-- https://central.sonatype.com/artifact/org.bouncycastle/bcprov-lts8on -->
         <version.org.bouncycastle>2.73.6</version.org.bouncycastle>
       </properties>
@@ -495,7 +509,7 @@
         <dependency>
           <groupId>org.bouncycastle</groupId>
           <artifactId>bcprov-lts8on</artifactId>
-          <version>2.73.6</version>
+          <version>${version.org.bouncycastle}</version>
           <scope>provided</scope>
         </dependency>
       </dependencies>

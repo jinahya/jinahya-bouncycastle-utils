@@ -1,7 +1,7 @@
 package _org.bouncycastle.crypto.params;
 
 import _org.bouncycastle.crypto._CipherParameters_TestUtils;
-import io.github.jinahya.util.bouncycastle.crypto.JinahyaBlockCipherUtils;
+import io.github.jinahya.bouncycastle.crypto.JinahyaBlockCipherUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.crypto.BlockCipher;
 import org.bouncycastle.crypto.BufferedBlockCipher;
