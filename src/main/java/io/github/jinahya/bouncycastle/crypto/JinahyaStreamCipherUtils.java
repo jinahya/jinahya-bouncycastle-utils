@@ -21,6 +21,35 @@ import java.util.Objects;
 public final class JinahyaStreamCipherUtils {
 
     // -----------------------------------------------------------------------------------------------------------------
+//    private static int processBytes_(final StreamCipher cipher, final byte[] in, final int inoff, final int inlen,
+//                                     final byte[] out, final int outoff) {
+//        return cipher.processBytes(in, inoff, inlen, out, outoff);
+//    }
+//
+//    public static int processBytes(final StreamCipher cipher, final byte[] in, final int inoff, final int inlen,
+//                                   final byte[] out, final int outoff) {
+//        Objects.requireNonNull(cipher, "cipher is null");
+//        Objects.requireNonNull(in, "in is null");
+//        if (inoff < 0) {
+//            throw new IllegalArgumentException("inoff(" + inoff + ") is negative");
+//        }
+//        if (inlen < 0) {
+//            throw new IllegalArgumentException("inlen(" + inlen + ") is negative");
+//        }
+//        if (inoff + inlen > in.length) {
+//            throw new IllegalArgumentException(
+//                    "inoff(" + inoff + ") + inlen(" + inlen + ") > in.length(" + in.length + ")");
+//        }
+//        Objects.requireNonNull(out, "out is null");
+//        if (outoff < 0) {
+//            throw new IllegalArgumentException("outoff(" + inoff + ") is negative");
+//        }
+//        if (outoff > out.length) {
+//            throw new IllegalArgumentException("outoff(" + outoff + ") > out.length(" + out.length + ")");
+//        }
+//        return processBytes_(cipher, in, inoff, inlen, out, outoff);
+//    }
+
     public static byte[] processBytes(final StreamCipher cipher, final byte[] in, final int inoff, final int inlen) {
         Objects.requireNonNull(cipher, "cipher is null");
         Objects.requireNonNull(in, "in is null");
@@ -34,14 +63,14 @@ public final class JinahyaStreamCipherUtils {
             throw new IllegalArgumentException(
                     "inoff(" + inoff + ") + inlen(" + inlen + ") > in.length(" + in.length + ")");
         }
-        for (var output = new byte[in.length == 0 ? 1 : in.length]; ; ) {
+        for (var out = new byte[in.length == 0 ? 1 : in.length]; ; ) {
             try {
-                final var processed = cipher.processBytes(in, inoff, inlen, output, 0);
-                return Arrays.copyOf(output, processed);
+                final var outlen = cipher.processBytes(in, inoff, inlen, out, 0);
+                return Arrays.copyOf(out, outlen);
             } catch (final DataLengthException dle) {
                 dle.printStackTrace();
-                System.err.println("doubling up output.length(" + output.length + ")");
-                output = new byte[output.length << 1];
+                System.err.println("doubling up out.length(" + out.length + ")");
+                out = new byte[out.length << 1];
             }
         }
     }
@@ -65,7 +94,9 @@ public final class JinahyaStreamCipherUtils {
             inoff = 0;
         }
         final var out = processBytes(cipher, in, inoff, inlen);
-        output.put(out);
+        output.put(out); // BufferOverflowException
+        // input's position should be modified only after the output.put(out) succeeded
+        input.position(input.position() + inlen);
         return out.length;
     }
 
