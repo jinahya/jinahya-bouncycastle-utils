@@ -1,4 +1,4 @@
-# jinahya-bouncycastle-utils
+# jinahya-bcprov
 
 [![Java CI with Maven](https://github.com/jinahya/jinahya-bouncycastle-utils/actions/workflows/maven.yml/badge.svg)](https://github.com/jinahya/jinahya-bouncycastle-utils/actions/workflows/maven.yml)
 

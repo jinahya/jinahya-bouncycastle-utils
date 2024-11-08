@@ -8,6 +8,7 @@ import java.util.Objects;
 
 public final class _PaddedBufferedBlockCipher_TestUtils {
 
+    // -----------------------------------------------------------------------------------------------------------------
     public static String cipherName(final PaddedBufferedBlockCipher cipher) {
         Objects.requireNonNull(cipher, "cipher is null");
         return _BlockCipher_TestUtils.cipherName(cipher.getUnderlyingCipher()) +

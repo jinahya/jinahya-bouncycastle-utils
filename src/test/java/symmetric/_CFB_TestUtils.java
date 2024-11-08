@@ -63,7 +63,8 @@ public final class _CFB_TestUtils {
                 .flatMap(c -> keySizeStreamSupplier.get().mapToObj(ks -> {
                     final var key = _Random_TestUtils.newRandomBytes(ks >> 3);
                     // initialisation vector must be between one and block size length
-                    final var iv = _Random_TestUtils.newRandomBytes(ThreadLocalRandom.current().nextInt(c.getBlockSize()) + 1);
+                    final var iv = _Random_TestUtils.newRandomBytes(
+                            ThreadLocalRandom.current().nextInt(c.getBlockSize()) + 1);
                     final var params = new ParametersWithIV(new KeyParameter(key), iv);
                     return Arguments.of(
                             Named.of(_TestUtils.cipherName(c), c),
